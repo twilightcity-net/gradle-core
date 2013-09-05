@@ -10,9 +10,9 @@ class IdeExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 	@Test
 	void idea_ShouldAddStandardSourceDirectoriesAndAdditionalTestConfigurations_IfIdePluginDeclaredBeforeTestPlugin() {
 		projectDir.newFile('build.gradle') << """
-            apply plugin: 'groovy'
-            apply plugin: 'ide-ext'
-            apply plugin: 'integration-test'
+apply plugin: 'groovy'
+apply plugin: 'ide-ext'
+apply plugin: 'integration-test'
         """
 		projectDir.newFolder('src', 'main', 'java')
 		projectDir.newFolder('src', 'test', 'groovy')
@@ -49,9 +49,9 @@ class IdeExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 	@Test
 	void eclipse_ShouldAddStandardSourceDirectoriesAndAdditionalTestConfigurations_IfIdePluginDeclaredAfterTestPlugin() {
 		projectDir.newFile('build.gradle') << """
-            apply plugin: 'groovy'
-            apply plugin: 'component-test'
-            apply plugin: 'ide-ext'
+apply plugin: 'groovy'
+apply plugin: 'component-test'
+apply plugin: 'ide-ext'
         """
 		projectDir.newFolder('src', 'main', 'java')
 		projectDir.newFolder('src', 'test', 'groovy')
