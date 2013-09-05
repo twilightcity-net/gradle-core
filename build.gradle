@@ -1,0 +1,23 @@
+buildscript {
+	dependencies {
+        classpath gradleApi()
+        classpath localGroovy()
+	}
+}
+
+apply plugin: 'bancvue'
+apply plugin: 'integration-test'
+
+repositories {
+    mavenLocal()
+	mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+
+    testCompile 'junit:junit:4.11'
+}
+
+check.dependsOn integrationTest
