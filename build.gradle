@@ -15,3 +15,7 @@ dependencies {
 }
 
 check.dependsOn integrationTest
+
+license {
+	name = 'BancVue, LTD'
+}
