@@ -26,15 +26,6 @@ class ProjectDefaultsPluginTest extends AbstractPluginTest {
 	}
 
 	@Test
-	void apply_ShouldSetJarBaseNameToArtifactId_IfArtifactIdSet() {
-		setArtifactId('some-artifact')
-
-		applyPlugin()
-
-		assert project.jar.baseName == 'some-artifact'
-	}
-
-	@Test
 	void apply_ShouldApplyJavaPluginAndSetCompatibility() {
 		project.ext.defaultsJavaVersion = '1.8'
 

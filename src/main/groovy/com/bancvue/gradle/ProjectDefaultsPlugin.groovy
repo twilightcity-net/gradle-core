@@ -39,7 +39,6 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 		setCompilerEncodingToUtf8()
 		addBuildDateAndJdkToJarManifest()
 		setJavaCompatibilityVersion()
-		setJarBaseNameToArtifactIdIfArtifactIdSet()
 	}
 
 	private void setDefaultCompileMemorySettings() {
@@ -85,12 +84,6 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	private void setJavaCompatibilityVersion() {
 		project.setProperty('sourceCompatibility', defaultsProperties.javaVersion)
 		project.setProperty('targetCompatibility', defaultsProperties.javaVersion)
-	}
-
-	private void setJarBaseNameToArtifactIdIfArtifactIdSet() {
-		if (project.hasProperty('artifactId')) {
-			project.jar.baseName = project.artifactId
-		}
 	}
 
 }
