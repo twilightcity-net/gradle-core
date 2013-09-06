@@ -26,12 +26,15 @@ class AbstractPluginIntegrationTest {
 
 	@Rule
 	public TemporaryFolder projectDir = new TemporaryFolder()
+	protected ProjectFileSystem projectFS
 	protected GradleRunner runner
 
 	@Before
 	void setUpRunner() {
 		runner = GradleRunnerFactory.create()
 		runner.directory = projectDir.root
+		projectFS = new ProjectFileSystem(projectDir.root)
+		projectFS.initBuildDir()
 	}
 
 	protected ExecutionResult run(String... args) {

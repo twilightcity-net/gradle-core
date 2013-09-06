@@ -1,14 +1,15 @@
 apply plugin: 'bancvue'
 apply plugin: 'integration-test'
+apply plugin: 'license-ext'
 
 repositories {
-    mavenLocal()
 	mavenCentral()
 }
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
+	compile 'nl.javadude.gradle.plugins:license-gradle-plugin:0.5.0'
 
     testCompile 'junit:junit:4.11'
 }
