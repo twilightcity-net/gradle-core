@@ -1,6 +1,7 @@
 package com.bancvue.gradle.custom
 
 import com.bancvue.gradle.test.AbstractPluginIntegrationTest
+import com.bancvue.gradle.test.TestFile
 import com.bancvue.zip.ZipArchive
 import org.junit.Test
 
@@ -8,9 +9,9 @@ class CustomGradlePluginIntegrationTest extends AbstractPluginIntegrationTest {
 
 	@Test
 	void buildCustomGradleDistro_ShouldBundleGradleCustomizationScript() {
-		File zipBaseDir = projectDir.newFolder('zipBase')
-		new File(zipBaseDir, 'emptyfile.txt').write("")
-		projectDir.newFile('build.gradle') << """
+		TestFile zipBaseDir = projectFS.mkdir("zipBase")
+		zipBaseDir.file('emptyfile.txt') << ""
+		projectFS.buildFile() << """
 ext {
     repositoryName = 'repo'
     repositoryPublicUrl = 'http://repo.domain/public'
@@ -40,7 +41,7 @@ println "Created cutomized gradle dist at \${buildCustomGradleDistro.archivePath
 
 		run('buildCustomGradleDistro')
 
-		File expectedZipFile = new File(projectDir.root, "build/distributions/gradle-bancvue-1.7-bv.1.0-bin.zip")
+		File expectedZipFile = projectFS.file("build/distributions/gradle-bancvue-1.7-bv.1.0-bin.zip")
 		assert expectedZipFile.exists()
 		ZipArchive archive = new ZipArchive(expectedZipFile)
 		String expectedCustomScript = archive.getContentForEntryWithNameLike('customized.gradle')

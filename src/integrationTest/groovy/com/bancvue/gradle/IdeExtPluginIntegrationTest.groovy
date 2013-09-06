@@ -9,24 +9,24 @@ class IdeExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 
 	@Test
 	void idea_ShouldAddStandardSourceDirectoriesAndAdditionalTestConfigurations_IfIdePluginDeclaredBeforeTestPlugin() {
-		projectDir.newFile('build.gradle') << """
+		projectFS.buildFile() << """
 apply plugin: 'groovy'
 apply plugin: 'ide-ext'
 apply plugin: 'integration-test'
         """
-		projectDir.newFolder('src', 'main', 'java')
-		projectDir.newFolder('src', 'test', 'groovy')
-		projectDir.newFolder('src', 'integrationTest', 'groovy')
+		projectFS.mkdir("src/main/java")
+		projectFS.mkdir("src/test/groovy")
+		projectFS.mkdir("src/integrationTest/groovy")
 
-		run('idea')
+		run("idea")
 
-		File expectedImlFile = new File(projectDir.root, "${projectDir.root.name}.iml")
+		File expectedImlFile = projectFS.file("${projectFS.name}.iml")
 		assert expectedImlFile.exists()
-		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, 'src/main/java', false)
-		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, 'src/test/groovy', true)
-		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, 'src/integrationTest/groovy', true)
+		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/main/java", false)
+		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/test/groovy", true)
+		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/integrationTest/groovy", true)
 		try {
-			assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, 'src/someOtherTest/groovy', true)
+			assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/someOtherTest/groovy", true)
 			fail("Test should have failed, something is likely wrong with positive validations")
 		} catch (Throwable ex) {}
 	}
@@ -48,24 +48,24 @@ apply plugin: 'integration-test'
 
 	@Test
 	void eclipse_ShouldAddStandardSourceDirectoriesAndAdditionalTestConfigurations_IfIdePluginDeclaredAfterTestPlugin() {
-		projectDir.newFile('build.gradle') << """
+		projectFS.buildFile() << """
 apply plugin: 'groovy'
 apply plugin: 'component-test'
 apply plugin: 'ide-ext'
         """
-		projectDir.newFolder('src', 'main', 'java')
-		projectDir.newFolder('src', 'test', 'groovy')
-		projectDir.newFolder('src', 'componentTest', 'groovy')
+		projectFS.mkdir("src/main/java")
+		projectFS.mkdir("src/test/groovy")
+		projectFS.mkdir("src/componentTest/groovy")
 
-		run('eclipse')
+		run("eclipse")
 
-		File expectedClasspathFile = new File(projectDir.root, ".classpath")
+		File expectedClasspathFile = projectFS.file(".classpath")
 		assert expectedClasspathFile.exists()
-		assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, 'src/main/java')
-		assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, 'src/test/groovy')
-		assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, 'src/componentTest/groovy')
+		assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, "src/main/java")
+		assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, "src/test/groovy")
+		assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, "src/componentTest/groovy")
 		try {
-			assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, 'src/someOtherTest/groovy')
+			assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, "src/someOtherTest/groovy")
 			fail("Test should have failed, something is likely wrong with positive validations")
 		} catch (Throwable ex) {}
 	}
@@ -73,7 +73,7 @@ apply plugin: 'ide-ext'
 	private void assertEclipseModuleFileContainsExpectedSourceFolder(File expectedClasspathFile, String folderName) {
 		def classpath = new XmlParser().parseText(expectedClasspathFile.text)
 		List result = classpath.classpathentry.findAll {
-			it.@kind == 'src' && it.@path == folderName
+			it.@kind == "src" && it.@path == folderName
 		}
 
 		if (!result) {
