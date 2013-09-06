@@ -12,7 +12,7 @@ apply plugin: 'test-ext'
 
 mainTestJar.archiveName='mainTest.jar'
         """
-		projectFS.file("src/mainTest/java/Class.java") << "class Class {}"
+		projectFS.emptyClassFile("src/mainTest/java/Class.java")
 
 		run("check", "mainTestJar")
 

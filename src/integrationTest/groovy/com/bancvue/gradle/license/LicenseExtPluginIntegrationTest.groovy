@@ -14,7 +14,7 @@ class LicenseExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 	@Test
 	void licenseFormat_ShouldWriteLicenseHeaderToSourceFiles() {
 		List<File> srcFiles = ["src/main/java", "src/mainTest/java", "src/test/java"].collect{ String path ->
-			projectFS.file(path, "Class.java") << "class Class {}"
+			projectFS.emptyClassFile("${path}/Class.java")
 		}
 		projectFS.buildFile() << """
 ext {
@@ -37,7 +37,7 @@ apply plugin: 'license-ext'
 
 	@Test
 	void licenseFormat_ShouldNotFailIfBuildIsFirstCleaned() {
-		File srcFile = projectFS.file('src/main/java/Class.java') << "class Class {}"
+		File srcFile = projectFS.emptyClassFile('src/main/java/Class.java')
 		projectFS.buildFile() << """
 apply plugin: 'java'
 apply plugin: 'license-ext'
@@ -57,7 +57,7 @@ license {
 
 	@Test
 	void licenseFormat_ShouldUseAlternativeHeaderIfProvided() {
-		File srcFile = projectFS.file('src/main/java/Class.java') << "class Class {}"
+		File srcFile = projectFS.emptyClassFile('src/main/java/Class.java')
 		projectFS.file('src/main/resources/ALT_HEADER') << "ALTERNATIVE HEADER"
 		projectFS.buildFile() << """
 ext {
@@ -77,7 +77,7 @@ apply plugin: 'license-ext'
 
 	@Test
 	void licenseCheck_ShouldCheckLicenseHeaderInSourceFiles() {
-		File srcFile = projectFS.file('src/main/java/Class.java') << "class Class {}"
+		File srcFile = projectFS.emptyClassFile('src/main/java/Class.java')
 		projectFS.buildFile() << """
 apply plugin: 'java'
 apply plugin: 'license-ext'

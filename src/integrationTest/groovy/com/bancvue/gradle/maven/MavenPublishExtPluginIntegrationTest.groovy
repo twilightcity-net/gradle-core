@@ -9,7 +9,7 @@ class MavenPublishExtPluginIntegrationTest extends AbstractPluginIntegrationTest
 
 	@Test
 	void shouldPublishArtifactAndSources() {
-		projectFS.file("src/main/java/Class.java") << "class Class {}"
+		projectFS.emptyClassFile("src/main/java/Class.java")
 		TestFile mavenRepo = projectFS.mkdir("build/maven-repo")
 		projectFS.buildFile() << """
 ext.repositoryReleaseUrl='${mavenRepo.toURI()}'
