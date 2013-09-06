@@ -1,6 +1,7 @@
 package com.bancvue.gradle.license
 
 import com.bancvue.gradle.test.AbstractPluginIntegrationTest
+import org.gradle.testkit.functional.ExecutionResult
 import org.junit.Test
 
 class LicenseExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
@@ -11,11 +12,10 @@ class LicenseExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 	 **************************************************************************************************************/
 
 	@Test
-	void shouldWriteLicenseHeaderToSourceFiles() {
+	void licenseFormat_ShouldWriteLicenseHeaderToSourceFiles() {
 		List<File> srcFiles = ["src/main/java", "src/mainTest/java", "src/test/java"].collect{ String path ->
 			projectFS.file(path, "Class.java") << "class Class {}"
 		}
-
 		projectFS.buildFile() << """
 ext {
 	licenseName='BancVue'
@@ -36,9 +36,8 @@ apply plugin: 'license-ext'
 	}
 
 	@Test
-	void shouldNotFailIfBuildIsFirstCleaned() {
+	void licenseFormat_ShouldNotFailIfBuildIsFirstCleaned() {
 		File srcFile = projectFS.file('src/main/java/Class.java') << "class Class {}"
-
 		projectFS.buildFile() << """
 apply plugin: 'java'
 apply plugin: 'license-ext'
@@ -57,10 +56,9 @@ license {
 	}
 
 	@Test
-	void shouldUseAlternativeHeaderIfProvided() {
+	void licenseFormat_ShouldUseAlternativeHeaderIfProvided() {
 		File srcFile = projectFS.file('src/main/java/Class.java') << "class Class {}"
 		projectFS.file('src/main/resources/ALT_HEADER') << "ALTERNATIVE HEADER"
-
 		projectFS.buildFile() << """
 ext {
 	licenseHeaderResourcePath='/ALT_HEADER'
@@ -75,6 +73,19 @@ apply plugin: 'license-ext'
 		String text = srcFile.text
 		println text
 		assert text =~ /ALTERNATIVE HEADER/
+	}
+
+	@Test
+	void licenseCheck_ShouldCheckLicenseHeaderInSourceFiles() {
+		File srcFile = projectFS.file('src/main/java/Class.java') << "class Class {}"
+		projectFS.buildFile() << """
+apply plugin: 'java'
+apply plugin: 'license-ext'
+        """
+
+		ExecutionResult result = run("licenseCheck")
+
+		assert result.standardOutput =~ /Missing header in: .*${srcFile}/
 	}
 
 }

@@ -22,7 +22,8 @@ class LicenseExtPlugin implements Plugin<Project> {
 		applyLicensePlugin()
 		configureApache2LicenseHeader()
 		setGroupOnAllFormatLicenseTasks()
-		addLicenseAllTask()
+		addFormatAllLicenseTask()
+		addCheckAllLicenseTask()
 	}
 
 	private void applyLicensePlugin() {
@@ -117,13 +118,29 @@ class LicenseExtPlugin implements Plugin<Project> {
 		}
 	}
 
-	private void addLicenseAllTask() {
+	private void addFormatAllLicenseTask() {
 		Task licenseFormat = project.tasks.create('licenseFormat')
 		licenseFormat.group = GROUP_NAME
-		licenseFormat.description = 'Scanning license on files from all available source sets'
+		licenseFormat.description = 'Apply license on files from all available source sets'
 
 		getFormatLicensesTasks().each { License task ->
-			licenseFormat.dependsOn task
+			licenseFormat.dependsOn(task)
+		}
+	}
+
+	private void addCheckAllLicenseTask() {
+		Task licenseCheck = project.tasks.create('licenseCheck')
+		licenseCheck.group = GROUP_NAME
+		licenseCheck.description = 'Check license on files from all available source sets'
+
+		getCheckLicensesTasks().each { License task ->
+			licenseCheck.dependsOn(task)
+		}
+	}
+
+	private Set<License> getCheckLicensesTasks() {
+		project.tasks.withType(License).findAll { License task ->
+			task.check
 		}
 	}
 
