@@ -85,7 +85,7 @@ apply plugin: 'license-ext'
 
 		ExecutionResult result = run("licenseCheck")
 
-		assert result.standardOutput =~ /Missing header in: .*${srcFile}/
+		assert result.standardOutput =~ /Missing header in: .*${srcFile.name}/
 	}
 
 }
