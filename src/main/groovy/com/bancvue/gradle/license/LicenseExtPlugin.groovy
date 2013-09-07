@@ -20,6 +20,7 @@ class LicenseExtPlugin implements Plugin<Project> {
 		applyLicensePlugin()
 		configureApache2LicenseHeader()
 		setGroupOnAllFormatLicenseTasks()
+		excludedConfiguredFileExtensions()
 		addFormatAllLicenseTask()
 		addCheckAllLicenseTask()
 	}
@@ -88,6 +89,25 @@ class LicenseExtPlugin implements Plugin<Project> {
 		getFormatLicensesTasks().each { License task ->
 			task.group = GROUP_NAME
 		}
+	}
+
+	private void excludedConfiguredFileExtensions() {
+		List<String> expressions = getExcludedFileExpressions()
+		if (expressions) {
+			project.tasks.withType(License).each { License licenseTask ->
+				licenseTask.exclude expressions
+			}
+		}
+	}
+
+	private List<String> getExcludedFileExpressions() {
+		List<String> expressions = []
+		if (licenseProperties) {
+			expressions = licenseProperties.excludedFileExtensions.collect { String extension ->
+				"**/*.${extension}"
+			}
+		}
+		expressions
 	}
 
 	private void addFormatAllLicenseTask() {

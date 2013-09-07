@@ -2,6 +2,7 @@ package com.bancvue.gradle.license
 
 import com.bancvue.gradle.AbstractPluginTest
 import com.bancvue.gradle.test.TestFile
+import nl.javadude.gradle.plugins.license.License
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,6 +43,19 @@ class LicenseExtPluginTest extends AbstractPluginTest {
 
 		assert headerFile.text =~ /new content/
 		assert !(headerFile.text =~ /existing content/)
+	}
+
+	@Test
+	void apply_ShouldExcludeDefinedExtensionsFromFormat() {
+		project.ext["licenseExcludedFileExtensions"] = ["properties", "yml"]
+
+		project.apply(plugin: "java")
+		applyPlugin()
+
+		assert project.tasks.withType(License)
+		project.tasks.withType(License) { License task ->
+			assert task.excludes == ["**/*.properties", "**/*.yml"] as Set
+		}
 	}
 
 }

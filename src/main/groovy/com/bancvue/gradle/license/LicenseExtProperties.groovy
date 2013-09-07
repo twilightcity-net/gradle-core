@@ -10,6 +10,7 @@ class LicenseExtProperties extends DefaultProjectPropertyContainer {
 
 	String name
 	String headerResourcePath = "/headers/APACHE_HEADER"
+	List<String> excludedFileExtensions = ["properties", "json", "yml", "yaml"]
 
 	LicenseExtProperties(Project project) {
 		super(project, NAME)
