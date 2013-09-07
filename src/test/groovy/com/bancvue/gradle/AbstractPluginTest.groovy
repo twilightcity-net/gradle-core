@@ -1,5 +1,6 @@
 package com.bancvue.gradle
 
+import com.bancvue.gradle.test.ProjectFileSystem
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
@@ -12,6 +13,7 @@ abstract class AbstractPluginTest {
 	@Rule
 	public TemporaryFolder projectDir = new TemporaryFolder()
 	protected Project project
+	protected ProjectFileSystem projectFS
 	protected String pluginName
 
 	AbstractPluginTest(String pluginName) {
@@ -21,6 +23,7 @@ abstract class AbstractPluginTest {
 	@Before
 	void setUpProject() {
 		project = createProject()
+		projectFS = new ProjectFileSystem(project.rootDir)
 	}
 
 	protected Project createProject() {
