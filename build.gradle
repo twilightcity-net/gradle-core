@@ -28,3 +28,4 @@ license {
 tasks.withType(License).each { licenseTask ->
 	licenseTask.exclude 'org/gradle/testkit/**'
 }
+licenseMain.exclude 'headers/*'
