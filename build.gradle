@@ -12,6 +12,7 @@ dependencies {
 	compile 'nl.javadude.gradle.plugins:license-gradle-plugin:0.6.0'
 
     testCompile 'junit:junit:4.11'
+	testCompile 'org.mockito:mockito-all:1.9.5'
 }
 
 check.dependsOn integrationTest

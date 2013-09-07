@@ -4,8 +4,6 @@ import nl.javadude.gradle.plugins.license.License
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.tasks.SourceSet
-
 
 class LicenseExtPlugin implements Plugin<Project> {
 
@@ -14,16 +12,22 @@ class LicenseExtPlugin implements Plugin<Project> {
 
 	private Project project
 	private LicenseExtProperties licenseProperties
+	private HeaderContentResolver headerContentResolver
 
 	@Override
 	void apply(Project project) {
-		this.project = project
-		licenseProperties = new LicenseExtProperties(project)
+		init(project)
 		applyLicensePlugin()
 		configureApache2LicenseHeader()
 		setGroupOnAllFormatLicenseTasks()
 		addFormatAllLicenseTask()
 		addCheckAllLicenseTask()
+	}
+
+	private void init(Project project) {
+		this.project = project
+		licenseProperties = new LicenseExtProperties(project)
+		headerContentResolver = new HeaderContentResolver.Impl(project)
 	}
 
 	private void applyLicensePlugin() {
@@ -54,10 +58,14 @@ class LicenseExtPlugin implements Plugin<Project> {
 
 	private void writeDefaultHeaderFileIfHeaderNotOverridden() {
 		if (isDefaultHeaderSetOnAnyLicenseTask()) {
-			File defaultHeaderFile = getDefaultHeaderFile()
-			defaultHeaderFile.parentFile.mkdirs()
-			defaultHeaderFile << acquireHeaderResourceContent()
+			writeDefaultHeaderFile()
 		}
+	}
+
+	private void writeDefaultHeaderFile() {
+		File defaultHeaderFile = getDefaultHeaderFile()
+		defaultHeaderFile.parentFile.mkdirs()
+		defaultHeaderFile.write(acquireHeaderResourceContent())
 	}
 
 	private boolean isDefaultHeaderSetOnAnyLicenseTask() {
@@ -68,40 +76,12 @@ class LicenseExtPlugin implements Plugin<Project> {
 		}
 	}
 
-	private String acquireHeaderResourceContent() {
-		String resourceName = licenseProperties.headerResourcePath
-		def resource = getHeaderFromSourceSetOrPath(resourceName)
-		if (resource == null) {
-			throw new RuntimeException("Failed to resolve resource with name=${resourceName}")
-		}
-		resource.text
-	}
-
-	private def getHeaderFromSourceSetOrPath(String resourceName) {
-		def resource = getHeaderResourceFromProjectSourceSets(resourceName)
-		if (resource == null) {
-			resource = getClass().getResource(resourceName)
-		}
-		resource
-	}
-
-	private File getHeaderResourceFromProjectSourceSets(String resourceName) {
-		File headerResourceFile = null
-		def srcDirs = project.sourceSets.collect { SourceSet sourceSet ->
-			sourceSet.resources.srcDirs
-		}
-
-		srcDirs*.each { File srcDir ->
-			File file = new File(srcDir, resourceName)
-			if (!headerResourceFile && file.exists()) {
-				headerResourceFile = file
-			}
-		}
-		headerResourceFile
-	}
-
 	private File getDefaultHeaderFile() {
 		new File(project.buildDir, licenseProperties.headerResourcePath)
+	}
+
+	private String acquireHeaderResourceContent() {
+		headerContentResolver.acquireHeaderResourceContent(licenseProperties.headerResourcePath)
 	}
 
 	private void setGroupOnAllFormatLicenseTasks() {
