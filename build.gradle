@@ -17,5 +17,5 @@ dependencies {
 check.dependsOn integrationTest
 
 license {
-	name = 'BancVue, LTD'
+	ext.name = 'BancVue, LTD'
 }
