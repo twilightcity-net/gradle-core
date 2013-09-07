@@ -11,6 +11,7 @@ class DefaultProjectPropertyContainerTest {
 	static class TestContainer extends DefaultProjectPropertyContainer {
 
 		String value
+		boolean boolValue
 
 		TestContainer(Project project) {
 			super(project, "test")
@@ -47,6 +48,14 @@ class DefaultProjectPropertyContainerTest {
 		container.value = "propertyValue"
 
 		assert container.value == "propertyValue"
+	}
+
+	@Test
+	void propertyAccess_ShouldRespectNonStringTypes() {
+		container.boolValue = true
+
+		assert container.boolValue
+		assert container.boolValue.class == Boolean.class
 	}
 
 }

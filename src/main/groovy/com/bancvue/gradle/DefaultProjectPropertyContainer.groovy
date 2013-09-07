@@ -30,7 +30,7 @@ class DefaultProjectPropertyContainer {
 	}
 
 	def getProperty(String propertyName) {
-		String value = getProjectProperty(propertyName)
+		def value = getProjectProperty(propertyName)
 		if (value == null) {
 			value = getDefaultProperty(propertyName)
 		}
@@ -38,14 +38,14 @@ class DefaultProjectPropertyContainer {
 		value
 	}
 
-	private String getDefaultProperty(String propertyName) {
+	private def getDefaultProperty(String propertyName) {
 		MetaProperty meta = metaClass.getMetaProperty(propertyName)
 		meta.getProperty(this)
 	}
 
-	private String getProjectProperty(String propertyName) {
+	private def getProjectProperty(String propertyName) {
 		String containerPropertyName = "${containerName}${propertyName.capitalize()}"
-		String value = null
+		def value = null
 		if (project?.hasProperty(containerPropertyName)) {
 			value = project.property(containerPropertyName)
 		}
