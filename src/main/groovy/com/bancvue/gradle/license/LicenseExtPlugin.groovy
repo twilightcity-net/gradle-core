@@ -100,14 +100,6 @@ class LicenseExtPlugin implements Plugin<Project> {
 		headerResourceFile
 	}
 
-	private String acquireResourceAsText(String resourceName) {
-		URL resource = getClass().getResource(resourceName)
-		if (resource == null) {
-			throw new RuntimeException("Failed to resolve resource with name=${resourceName}")
-		}
-		resource.text
-	}
-
 	private File getDefaultHeaderFile() {
 		new File(project.buildDir, licenseProperties.headerResourcePath)
 	}
