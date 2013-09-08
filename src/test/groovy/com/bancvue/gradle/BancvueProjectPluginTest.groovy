@@ -16,6 +16,7 @@
 package com.bancvue.gradle
 
 import com.bancvue.gradle.maven.MavenPublishExtPlugin
+import com.bancvue.gradle.test.AbstractPluginTest
 import com.bancvue.gradle.test.ComponentTestPlugin
 import com.bancvue.gradle.test.TestExtPlugin
 import org.gradle.testfixtures.ProjectBuilder

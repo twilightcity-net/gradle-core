@@ -15,6 +15,7 @@
  */
 package com.bancvue.gradle
 
+import com.bancvue.gradle.test.AbstractPluginTest
 import org.junit.Test
 
 class IdeExtPluginTest extends AbstractPluginTest {

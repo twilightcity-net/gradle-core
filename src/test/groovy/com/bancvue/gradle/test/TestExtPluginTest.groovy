@@ -15,7 +15,6 @@
  */
 package com.bancvue.gradle.test
 
-import com.bancvue.gradle.AbstractPluginTest
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.api.tasks.testing.logging.TestStackTraceFilter

@@ -15,7 +15,7 @@
  */
 package com.bancvue.gradle.pmd
 
-import com.bancvue.gradle.AbstractPluginTest
+import com.bancvue.gradle.test.AbstractPluginTest
 import com.google.common.io.Files
 import org.junit.Before
 import org.junit.Test

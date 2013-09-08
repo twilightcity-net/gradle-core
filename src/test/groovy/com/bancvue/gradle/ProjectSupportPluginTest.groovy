@@ -17,6 +17,7 @@ package com.bancvue.gradle
 
 import com.bancvue.gradle.tasks.ClearArtifactCache
 import com.bancvue.gradle.tasks.PrintClasspath
+import com.bancvue.gradle.test.AbstractPluginTest
 import org.junit.Before
 import org.junit.Test
 

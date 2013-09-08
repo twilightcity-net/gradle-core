@@ -15,7 +15,7 @@
  */
 package com.bancvue.gradle.maven
 
-import com.bancvue.gradle.AbstractPluginTest
+import com.bancvue.gradle.test.AbstractPluginTest
 import org.gradle.api.Task
 import org.gradle.api.artifacts.ArtifactRepositoryContainer
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository

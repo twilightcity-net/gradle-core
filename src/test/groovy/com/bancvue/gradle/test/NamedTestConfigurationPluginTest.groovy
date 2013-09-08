@@ -15,7 +15,6 @@
  */
 package com.bancvue.gradle.test
 
-import com.bancvue.gradle.AbstractPluginTest
 import org.gradle.api.Task
 import org.junit.Before
 import org.junit.Test

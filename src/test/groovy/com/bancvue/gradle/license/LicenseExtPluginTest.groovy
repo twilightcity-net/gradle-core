@@ -15,7 +15,7 @@
  */
 package com.bancvue.gradle.license
 
-import com.bancvue.gradle.AbstractPluginTest
+import com.bancvue.gradle.test.AbstractPluginTest
 import com.bancvue.gradle.ResourceResolver
 import com.bancvue.gradle.test.TestFile
 import nl.javadude.gradle.plugins.license.License
