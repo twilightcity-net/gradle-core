@@ -39,10 +39,14 @@ class TestFile extends File {
 		new TestFile(new File(parentDir, fileName))
 	}
 
-	public TestFile leftShift(Object content) {
+	TestFile leftShift(Object content) {
 		parentFile.mkdirs()
 		super.leftShift(content)
 		this
+	}
+
+	URL toURL() {
+		toURI().toURL()
 	}
 
 }
