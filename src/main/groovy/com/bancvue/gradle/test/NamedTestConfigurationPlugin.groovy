@@ -77,8 +77,8 @@ class NamedTestConfigurationPlugin implements Plugin<Project> {
 			group = 'Verification'
 			testClassesDir = project.sourceSets."${configurationName}".output.classesDir
 			classpath = project.sourceSets."${configurationName}".runtimeClasspath
-			testReportDir = new File(project.reporting.baseDir, "${configurationName}s")
-			testResultsDir = new File(project.buildDir, "${configurationName}-results")
+			reports.html.destination = new File(project.reporting.baseDir, "${configurationName}s")
+			reports.junitXml.destination = new File(project.buildDir, "${configurationName}-results")
 		}
 		testTask
 	}

@@ -80,8 +80,8 @@ class NamedTestConfigurationPluginTest extends AbstractPluginTest {
 		assert functionalTestTask.group == 'Verification'
 		assert functionalTestTask.testClassesDir == project.sourceSets.functionalTest.output.classesDir
 		assert functionalTestTask.classpath == project.sourceSets.functionalTest.runtimeClasspath
-		assert functionalTestTask.testReportDir == new File(project.buildDir, 'reports/functionalTests')
-		assert functionalTestTask.testResultsDir == new File(project.buildDir, 'functionalTest-results')
+		assert functionalTestTask.reports.html.destination == new File(project.buildDir, 'reports/functionalTests')
+		assert functionalTestTask.reports.junitXml.destination == new File(project.buildDir, 'functionalTest-results')
 	}
 
 	@Test
