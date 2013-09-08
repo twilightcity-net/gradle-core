@@ -34,7 +34,7 @@ class DefaultProjectPropertyContainer {
 		if (value == null) {
 			value = getDefaultProperty(propertyName)
 		}
-		log.debug("getProperty(${propertyName}) : ${value}")
+		log.debug("[${containerName}] getProperty(${propertyName}) : ${value}")
 		value
 	}
 
