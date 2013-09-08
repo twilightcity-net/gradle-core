@@ -39,24 +39,40 @@ interface ResourceResolver {
 		}
 
 		URL acquireResourceURL(String resourcePath) {
-			def resource = getResourceFromSourceSetOrPath(resourcePath)
+			def resource = getResourceFromResourceDirOrProjectDirOrPath(resourcePath)
 			if (resource == null) {
 				throw new RuntimeException("Failed to resolve resource with path=${resourcePath}")
 			}
 			resource
 		}
 
-		private URL getResourceFromSourceSetOrPath(String resourceName) {
+		private URL getResourceFromResourceDirOrProjectDirOrPath(String resourceName) {
 			URL resource = getNamedResourceAsURLFromProjectResourceDirs(resourceName)
+			if (resource == null) {
+				resource = getNamedResourceAsURLFromProjectRoot(resourceName)
+			}
 			if (resource == null) {
 				resource = getClass().getResource(resourceName)
 			}
 			resource
 		}
 
+		private URL getNamedResourceAsURLFromProjectRoot(String resourceName) {
+			File file = project.file(resourceName)
+			toURL(file)
+		}
+
 		private URL getNamedResourceAsURLFromProjectResourceDirs(String resourceName) {
 			File headerResourceFile = getNamedResourceAsFileFromProjectResourceDirs(resourceName)
-			headerResourceFile != null ? headerResourceFile.toURI().toURL() : null
+			toURL(headerResourceFile)
+		}
+
+		private URL toURL(File file) {
+			URL url = null
+			if ((file != null) && file.exists()) {
+				url = file.toURI().toURL()
+			}
+			url
 		}
 
 		private File getNamedResourceAsFileFromProjectResourceDirs(String resourceName) {

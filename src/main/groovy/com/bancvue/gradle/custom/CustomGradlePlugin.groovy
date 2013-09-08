@@ -15,6 +15,7 @@
  */
 package com.bancvue.gradle.custom
 
+import com.bancvue.gradle.ResourceResolver
 import com.bancvue.gradle.maven.MavenPublishExtPlugin
 import com.bancvue.gradle.maven.MavenRepositoryProperties
 import org.gradle.api.Plugin
@@ -29,9 +30,11 @@ class CustomGradlePlugin implements Plugin<Project> {
 	static final String PLUGIN_NAME = 'custom-gradle'
 
 	private Project project
+	private CustomGradleProperties gradleProperties
 
 	public void apply(Project project) {
 		this.project = project
+		gradleProperties = new CustomGradleProperties(project)
 		applyJavaPlugin()
 		applyMavenPublishExtPlugin()
 		addBuildCustomGradleDistroTask()
@@ -48,7 +51,6 @@ class CustomGradlePlugin implements Plugin<Project> {
 	}
 
 	private DownloadGradle addDownloadGradleTask() {
-		CustomGradleProperties gradleProperties = new CustomGradleProperties(project)
 		DownloadGradle downloadGradleTask = project.tasks.create('downloadGradle', DownloadGradle)
 		downloadGradleTask.configure {
 			description = 'Download Gradle version from Gradle distributions website'
@@ -59,7 +61,6 @@ class CustomGradlePlugin implements Plugin<Project> {
 	}
 
 	private void addBuildCustomGradleDistroTask() {
-		CustomGradleProperties gradleProperties = new CustomGradleProperties(project)
 		DownloadGradle downloadGradleTask = addDownloadGradleTask()
 		Task buildCustomGradleDistroTask = project.tasks.create('buildCustomGradleDistro', Zip)
 		buildCustomGradleDistroTask.configure {
@@ -87,39 +88,19 @@ class CustomGradlePlugin implements Plugin<Project> {
 	}
 
 	private String getGradleInitializationScriptContent() {
-		MavenRepositoryProperties repositoryProperties = new MavenRepositoryProperties(project)
-		"""
-println "Using the BancVue gradle"
-
-allprojects {
-    buildscript {
-        repositories {
-            mavenLocal()
-            maven {
-                url "${repositoryProperties.publicUrl}"
-            }
-        }
-    }
-
-    project.ext {
-        repositoryName = "${repositoryProperties.name}"
-        repositoryPublicUrl = "${repositoryProperties.publicUrl}"
-        repositorySnapshotUrl = "${repositoryProperties.snapshotUrl}"
-        repositoryReleaseUrl = "${repositoryProperties.releaseUrl}"
-    }
-}
-"""
+		ResourceResolver resolver = new ResourceResolver.Impl(project)
+		resolver.acquireResourceContent(gradleProperties.scriptResourcePath)
 	}
 
 	private void addMavenPublication() {
-		CustomGradleProperties customGradle = new CustomGradleProperties(project)
 		project.publishing {
 			Task buildCustomGradleDistroTask = project.tasks.getByName('buildCustomGradleDistro')
 			publications {
 				"customGradleDistro"(MavenPublication) {
 					artifact buildCustomGradleDistroTask
-					artifactId = customGradle.artifactId
-					version = customGradle.version
+					groupId = gradleProperties.groupId
+					artifactId = gradleProperties.artifactId
+					version = gradleProperties.version
 				}
 			}
 		}
@@ -134,11 +115,10 @@ allprojects {
 
 	private void createDistributionUrl() {
 		MavenRepositoryProperties repository = new MavenRepositoryProperties(project)
-		CustomGradleProperties customGradle = new CustomGradleProperties(project)
-		// TODO: will fail if customGradle.groupName is null, need test and need to figure out what to do in that case
+		// TODO: will fail if gradleProperties.groupId is null, need test and need to figure out what to do in that case
 		"${repository.releaseUrl}/" +
-				"${customGradle.groupName.replaceAll('.', '/')}/" +
-				"${customGradle.artifactId}/${customGradle.version}/" +
-				"${customGradle.artifactId}-${customGradle.version}-bin.zip"
+				"${gradleProperties.groupId.replaceAll('.', '/')}/" +
+				"${gradleProperties.artifactId}/${gradleProperties.version}/" +
+				"${gradleProperties.artifactId}-${gradleProperties.version}-bin.zip"
 	}
 }

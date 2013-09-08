@@ -23,10 +23,11 @@ class CustomGradleProperties extends DefaultProjectPropertyContainer {
 
 	private static final String NAME = "customGradle"
 
-	String groupName
+	String groupId
 	String artifactId
 	String version
 	String baseVersion
+	String scriptResourcePath
 
 	CustomGradleProperties(Project project) {
 		super(project, NAME)

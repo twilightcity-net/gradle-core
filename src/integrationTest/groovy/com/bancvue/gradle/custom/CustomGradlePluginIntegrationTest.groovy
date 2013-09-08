@@ -24,19 +24,26 @@ class CustomGradlePluginIntegrationTest extends AbstractPluginIntegrationTest {
 
 	@Test
 	void buildCustomGradleDistro_ShouldBundleGradleCustomizationScript() {
+		TestFile mavenRepo = projectFS.mkdir("build/maven-repo")
 		TestFile zipBaseDir = projectFS.mkdir("zipBase")
 		zipBaseDir.file('emptyfile.txt') << ""
-		projectFS.buildFile() << """
+		projectFS.file('custom.gradle') << """
 ext {
     repositoryName = 'repo'
     repositoryPublicUrl = 'http://repo.domain/public'
     repositorySnapshotUrl = 'http://repo.domain/snapshots'
     repositoryReleaseUrl = 'http://repo.domain/releases'
-
+}
+"""
+		projectFS.buildFile() << """
+ext {
     customGradleBaseVersion = "1.7"
     customGradleVersion = "1.7-bv.1.0"
-    customGradleGroupName = "com.bancvue"
+    customGradleGroupId = "com.bancvue"
     customGradleArtifactId = "gradle-bancvue"
+    customGradleScriptResourcePath = "custom.gradle"
+
+	repositoryReleaseUrl='${mavenRepo.toURI()}'
 }
 
 apply plugin: 'custom-gradle'
@@ -54,17 +61,15 @@ downloadGradle.gradleDownloadBase = "file:///\${createDownloadArchive.destinatio
 println "Created cutomized gradle dist at \${buildCustomGradleDistro.archivePath}"
         """
 
-		run('buildCustomGradleDistro')
+		run('publishCustomGradleDistroPublicationToRepoRepository')
 
-		File expectedZipFile = projectFS.file("build/distributions/gradle-bancvue-1.7-bv.1.0-bin.zip")
+		File expectedZipFile = mavenRepo.file("com/bancvue/gradle-bancvue/1.7-bv.1.0/gradle-bancvue-1.7-bv.1.0-bin.zip")
 		assert expectedZipFile.exists()
 		ZipArchive archive = new ZipArchive(expectedZipFile)
-		String expectedCustomScript = archive.getContentForEntryWithNameLike('customized.gradle')
-		assert expectedCustomScript
-		assert expectedCustomScript =~ 'url "http://repo.domain/public"'
-		assert expectedCustomScript =~ 'repositoryPublicUrl = "http://repo.domain/public"'
-		assert expectedCustomScript =~ 'repositorySnapshotUrl = "http://repo.domain/snapshots"'
-		assert expectedCustomScript =~ 'repositoryReleaseUrl = "http://repo.domain/releases"'
+		String expectedCustomScript = archive.acquireContentForEntryWithNameLike('customized.gradle')
+		assert expectedCustomScript =~ "repositoryPublicUrl = 'http://repo.domain/public'"
+		assert expectedCustomScript =~ "repositorySnapshotUrl = 'http://repo.domain/snapshots'"
+		assert expectedCustomScript =~ "repositoryReleaseUrl = 'http://repo.domain/releases'"
 	}
 
 }
