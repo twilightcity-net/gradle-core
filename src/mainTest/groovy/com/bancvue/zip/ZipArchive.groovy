@@ -29,7 +29,7 @@ class ZipArchive {
 		this.zip = new ZipFile(file)
 	}
 
-	String getContentForEntryWithNameLike(String name) {
+	String acquireContentForEntryWithNameLike(String name) {
 		ZipEntry entry = zip.entries().find { ZipEntry entry ->
 			entry.name =~ /${name}/
 		}
@@ -38,4 +38,5 @@ class ZipArchive {
 		}
 		zip.getInputStream(entry).text
 	}
+
 }
