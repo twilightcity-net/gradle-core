@@ -76,7 +76,7 @@ license {
 		projectFS.file('src/main/resources/ALT_HEADER') << "ALTERNATIVE HEADER"
 		projectFS.buildFile() << """
 ext {
-	licenseHeaderResourcePath='/ALT_HEADER'
+	licenseHeaderResourcePath='ALT_HEADER'
 }
 
 apply plugin: 'java'

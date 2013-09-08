@@ -52,9 +52,13 @@ interface ResourceResolver {
 				resource = getNamedResourceAsURLFromProjectRoot(resourceName)
 			}
 			if (resource == null) {
-				resource = getClass().getResource(resourceName)
+				resource = getNamedResourceFromClasspath(resourceName)
 			}
 			resource
+		}
+
+		private URL getNamedResourceFromClasspath(String resourceName) {
+			getClass().getClassLoader().getResource(resourceName)
 		}
 
 		private URL getNamedResourceAsURLFromProjectRoot(String resourceName) {
