@@ -16,6 +16,7 @@
 package com.bancvue.gradle.license
 
 import com.bancvue.gradle.AbstractPluginTest
+import com.bancvue.gradle.ResourceResolver
 import com.bancvue.gradle.test.TestFile
 import nl.javadude.gradle.plugins.license.License
 import org.junit.Before
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.when
 class LicenseExtPluginTest extends AbstractPluginTest {
 
 	@Mock
-	private HeaderContentResolver headerContentResolver
+	private ResourceResolver headerContentResolver
 	private LicenseExtPlugin plugin
 	private LicenseExtProperties licenseProperties
 
@@ -52,7 +53,7 @@ class LicenseExtPluginTest extends AbstractPluginTest {
 	void writeDefaultHeaderFile_ShouldOverwriteAnyExistingContent() {
 		licenseProperties.headerResourcePath = "HEADER"
 		TestFile headerFile = projectFS.file("build/HEADER") << "existing content"
-		when(headerContentResolver.acquireHeaderResourceContent(anyString())).thenReturn("new content")
+		when(headerContentResolver.acquireResourceContent(anyString())).thenReturn("new content")
 
 		plugin.writeDefaultHeaderFile()
 

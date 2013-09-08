@@ -15,6 +15,7 @@
  */
 package com.bancvue.gradle.license
 
+import com.bancvue.gradle.ResourceResolver
 import nl.javadude.gradle.plugins.license.License
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -27,7 +28,7 @@ class LicenseExtPlugin implements Plugin<Project> {
 
 	private Project project
 	private LicenseExtProperties licenseProperties
-	private HeaderContentResolver headerContentResolver
+	private ResourceResolver headerContentResolver
 
 	@Override
 	void apply(Project project) {
@@ -43,7 +44,7 @@ class LicenseExtPlugin implements Plugin<Project> {
 	private void init(Project project) {
 		this.project = project
 		licenseProperties = new LicenseExtProperties(project)
-		headerContentResolver = new HeaderContentResolver.Impl(project)
+		headerContentResolver = new ResourceResolver.Impl(project)
 	}
 
 	private void applyLicensePlugin() {
@@ -97,7 +98,7 @@ class LicenseExtPlugin implements Plugin<Project> {
 	}
 
 	private String acquireHeaderResourceContent() {
-		headerContentResolver.acquireHeaderResourceContent(licenseProperties.headerResourcePath)
+		headerContentResolver.acquireResourceContent(licenseProperties.headerResourcePath)
 	}
 
 	private void setGroupOnAllFormatLicenseTasks() {
