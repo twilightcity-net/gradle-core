@@ -21,7 +21,6 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.testing.Test
 
-
 @Mixin(GradlePluginMixin)
 class NamedTestConfigurationPlugin implements Plugin<Project> {
 
@@ -75,11 +74,19 @@ class NamedTestConfigurationPlugin implements Plugin<Project> {
 		testTask.configure {
 			description = "Runs the ${configurationName} tests."
 			group = 'Verification'
-			testClassesDir = project.sourceSets."${configurationName}".output.classesDir
-			classpath = project.sourceSets."${configurationName}".runtimeClasspath
-			reports.html.destination = new File(project.reporting.baseDir, "${configurationName}s")
-			reports.junitXml.destination = new File(project.buildDir, "${configurationName}-results")
 		}
+		testTask.conventionMapping.map("classpath", {
+            project.sourceSets."${configurationName}".runtimeClasspath
+		})
+		testTask.conventionMapping.map("testClassesDir") {
+			 project.sourceSets."${configurationName}".output.classesDir
+		}
+		testTask.reports.html.conventionMapping.map("destination", {
+			new File(project.reporting.baseDir, "${configurationName}s")
+		})
+		testTask.reports.junitXml.conventionMapping.map("destination", {
+			new File(project.buildDir, "${configurationName}-results")
+		})
 		testTask
 	}
 
