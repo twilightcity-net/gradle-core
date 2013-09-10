@@ -23,13 +23,25 @@ import org.gradle.api.tasks.TaskAction
 class PrintClasspath extends DefaultTask {
 
 	{
-		description = 'Print classpaths of each source set to console (use -Pfullpath=1 to output complete directory paths)'
+		description = 'Print classpaths of each source set to console (-Pfullpath=1 to write fully qualified paths, ' +
+				'-PsourceSetName=<name> to filter by source set)'
 	}
 
 	@TaskAction
 	void printClasspathsForAllSourceSets() {
-		project.sourceSets.each { SourceSet sourceSet ->
+		getSourceSets().each { SourceSet sourceSet ->
 			printClasspathsForSourceSet(sourceSet)
+		}
+	}
+
+	private def getSourceSets() {
+		String sourceSetName = project.getProperties().get("sourceSetName")
+		project.sourceSets.findAll { SourceSet sourceSet ->
+			boolean match = true
+			if (sourceSetName != null) {
+				match = (sourceSet.name == sourceSetName)
+			}
+			match
 		}
 	}
 
