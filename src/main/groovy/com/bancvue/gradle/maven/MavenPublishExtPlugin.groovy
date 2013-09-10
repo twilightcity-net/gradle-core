@@ -162,7 +162,7 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 					"${getProjectName()}"(MavenPublication) {
 						from project.components.java
 						if (getProjectArtifactId() != null) {
-							pom.projectIdentity.artifactId = getProjectArtifactId()
+							artifactId = getProjectArtifactId()
 						}
 						attachAdditionalArtifactsToMavenPublication(delegate)
 					}
