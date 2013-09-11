@@ -27,10 +27,27 @@ class MavenRepositoryProperties extends DefaultProjectPropertyContainer {
 	}
 
 	String name = "repo"
+	/**
+	 * Dependency repository public url.
+	 */
 	String publicUrl = getDefaultUrlPropertyValue("publicUrl")
+	/**
+	 * Publication repository snapshot url.
+	 */
 	String snapshotUrl = getDefaultUrlPropertyValue("snapshotUrl")
+	/**
+	 * Publication repository release url.
+	 */
 	String releaseUrl = getDefaultUrlPropertyValue("releaseUrl")
+	/**
+	 * Publication repository username.  Only needed if publishing to remote repository; this will generally only
+	 * happen on a CI server and will be passed in by the CI job.
+	 */
 	String username
+	/**
+	 * Publication repository password.  Only needed if publishing to remote repository; this will generally only
+	 * happen on a CI server and will be passed in by the CI job.
+	 */
 	String password
 
 	MavenRepositoryProperties(Project project) {
