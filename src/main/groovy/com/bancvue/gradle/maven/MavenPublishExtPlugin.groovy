@@ -45,8 +45,8 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 	private void addArtifactDependencyAndPublishingSupport() {
 		project.apply(plugin: 'maven-publish')
 		renamePublishTasks()
-		addNexusDependencyRepository()
-		addNexusPublishingRepository()
+		addMavenLocalAndOrganizationArtifactRepository()
+		addOrganizationPublishingRepository()
 		addSourceJarTask()
 		addJavadocJarTask()
 		addProjectPublication()
@@ -70,7 +70,7 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		renameTask(publishToMavenLocal, 'publish')
 	}
 
-	private void addNexusDependencyRepository() {
+	private void addMavenLocalAndOrganizationArtifactRepository() {
 		project.repositories.mavenLocal()
 		project.repositories {
 			maven {
@@ -92,7 +92,7 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		}
 	}
 
-	private void addNexusPublishingRepository() {
+	private void addOrganizationPublishingRepository() {
 		project.publishing {
 			repositories {
 				maven {
