@@ -43,7 +43,7 @@ class ProjectDefaultsPluginTest extends AbstractPluginTest {
 
 	@Test
 	void apply_ShouldApplyJavaPluginAndSetCompatibility() {
-		project.ext.defaultsJavaVersion = '1.8'
+		project.ext.defaultJavaVersion = '1.8'
 
 		applyPlugin()
 
@@ -65,9 +65,9 @@ class ProjectDefaultsPluginTest extends AbstractPluginTest {
 
 	@Test
 	void apply_ShouldSetMemorySettingsForJavaAndGroovyCompileTasks() {
-		project.ext.defaultsMinHeapSize = '16m'
-		project.ext.defaultsMaxHeapSize = '24m'
-		project.ext.defaultsMaxPermSize = '8m'
+		project.ext.defaultMinHeapSize = '16m'
+		project.ext.defaultMaxHeapSize = '24m'
+		project.ext.defaultMaxPermSize = '8m'
 
 		project.apply(plugin: 'groovy')
 		applyPlugin()
@@ -91,9 +91,9 @@ class ProjectDefaultsPluginTest extends AbstractPluginTest {
 
 	@Test
 	void apply_ShouldSetHeapSizeForTestTasks() {
-		project.ext.defaultsMinTestHeapSize = '17m'
-		project.ext.defaultsMaxTestHeapSize = '23m'
-		project.ext.defaultsMaxTestPermSize = '5m'
+		project.ext.defaultMinTestHeapSize = '17m'
+		project.ext.defaultMaxTestHeapSize = '23m'
+		project.ext.defaultMaxTestPermSize = '5m'
 
 		applyPlugin()
 

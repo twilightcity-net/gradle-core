@@ -36,7 +36,7 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 		project.apply(plugin: 'java')
 		setDefaultCompileMemorySettings()
 		setDefaultTestMemorySettings()
-		setCompilerEncodingToUtf8()
+		setCompilerEncoding()
 		addBuildDateAndJdkToJarManifest()
 		setJavaCompatibilityVersion()
 	}
@@ -66,9 +66,9 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 		}
 	}
 
-	private void setCompilerEncodingToUtf8() {
+	private void setCompilerEncoding() {
 		project.tasks.withType(JavaCompile) { JavaCompile compile ->
-			compile.options.encoding = 'UTF-8'
+			compile.options.encoding = defaultsProperties.compilerEncoding
 		}
 	}
 

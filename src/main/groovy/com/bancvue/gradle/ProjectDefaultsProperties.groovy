@@ -20,9 +20,11 @@ import org.gradle.api.Project
 
 class ProjectDefaultsProperties extends DefaultProjectPropertyContainer {
 
-	private static final String NAME = 'defaults'
+	private static final String NAME = 'default'
 
 	String javaVersion = '1.7'
+
+	String compilerEncoding = 'UTF-8'
 
 	String minHeapSize = '64m'
 	String maxHeapSize = '256m'
