@@ -15,6 +15,8 @@
  */
 package com.bancvue.gradle.test
 
+import com.bancvue.zip.ZipArchive
+
 
 class TestFile extends File {
 
@@ -27,6 +29,11 @@ class TestFile extends File {
 		TestFile dir = file(relativePath)
 		dir.mkdirs()
 		dir
+	}
+
+	ZipArchive archive(String relativePath) {
+		TestFile file = file(relativePath)
+		new ZipArchive(file)
 	}
 
 	TestFile file(String relativePath) {
