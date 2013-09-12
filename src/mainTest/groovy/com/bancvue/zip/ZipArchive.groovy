@@ -19,13 +19,12 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
 
-class ZipArchive {
+class ZipArchive extends File {
 
-	private File file
 	private ZipFile zip
 
 	ZipArchive(File file) {
-		this.file = file
+		super(file.absolutePath)
 		this.zip = new ZipFile(file)
 	}
 
@@ -34,7 +33,7 @@ class ZipArchive {
 			entry.name =~ /${name}/
 		}
 		if (entry == null) {
-			throw new RuntimeException("No entry with name like '${name}' in file=${file.absolutePath}")
+			throw new RuntimeException("No entry with name like '${name}' in file=${absolutePath}")
 		}
 		zip.getInputStream(entry).text
 	}
