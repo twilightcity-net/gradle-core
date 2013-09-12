@@ -72,7 +72,7 @@ class TestExtPlugin implements Plugin<Project> {
 			group = "Build"
 			classifier = "test"
 			description = "Assembles a jar archive containing the test sources."
-			from project.sourceSets.mainTest.allSource
+			from project.sourceSets.mainTest.output
 		}
 	}
 
