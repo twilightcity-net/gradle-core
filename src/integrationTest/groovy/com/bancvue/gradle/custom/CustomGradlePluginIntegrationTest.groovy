@@ -24,10 +24,10 @@ class CustomGradlePluginIntegrationTest extends AbstractPluginIntegrationTest {
 
 	@Test
 	void buildCustomGradleDistro_ShouldBundleGradleCustomizationScript() {
-		TestFile mavenRepo = projectFS.mkdir("build/maven-repo")
-		TestFile zipBaseDir = projectFS.mkdir("zipBase")
+		TestFile mavenRepo = mkdir("build/maven-repo")
+		TestFile zipBaseDir = mkdir("zipBase")
 		zipBaseDir.file('emptyfile.txt') << ""
-		projectFS.file('custom.gradle') << """
+		file('custom.gradle') << """
 ext {
     repositoryName = 'repo'
     repositoryPublicUrl = 'http://repo.domain/public'
@@ -35,7 +35,7 @@ ext {
     repositoryReleaseUrl = 'http://repo.domain/releases'
 }
 """
-		projectFS.buildFile() << """
+		buildFile << """
 ext {
     customGradleBaseVersion = "1.7"
     customGradleVersion = "1.7-bv.1.0"

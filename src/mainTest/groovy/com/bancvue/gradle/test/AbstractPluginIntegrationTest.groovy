@@ -43,4 +43,20 @@ class AbstractPluginIntegrationTest {
 		runner.run()
 	}
 
+	protected TestFile getBuildFile() {
+		projectFS.buildFile
+	}
+
+	protected TestFile mkdir(String relativePath) {
+		projectFS.mkdir(relativePath)
+	}
+
+	protected TestFile file(String relativePath) {
+		projectFS.file(relativePath)
+	}
+
+	protected TestFile emptyClassFile(String filePath) {
+		projectFS.emptyClassFile(filePath)
+	}
+
 }

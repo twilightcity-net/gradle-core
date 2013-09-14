@@ -28,7 +28,7 @@ class ProjectFileSystem extends TestFile {
 		mkdir('build')
 	}
 
-	TestFile buildFile() {
+	TestFile getBuildFile() {
 		file("build.gradle")
 	}
 

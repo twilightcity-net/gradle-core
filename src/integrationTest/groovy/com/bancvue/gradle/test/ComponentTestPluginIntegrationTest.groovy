@@ -23,8 +23,8 @@ class ComponentTestPluginIntegrationTest extends AbstractPluginIntegrationTest {
 
 	@Test
 	void sourceSetModificationsShouldBeAppliedToTestClasspath() {
-		projectFS.file("resource-dir/resource.txt") << "resource content"
-		projectFS.file("src/componentTest/groovy/SomeTest.groovy") << """
+		file("resource-dir/resource.txt") << "resource content"
+		file("src/componentTest/groovy/SomeTest.groovy") << """
 import org.junit.Test
 class SomeTest {
 	@Test
@@ -35,7 +35,7 @@ class SomeTest {
 	}
 }
 """
-		projectFS.file("build.gradle") << """
+		buildFile << """
 apply plugin: 'groovy'
 apply plugin: 'component-test'
 

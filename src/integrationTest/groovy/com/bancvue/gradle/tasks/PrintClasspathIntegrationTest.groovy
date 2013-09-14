@@ -19,15 +19,12 @@ import com.bancvue.gradle.test.AbstractPluginIntegrationTest
 import org.gradle.testkit.functional.ExecutionResult
 import org.junit.Test
 
-import static org.junit.Assert.fail
-
-
 class PrintClasspathIntegrationTest extends AbstractPluginIntegrationTest {
 
 
 	@Test
 	void shouldPrintCompileAndRuntimeClasspathsToConsoleForAllSourceSets() {
-		projectFS.buildFile() << """
+		buildFile << """
 apply plugin: 'java'
 dependencies {
     compile localGroovy()
@@ -47,7 +44,7 @@ task printClasspath(type: com.bancvue.gradle.tasks.PrintClasspath)
 
 	@Test
 	void shouldFilterSourceSetByName() {
-		projectFS.buildFile() << """
+		buildFile << """
 apply plugin: 'java'
 task printClasspath(type: com.bancvue.gradle.tasks.PrintClasspath)
         """

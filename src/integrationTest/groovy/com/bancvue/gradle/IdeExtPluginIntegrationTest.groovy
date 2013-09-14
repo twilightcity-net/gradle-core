@@ -24,18 +24,18 @@ class IdeExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 
 	@Test
 	void idea_ShouldAddStandardSourceDirectoriesAndAdditionalTestConfigurations_IfIdePluginDeclaredBeforeTestPlugin() {
-		projectFS.buildFile() << """
+		buildFile << """
 apply plugin: 'groovy'
 apply plugin: 'ide-ext'
 apply plugin: 'integration-test'
         """
-		projectFS.mkdir("src/main/java")
-		projectFS.mkdir("src/test/groovy")
-		projectFS.mkdir("src/integrationTest/groovy")
+		mkdir("src/main/java")
+		mkdir("src/test/groovy")
+		mkdir("src/integrationTest/groovy")
 
 		run("idea")
 
-		File expectedImlFile = projectFS.file("${projectFS.name}.iml")
+		File expectedImlFile = file("${projectFS.name}.iml")
 		assert expectedImlFile.exists()
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/main/java", false)
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/test/groovy", true)
@@ -63,18 +63,18 @@ apply plugin: 'integration-test'
 
 	@Test
 	void eclipse_ShouldAddStandardSourceDirectoriesAndAdditionalTestConfigurations_IfIdePluginDeclaredAfterTestPlugin() {
-		projectFS.buildFile() << """
+		buildFile << """
 apply plugin: 'groovy'
 apply plugin: 'component-test'
 apply plugin: 'ide-ext'
         """
-		projectFS.mkdir("src/main/java")
-		projectFS.mkdir("src/test/groovy")
-		projectFS.mkdir("src/componentTest/groovy")
+		mkdir("src/main/java")
+		mkdir("src/test/groovy")
+		mkdir("src/componentTest/groovy")
 
 		run("eclipse")
 
-		File expectedClasspathFile = projectFS.file(".classpath")
+		File expectedClasspathFile = file(".classpath")
 		assert expectedClasspathFile.exists()
 		assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, "src/main/java")
 		assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, "src/test/groovy")

@@ -24,9 +24,9 @@ class MavenPublishExtPluginIntegrationTest extends AbstractPluginIntegrationTest
 
 	@Test
 	void shouldPublishArtifactAndSources() {
-		projectFS.emptyClassFile("src/main/java/Class.java")
-		TestFile mavenRepo = projectFS.mkdir("build/maven-repo")
-		projectFS.buildFile() << """
+		emptyClassFile("src/main/java/Class.java")
+		TestFile mavenRepo = mkdir("build/maven-repo")
+		buildFile << """
 ext.repositoryReleaseUrl='${mavenRepo.toURI()}'
 ext.artifactId='artifact'
 
@@ -38,8 +38,8 @@ version = '1.0'
 
 		run("publishRemote")
 
-		assert projectFS.file("build/libs/artifact-1.0.jar").exists()
-		assert projectFS.file("build/libs/artifact-1.0-sources.jar").exists()
+		assert file("build/libs/artifact-1.0.jar").exists()
+		assert file("build/libs/artifact-1.0-sources.jar").exists()
 		assert mavenRepo.file("group/artifact/1.0/artifact-1.0.jar").exists()
 		assert mavenRepo.file("group/artifact/1.0/artifact-1.0-sources.jar").exists()
 	}

@@ -22,16 +22,16 @@ import org.junit.Test
 class LicenseExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 
 	/**************************************************************************************************************
-	 * NOTE: if these test fail in an IDE, it may need to add 'headers/*' to the compiler settings so resources
+	 * NOTE: if these test fail in an IDE, you may need to add 'headers/*' to the compiler settings so resources
 	 * are copied appropriately
 	 **************************************************************************************************************/
 
 	@Test
 	void licenseFormat_ShouldWriteLicenseHeaderToSourceFiles() {
 		List<File> srcFiles = ["src/main/java", "src/mainTest/java", "src/test/java"].collect{ String path ->
-			projectFS.emptyClassFile("${path}/Class.java")
+			emptyClassFile("${path}/Class.java")
 		}
-		projectFS.buildFile() << """
+		buildFile << """
 ext {
 	licenseName='BancVue'
 }
@@ -52,8 +52,8 @@ apply plugin: 'license-ext'
 
 	@Test
 	void licenseFormat_ShouldNotFailIfBuildIsFirstCleaned() {
-		File srcFile = projectFS.emptyClassFile('src/main/java/Class.java')
-		projectFS.buildFile() << """
+		File srcFile = emptyClassFile('src/main/java/Class.java')
+		buildFile << """
 apply plugin: 'java'
 apply plugin: 'license-ext'
 
@@ -72,9 +72,9 @@ license {
 
 	@Test
 	void licenseFormat_ShouldUseAlternativeHeaderIfProvided() {
-		File srcFile = projectFS.emptyClassFile('src/main/java/Class.java')
-		projectFS.file('src/main/resources/ALT_HEADER') << "ALTERNATIVE HEADER"
-		projectFS.buildFile() << """
+		File srcFile = emptyClassFile('src/main/java/Class.java')
+		file('src/main/resources/ALT_HEADER') << "ALTERNATIVE HEADER"
+		buildFile << """
 ext {
 	licenseHeaderResourcePath='ALT_HEADER'
 }
@@ -92,8 +92,8 @@ apply plugin: 'license-ext'
 
 	@Test
 	void licenseCheck_ShouldCheckLicenseHeaderInSourceFiles() {
-		File srcFile = projectFS.emptyClassFile('src/main/java/Class.java')
-		projectFS.buildFile() << """
+		File srcFile = emptyClassFile('src/main/java/Class.java')
+		buildFile << """
 apply plugin: 'java'
 apply plugin: 'license-ext'
         """

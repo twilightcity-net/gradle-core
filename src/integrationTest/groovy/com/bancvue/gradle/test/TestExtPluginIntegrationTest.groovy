@@ -22,8 +22,8 @@ class TestExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 
 	@Test
 	void shouldCompileMainTestSourceAndCreateJarFromSource() {
-		projectFS.emptyClassFile("src/mainTest/java/Class.java")
-		projectFS.file("build.gradle") << """
+		emptyClassFile("src/mainTest/java/Class.java")
+		buildFile << """
 apply plugin: 'java'
 apply plugin: 'test-ext'
 
@@ -32,7 +32,7 @@ mainTestJar.archiveName='mainTest.jar'
 
 		run("check", "mainTestJar")
 
-		assert projectFS.file("build/classes/mainTest/Class.class").exists()
+		assert file("build/classes/mainTest/Class.class").exists()
 		ZipArchive mainTestJar = projectFS.archive("build/libs/mainTest.jar")
 		assert mainTestJar.exists()
 		assert mainTestJar.acquireContentForEntryWithNameLike("Class.class")
