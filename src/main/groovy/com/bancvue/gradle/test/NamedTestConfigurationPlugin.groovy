@@ -75,11 +75,9 @@ class NamedTestConfigurationPlugin implements Plugin<Project> {
 			description = "Runs the ${configurationName} tests."
 			group = 'Verification'
 		}
-		testTask.conventionMapping.map("classpath", {
-            project.sourceSets."${configurationName}".runtimeClasspath
-		})
-		testTask.conventionMapping.map("testClassesDir") {
-			 project.sourceSets."${configurationName}".output.classesDir
+ 		testTask.conventionMapping.with {
+			classpath = { project.sourceSets."${configurationName}".runtimeClasspath }
+			testClassesDir = { project.sourceSets."${configurationName}".output.classesDir }
 		}
 		testTask.reports.html.conventionMapping.map("destination", {
 			new File(project.reporting.baseDir, "${configurationName}s")

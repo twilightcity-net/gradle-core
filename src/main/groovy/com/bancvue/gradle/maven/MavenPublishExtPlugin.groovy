@@ -49,7 +49,7 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		addOrganizationPublishingRepository()
 		addSourceJarTask()
 		addJavadocJarTask()
-		addProjectPublication()
+		addProjectPublicationIfCustomPublicationNotDefined()
 	}
 
 	private void renamePublishTasks() {
@@ -153,19 +153,23 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		}
 	}
 
-	private void addProjectPublication() {
+	private void addProjectPublicationIfCustomPublicationNotDefined() {
 		if (project.hasProperty("customPublication")) {
 			log.info("Project property 'customPublication' defined, default publication disabled")
 		} else {
-			project.publishing {
-				publications {
-					"${getProjectName()}"(MavenPublication) {
-						from project.components.java
-						if (getProjectArtifactId() != null) {
-							artifactId = getProjectArtifactId()
-						}
-						attachAdditionalArtifactsToMavenPublication(delegate)
+			addProjectPublication()
+		}
+	}
+
+	private void addProjectPublication() {
+		project.publishing {
+			publications {
+				"${getProjectName()}"(MavenPublication) {
+					from project.components.java
+					if (getProjectArtifactId() != null) {
+						artifactId = getProjectArtifactId()
 					}
+					attachAdditionalArtifactsToMavenPublication(delegate)
 				}
 			}
 		}
@@ -174,6 +178,7 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 	private void attachAdditionalArtifactsToMavenPublication(MavenPublication publication) {
 		attachArtifactToMavenPublication(publication, "sourceJar")
 //		attachArtifactToMavenPublication(publication, "javadocJar")
+		// TODO: should publish test as separate publication so source and javadoc can be attached
 		attachTestArtifactToMavenPublicationIfMainTestConfigurationDefined(publication)
 	}
 
