@@ -16,7 +16,7 @@
 package com.bancvue.gradle.test
 
 import com.bancvue.zip.ZipArchive
-
+import org.apache.commons.io.FilenameUtils
 
 class TestFile extends File {
 
@@ -24,6 +24,9 @@ class TestFile extends File {
 		super(file.toURI())
 	}
 
+	String getBaseName() {
+		FilenameUtils.getBaseName(name)
+	}
 
 	TestFile mkdir(String relativePath){
 		TestFile dir = file(relativePath)
@@ -44,6 +47,11 @@ class TestFile extends File {
 	TestFile file(String relativePath, String fileName) {
 		File parentDir = file(relativePath)
 		new TestFile(new File(parentDir, fileName))
+	}
+
+	void write(String text) {
+		parentFile.mkdirs()
+ 		super.write(text)
 	}
 
 	TestFile leftShift(Object content) {
