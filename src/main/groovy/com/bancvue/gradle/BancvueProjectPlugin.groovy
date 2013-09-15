@@ -17,6 +17,7 @@ package com.bancvue.gradle
 
 import com.bancvue.gradle.maven.MavenPublishExtPlugin
 import com.bancvue.gradle.test.ComponentTestPlugin
+import com.bancvue.gradle.test.JacocoExtPlugin
 import com.bancvue.gradle.test.TestExtPlugin
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -50,6 +51,7 @@ class BancvueProjectPlugin implements Plugin<Project> {
 		applyMavenPublishExtPlugin()
 		applyTestExtPlugin()
 		applyComponentTestPlugin()
+		applyJacocoExtPlugin()
 		applyIdeExtPlugin()
 		applyBancvueUtilPlugin()
 	}
@@ -93,6 +95,10 @@ class BancvueProjectPlugin implements Plugin<Project> {
 
 	private void applyComponentTestPlugin() {
 		project.apply(plugin: ComponentTestPlugin.PLUGIN_NAME)
+	}
+
+	private void applyJacocoExtPlugin() {
+		project.apply(plugin: JacocoExtPlugin.PLUGIN_NAME)
 	}
 
 	private void applyBancvueUtilPlugin() {
