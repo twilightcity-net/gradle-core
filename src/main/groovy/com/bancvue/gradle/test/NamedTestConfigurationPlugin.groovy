@@ -73,7 +73,7 @@ class NamedTestConfigurationPlugin implements Plugin<Project> {
 		Task testTask = project.tasks.create(configurationName, Test)
 		testTask.configure {
 			description = "Runs the ${configurationName} tests."
-			group = 'Verification'
+			group = TestExtPlugin.VERIFICATION_GROUP_NAME
 		}
  		testTask.conventionMapping.with {
 			classpath = { project.sourceSets."${configurationName}".runtimeClasspath }

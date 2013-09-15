@@ -26,6 +26,7 @@ import org.gradle.api.tasks.testing.Test
 class TestExtPlugin implements Plugin<Project> {
 
 	static final String PLUGIN_NAME = "test-ext"
+	static final String VERIFICATION_GROUP_NAME = "Verification"
 
 	static Jar getMainTestJarTaskOrNullIfMainTestConfigurationNotDefined(Project project) {
 		project.tasks.findByName("mainTestJar")
@@ -103,7 +104,7 @@ class TestExtPlugin implements Plugin<Project> {
 	private void addStyledTestOutputTask() {
 		StyledTestOutput stoTask = project.tasks.create("styledTestOutput", StyledTestOutput)
 		stoTask.configure {
-			group = "Verification"
+			group = VERIFICATION_GROUP_NAME
 			description = "Modifies build to output test results incrementally"
 		}
 
