@@ -22,7 +22,7 @@ import org.junit.Test
 class LicenseExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 
 	/**************************************************************************************************************
-	 * NOTE: if these test fail in an IDE, you may need to add 'headers/*' to the compiler settings so resources
+	 * NOTE: if these test fail in an IDE, you may need to add 'licenses/*' to the compiler settings so resources
 	 * are copied appropriately
 	 **************************************************************************************************************/
 
@@ -73,20 +73,19 @@ license {
 	@Test
 	void licenseFormat_ShouldUseAlternativeHeaderIfProvided() {
 		File srcFile = emptyClassFile('src/main/java/Class.java')
-		file('src/main/resources/ALT_HEADER') << "ALTERNATIVE HEADER"
+		file('src/main/resources/ALT_LICENSE') << 'header: "ALTERNATIVE HEADER"'
 		buildFile << """
 ext {
-	licenseHeaderResourcePath='ALT_HEADER'
+	licenseResourcePath='ALT_LICENSE'
 }
 
 apply plugin: 'java'
 apply plugin: 'license-ext'
         """
 
-		run("assemble", "licenseFormat")
+		run("assemble", "licenseFormat", "--info")
 
 		String text = srcFile.text
-		println text
 		assert text =~ /ALTERNATIVE HEADER/
 	}
 

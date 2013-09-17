@@ -26,4 +26,4 @@ license {
 tasks.withType(nl.javadude.gradle.plugins.license.License).each { licenseTask ->
 	licenseTask.exclude 'org/gradle/testkit/**'
 }
-licenseMain.exclude 'headers/*'
+licenseMain.exclude 'licenses/*'

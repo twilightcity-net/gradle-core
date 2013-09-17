@@ -21,6 +21,8 @@ import org.gradle.api.tasks.SourceSet
 
 interface ResourceResolver {
 
+	public <T> T resolveObjectFromMap(String resourcePath, Class<T> type)
+
 	URL acquireResourceURL(String resourcePath)
 
 	String acquireResourceContent(String resourcePath)
@@ -32,6 +34,12 @@ interface ResourceResolver {
 
 		Impl(Project project) {
 			this.project = project
+		}
+
+		public <T> T resolveObjectFromMap(String resourcePath, Class<T> type) {
+			String jsonContent = acquireResourceContent(resourcePath)
+			Map result = Eval.me("[${jsonContent}]")
+			type.newInstance(result)
 		}
 
 		String acquireResourceContent(String resourcePath) {

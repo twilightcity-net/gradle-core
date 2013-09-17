@@ -28,7 +28,6 @@ class LicenseExtPlugin implements Plugin<Project> {
 
 	private Project project
 	private LicenseExtProperties licenseProperties
-	private ResourceResolver headerContentResolver
 
 	@Override
 	void apply(Project project) {
@@ -44,7 +43,6 @@ class LicenseExtPlugin implements Plugin<Project> {
 	private void init(Project project) {
 		this.project = project
 		licenseProperties = new LicenseExtProperties(project)
-		headerContentResolver = new ResourceResolver.Impl(project)
 	}
 
 	private void applyLicensePlugin() {
@@ -52,9 +50,9 @@ class LicenseExtPlugin implements Plugin<Project> {
 	}
 
 	private void configureApache2LicenseHeader() {
-		addTaskToWriteDefaultHeaderPriorToLicenseExecution()
+		writeConfiguredLicenseHeaderToBuildDirPriorToLicenseExecution()
 		project.license {
-			header = getDefaultHeaderFile()
+			header = getHeaderFile()
 			ext.year = Calendar.getInstance().get(Calendar.YEAR)
 			if (licenseProperties.name) {
 				ext.name = licenseProperties.name
@@ -62,43 +60,27 @@ class LicenseExtPlugin implements Plugin<Project> {
 		}
 	}
 
-	private void addTaskToWriteDefaultHeaderPriorToLicenseExecution() {
-		Task writeHeaderResourceToFile = project.tasks.create('writeDefaultHeaderFile')
-		writeHeaderResourceToFile.doLast {
-			writeDefaultHeaderFileIfHeaderNotOverridden()
+	private void writeConfiguredLicenseHeaderToBuildDirPriorToLicenseExecution() {
+		Task writeLicenseHeaderToBuildDirTask = project.tasks.create('writeLicenseHeaderToBuildDir')
+		writeLicenseHeaderToBuildDirTask.doLast {
+			writeLicenseHeaderToBuildDir()
 		}
 
 		project.tasks.withType(License).findAll { License task ->
-			task.dependsOn(writeHeaderResourceToFile)
+			task.dependsOn(writeLicenseHeaderToBuildDirTask)
 		}
 	}
 
-	private void writeDefaultHeaderFileIfHeaderNotOverridden() {
-		if (isDefaultHeaderSetOnAnyLicenseTask()) {
-			writeDefaultHeaderFile()
-		}
+	private void writeLicenseHeaderToBuildDir() {
+		LicenseModel license = licenseProperties.getLicenseModel()
+		File headerFile = getHeaderFile()
+
+		headerFile.parentFile.mkdirs()
+		headerFile.write(license.header)
 	}
 
-	private void writeDefaultHeaderFile() {
-		File defaultHeaderFile = getDefaultHeaderFile()
-		defaultHeaderFile.parentFile.mkdirs()
-		defaultHeaderFile.write(acquireHeaderResourceContent())
-	}
-
-	private boolean isDefaultHeaderSetOnAnyLicenseTask() {
-		File defaultHeaderFile = getDefaultHeaderFile()
-
-		project.tasks.withType(License).find { License task ->
-			task.header == defaultHeaderFile
-		}
-	}
-
-	private File getDefaultHeaderFile() {
-		new File(project.buildDir, licenseProperties.headerResourcePath)
-	}
-
-	private String acquireHeaderResourceContent() {
-		headerContentResolver.acquireResourceContent(licenseProperties.headerResourcePath)
+	private File getHeaderFile() {
+		new File(project.buildDir, "license/HEADER")
 	}
 
 	private void setGroupOnAllFormatLicenseTasks() {
