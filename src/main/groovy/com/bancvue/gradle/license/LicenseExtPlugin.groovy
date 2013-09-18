@@ -15,7 +15,6 @@
  */
 package com.bancvue.gradle.license
 
-import com.bancvue.gradle.ResourceResolver
 import nl.javadude.gradle.plugins.license.License
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -72,7 +71,7 @@ class LicenseExtPlugin implements Plugin<Project> {
 	}
 
 	private void writeLicenseHeaderToBuildDir() {
-		LicenseModel license = licenseProperties.getLicenseModel()
+		LicenseModel license = licenseProperties.acquireLicenseModel()
 		File headerFile = getHeaderFile()
 
 		headerFile.parentFile.mkdirs()

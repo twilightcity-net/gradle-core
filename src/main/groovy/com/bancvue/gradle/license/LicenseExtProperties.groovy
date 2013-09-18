@@ -32,6 +32,14 @@ class LicenseExtProperties extends DefaultProjectPropertyContainer {
 		super(project, NAME)
 	}
 
+	LicenseModel acquireLicenseModel() {
+		LicenseModel model = getLicenseModel()
+		if (model == null) {
+			throw new RuntimeException("Failed to resolve license from path=${resourcePath}")
+		}
+		model
+	}
+
 	LicenseModel getLicenseModel() {
 		String resourcePath = getProperty("resourcePath")
 		log.info("Resolving license from path=${resourcePath}")

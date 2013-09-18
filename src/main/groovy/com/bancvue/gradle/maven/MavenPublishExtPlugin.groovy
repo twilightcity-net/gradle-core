@@ -16,6 +16,8 @@
 package com.bancvue.gradle.maven
 
 import com.bancvue.gradle.GradlePluginMixin
+import com.bancvue.gradle.license.LicenseExtProperties
+import com.bancvue.gradle.license.LicenseModel
 import com.bancvue.gradle.test.TestExtPlugin
 import groovy.util.logging.Slf4j
 import org.gradle.api.Plugin
@@ -164,12 +166,51 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 	private void addProjectPublication() {
 		project.publishing {
 			publications {
-				"${getProjectName()}"(MavenPublication) {
+				"${getProjectName()}"(MavenPublication) { MavenPublication publication ->
+					addBasicDescriptionToMavenPOM(publication)
 					from project.components.java
 					if (getProjectArtifactId() != null) {
 						artifactId = getProjectArtifactId()
 					}
-					attachAdditionalArtifactsToMavenPublication(delegate)
+					attachLicenseToMavenPOMIfLicenseExtPluginApplied(publication)
+					attachAdditionalArtifactsToMavenPublication(publication)
+				}
+			}
+		}
+	}
+
+	private void addBasicDescriptionToMavenPOM(MavenPublication publication) {
+		publication.pom.withXml {
+			asNode().children().last() + {
+				name project.name
+				// TODO: description is currently null; need to add validation of required properties when publishing to central
+				description project.description
+				// TODO: add project url
+				// url projectUrl
+			}
+		}
+	}
+
+	private void attachLicenseToMavenPOMIfLicenseExtPluginApplied(MavenPublication publication) {
+		LicenseExtProperties licenseProperties = new LicenseExtProperties(project)
+		LicenseModel licenseModel = licenseProperties.getLicenseModel()
+
+		if (licenseModel != null) {
+			attachLicenseModelToMavenPOM(publication, licenseModel)
+		} else {
+			log.info("No license model found, bypassing augmentation of maven POM with license info")
+		}
+	}
+
+	private void attachLicenseModelToMavenPOM(MavenPublication publication, licenseModel) {
+		publication.pom.withXml {
+			asNode().children().last() + {
+				licenses {
+					license {
+						name licenseModel.name
+						url licenseModel.url
+						distribution licenseModel.distribution
+					}
 				}
 			}
 		}
