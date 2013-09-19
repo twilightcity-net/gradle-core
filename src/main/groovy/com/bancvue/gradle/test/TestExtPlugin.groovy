@@ -80,10 +80,10 @@ class TestExtPlugin implements Plugin<Project> {
 	private void updateTestSourceSetToIncludeMainTestConfiguration() {
 		project.sourceSets {
 			test {
-				compileClasspath = main.output + mainTest.output + compileClasspath +
-						project.configurations.mainTestCompile
-				runtimeClasspath = main.output + test.output + project.sourceSets.mainTest.output + runtimeClasspath +
-						project.configurations.mainTestRuntime
+				compileClasspath = mainTest.output + main.output +
+						project.configurations.mainTestCompile + compileClasspath
+				runtimeClasspath = test.output + mainTest.output + main.output +
+						project.configurations.mainTestRuntime + runtimeClasspath
 			}
 		}
 	}
