@@ -18,15 +18,22 @@ package com.bancvue.gradle
 import groovy.util.logging.Slf4j
 import org.gradle.api.Project
 
+/**
+ * NOTE: due to how groovy routes property access, sub-classes must use getProperty(<property name>) to
+ * access their own properties
+ * see http://groovy.329449.n5.nabble.com/How-invoke-getProperty-interceptor-from-this-td5712559.html
+ */
 @Slf4j
 class DefaultProjectPropertyContainer {
 
-	private Project project
 	private String containerName
+	protected Project project
+	protected ResourceResolver resourceResolver
 
 	DefaultProjectPropertyContainer(Project project, String containerName) {
 		this.project = project
 		this.containerName = containerName
+		this.resourceResolver = new ResourceResolver.Impl(project)
 	}
 
 	def getProperty(String propertyName) {

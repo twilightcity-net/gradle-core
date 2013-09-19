@@ -25,7 +25,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.runners.MockitoJUnitRunner
 
-import static org.mockito.Matchers.anyString
 import static org.mockito.Mockito.when
 
 
@@ -33,7 +32,7 @@ import static org.mockito.Mockito.when
 class LicenseExtPluginTest extends AbstractPluginTest {
 
 	@Mock
-	private ResourceResolver headerContentResolver
+	private ResourceResolver resourceResolver
 	private LicenseExtPlugin plugin
 	private LicenseExtProperties licenseProperties
 
@@ -46,16 +45,16 @@ class LicenseExtPluginTest extends AbstractPluginTest {
 		plugin = new LicenseExtPlugin()
 		plugin.init(project)
 		licenseProperties = plugin.licenseProperties
-		plugin.headerContentResolver = headerContentResolver
+		licenseProperties.resourceResolver = resourceResolver
 	}
 
 	@Test
 	void writeDefaultHeaderFile_ShouldOverwriteAnyExistingContent() {
-		licenseProperties.headerResourcePath = "HEADER"
-		TestFile headerFile = projectFS.file("build/HEADER") << "existing content"
-		when(headerContentResolver.acquireResourceContent(anyString())).thenReturn("new content")
+		TestFile headerFile = new TestFile(plugin.getHeaderFile())
+		headerFile << "existing content"
+		when(resourceResolver.resolveObjectFromMap(licenseProperties.resourcePath, LicenseModel)).thenReturn(new LicenseModel(header: "new content"))
 
-		plugin.writeDefaultHeaderFile()
+		plugin.writeLicenseHeaderToBuildDir()
 
 		assert headerFile.text =~ /new content/
 		assert !(headerFile.text =~ /existing content/)

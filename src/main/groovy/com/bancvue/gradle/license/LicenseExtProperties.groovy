@@ -16,19 +16,26 @@
 package com.bancvue.gradle.license
 
 import com.bancvue.gradle.DefaultProjectPropertyContainer
+import groovy.util.logging.Slf4j
 import org.gradle.api.Project
 
-
+@Slf4j
 class LicenseExtProperties extends DefaultProjectPropertyContainer {
 
 	private static final String NAME = "license"
 
 	String name
-	String headerResourcePath = "headers/APACHE_HEADER"
+	String resourcePath = "licenses/apache_2.0"
 	List<String> excludedFileExtensions = ["properties", "json", "yml", "yaml"]
 
 	LicenseExtProperties(Project project) {
 		super(project, NAME)
+	}
+
+	LicenseModel getLicenseModel() {
+		String resourcePath = getProperty("resourcePath")
+		log.info("Resolving license from path=${resourcePath}")
+		resourceResolver.resolveObjectFromMap(resourcePath, LicenseModel)
 	}
 
 }

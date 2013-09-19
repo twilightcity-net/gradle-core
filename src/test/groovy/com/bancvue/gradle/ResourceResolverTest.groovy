@@ -22,6 +22,11 @@ import org.junit.Test
 
 class ResourceResolverTest extends AbstractPluginSupportTest {
 
+	private static final class Model {
+		String key
+	}
+
+
 	private static final String CLASSPATH_RESOURCE_PATH = "com/bancvue/gradle/ResourceResolverTest.class"
 
 	private ResourceResolver.Impl resolver
@@ -29,12 +34,12 @@ class ResourceResolverTest extends AbstractPluginSupportTest {
 	@Before
 	void setUp() {
 		resolver = new ResourceResolver.Impl(project)
+		project.apply(plugin: "java")
 	}
 
 	@Test
 	void getNamedResourceAsURLFromProjectResourceDirs_ShouldResolveURL() {
 		TestFile resourceFile = projectFS.file("src/main/resources/resource.txt") << "content"
-		project.apply(plugin: "java")
 
 		URL resourceUrl = resolver.getNamedResourceAsURLFromProjectResourceDirs("resource.txt")
 
@@ -62,8 +67,7 @@ class ResourceResolverTest extends AbstractPluginSupportTest {
 	@Test
 	void acquireResourceURL_ShouldResolveFromResourceDirBeforeProjectRoot() {
 		TestFile resourceDirFile = projectFS.file("src/main/resources/resource.txt") << "content"
-		TestFile projectRootFile = projectFS.file("resource.txt") << "content"
-		project.apply(plugin: "java")
+		projectFS.file("resource.txt") << "content"
 
 		URL resourceUrl = resolver.acquireResourceURL("resource.txt")
 
@@ -74,12 +78,23 @@ class ResourceResolverTest extends AbstractPluginSupportTest {
 	@Test
 	void acquireResourceURL_ShouldResolveResourceFromProjectRootBeforeClasspath() {
 		TestFile projectRootFile = projectFS.file(CLASSPATH_RESOURCE_PATH) << "content"
-		project.apply(plugin: "java")
 
 		URL resourceUrl = resolver.acquireResourceURL(CLASSPATH_RESOURCE_PATH)
 
 		assert resourceUrl
 		assert resourceUrl == projectRootFile.toURL()
+	}
+
+	@Test
+	void resolveObjectFromMap_ShouldCreateInstanceOfInputTypeAndInitializeWithMapFromResourceFile() {
+		projectFS.file("src/main/resources/map_file") << """
+key: "value"
+"""
+
+		Model model = resolver.resolveObjectFromMap("map_file", Model)
+
+		assert model != null
+		assert model.key == "value"
 	}
 
 }
