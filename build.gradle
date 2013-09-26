@@ -7,11 +7,11 @@ repositories {
 }
 
 dependencies {
-    compile gradleApi()
-    compile localGroovy()
+	compile gradleApi()
+	compile 'org.codehaus.groovy:groovy-all:2.1.2'
 	compile 'nl.javadude.gradle.plugins:license-gradle-plugin:0.6.0'
 
-    testCompile 'junit:junit:4.11'
+	testCompile 'junit:junit:4.11'
 	testCompile 'org.mockito:mockito-all:1.9.5'
 }
 
@@ -27,3 +27,31 @@ tasks.withType(nl.javadude.gradle.plugins.license.License).each { licenseTask ->
 	licenseTask.exclude 'org/gradle/testkit/**'
 }
 licenseMain.exclude 'licenses/*'
+
+
+publishingext {
+	publications {
+		'gradleCore' {
+			pom.withXml {
+				asNode().children().last() + {
+					resolveStrategy = Closure.DELEGATE_FIRST
+					packaging 'jar'
+					url 'https://github.com/BancVue/GradlePluginsCore'
+					description 'Gradle plugins for general project development'
+					developers {
+						developer {
+							id 'bancvue_oss'
+							name 'BancVue Open Source Development'
+							email 'opensource@bancvue.com'
+						}
+					}
+					scm {
+						url 'https://github.com/BancVue/GradlePluginsCore.git'
+						connection 'scm:git:git@github.com:BancVue/GradlePluginsCore.git'
+						developerConnection 'scm:git:git@github.com:BancVue/GradlePluginsCore.git'
+					}
+				}
+			}
+		}
+	}
+}
