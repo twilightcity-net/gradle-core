@@ -20,9 +20,12 @@ import com.bancvue.gradle.license.LicenseExtProperties
 import com.bancvue.gradle.license.LicenseModel
 import com.bancvue.gradle.test.TestExtPlugin
 import groovy.util.logging.Slf4j
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.publish.Publication
+import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
@@ -30,6 +33,12 @@ import org.gradle.api.tasks.javadoc.Javadoc
 @Slf4j
 @Mixin(GradlePluginMixin)
 class MavenPublishExtPlugin implements Plugin<Project> {
+
+	public static class MissingPublicationException extends GradleException {
+		MissingPublicationException(String message) {
+			super(message)
+		}
+	}
 
 	static final String PLUGIN_NAME = 'maven-publish-ext'
 
@@ -40,8 +49,44 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		this.project = project
 		this.repositoryProperties = new MavenRepositoryProperties(project)
 		project.apply(plugin: 'java')
+		addPublishingExtExtension()
 		addArtifactDependencyAndPublishingSupport()
 		setJarBaseNameToArtifactIdIfArtifactIdSet()
+		project.afterEvaluate {
+			assertDeclaredExtendedPublicationsHaveMatchingDeclaredPublications()
+		}
+	}
+
+	private void assertDeclaredExtendedPublicationsHaveMatchingDeclaredPublications() {
+		List<String> declaredPublicationNames = getDeclaredPublicationNames()
+
+		getDeclaredExtendedPublicationNames().each { String declaredExtendedPublicationName ->
+			if (!declaredPublicationNames.contains(declaredExtendedPublicationName)) {
+				throw new MissingPublicationException("Extended publication defined with name " +
+						"'${declaredExtendedPublicationName}' but no matching publication found")
+			}
+		}
+	}
+
+	private List<String> getDeclaredPublicationNames() {
+		PublishingExtension publishing = project.extensions.getByName(PublishingExtension.NAME)
+		publishing.publications.collect { Publication publication ->
+			publication.name
+		}
+	}
+
+	private List<String> getDeclaredExtendedPublicationNames() {
+		extension.getExtendedPublications().collect { ExtendedPublication publication ->
+			publication.name
+		}
+	}
+
+	private void addPublishingExtExtension() {
+		project.extensions.create(MavenPublishExtExtension.NAME, MavenPublishExtExtension, project)
+	}
+
+	private MavenPublishExtExtension getExtension() {
+		project.extensions.getByName(MavenPublishExtExtension.NAME) as MavenPublishExtExtension
 	}
 
 	private void addArtifactDependencyAndPublishingSupport() {
@@ -112,23 +157,11 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 	}
 
 	private String getBaseNameForTask(Jar task) {
-		String baseName = getProjectArtifactId()
+		String baseName = getExtension().projectArtifactId
 		if (baseName == null) {
 			baseName = task.baseName
 		}
 		baseName
-	}
-
-	private String getProjectArtifactId() {
-		project.hasProperty('artifactId') ? project.ext.artifactId : null
-	}
-
-	private String getProjectName() {
-		String projectName = getProjectArtifactId()
-		if (projectName == null) {
-			projectName = project.name
-		}
-		projectName.replaceAll(/[-](\S)/) { it[1].toUpperCase() }
 	}
 
 	private void addSourceJarTask() {
@@ -156,6 +189,7 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 	}
 
 	private void addProjectPublicationIfCustomPublicationNotDefined() {
+		// TODO: move customPublication to extension class
 		if (project.hasProperty("customPublication")) {
 			log.info("Project property 'customPublication' defined, default publication disabled")
 		} else {
@@ -166,25 +200,41 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 	private void addProjectPublication() {
 		project.publishing {
 			publications {
-				"${getProjectName()}"(MavenPublication) { MavenPublication publication ->
-					addBasicDescriptionToMavenPOM(publication)
+				String publicationName = extension.primaryArtifactName
+				String projectArtifactId = extension.projectArtifactId
+
+				"${publicationName}"(MavenPublication) { MavenPublication publication ->
 					from project.components.java
-					if (getProjectArtifactId() != null) {
-						artifactId = getProjectArtifactId()
+					if (projectArtifactId != null) {
+						artifactId = projectArtifactId
 					}
+					addBasicDescriptionToMavenPOM(publication)
 					attachLicenseToMavenPOMIfLicenseExtPluginApplied(publication)
 					attachAdditionalArtifactsToMavenPublication(publication)
+					applyCustomConfigurationToPublication(publication, delegate, owner, getThisObject())
 				}
 			}
+		}
+	}
+
+	private void applyCustomConfigurationToPublication(MavenPublication publication, Object delegate, Object owner, Object thisObject) {
+		ExtendedPublication extPublication = extension.getExtendedPublication(publication.name)
+		if (extPublication != null) {
+			Closure extPublicationClosure = extPublication.closure
+			extPublicationClosure = extPublicationClosure.rehydrate(delegate, owner, thisObject)
+			extPublicationClosure.resolveStrategy = Closure.DELEGATE_FIRST
+			extPublicationClosure(publication)
 		}
 	}
 
 	private void addBasicDescriptionToMavenPOM(MavenPublication publication) {
 		publication.pom.withXml {
 			asNode().children().last() + {
-				name project.name
-				// TODO: description is currently null; need to add validation of required properties when publishing to central
-				description project.description
+				name extension.projectArtifactId
+				// TODO: add packaging
+				// packaging "jar"
+				// TODO: add description
+				// description project.description
 				// TODO: add project url
 				// url projectUrl
 			}
@@ -237,7 +287,7 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 	}
 
 	private void setJarBaseNameToArtifactIdIfArtifactIdSet() {
-		String artifactId = getProjectArtifactId()
+		String artifactId = getExtension().projectArtifactId
 		if (artifactId != null) {
 			project.jar.baseName = artifactId
 		}

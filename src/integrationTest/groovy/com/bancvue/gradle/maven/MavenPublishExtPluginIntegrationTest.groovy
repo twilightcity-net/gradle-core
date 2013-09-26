@@ -17,6 +17,7 @@ package com.bancvue.gradle.maven
 
 import com.bancvue.gradle.test.AbstractPluginIntegrationTest
 import com.bancvue.gradle.test.TestFile
+import org.gradle.tooling.BuildException
 import org.junit.Test
 
 
@@ -42,6 +43,53 @@ version = '1.0'
 		assert file("build/libs/artifact-1.0-sources.jar").exists()
 		assert mavenRepo.file("group/artifact/1.0/artifact-1.0.jar").exists()
 		assert mavenRepo.file("group/artifact/1.0/artifact-1.0-sources.jar").exists()
+	}
+
+	@Test
+	void customizeDefaultArtifact() {
+		buildFile << """
+ext.artifactId='artifact'
+
+apply plugin: 'maven-publish-ext'
+
+publishingext {
+	publications {
+		"artifact" {
+			pom.withXml {
+				asNode().children().last() + {
+					resolveStrategy = Closure.DELEGATE_FIRST
+					reporting {
+						outputDirectory = file("build/reporting")
+					}
+				}
+			}
+		}
+	}
+}
+"""
+
+		run("generatePomFileForArtifactPublication")
+
+		TestFile pomFile = file("build/publications/artifact/pom-default.xml")
+
+		assert pomFile.text =~ /build\/reporting/
+	}
+
+	@Test(expected = BuildException)
+	void shouldFailBuild_IfExtendedPublicationDefinedButNoMatchingMavenPublicationIsFound() {
+		buildFile << """
+ext.artifactId='artifact'
+
+apply plugin: 'maven-publish-ext'
+
+publishingext {
+	publications {
+		"otherArtifact" {}
+	}
+}
+"""
+
+		run("generatePomFileForArtifactPublication")
 	}
 
 }

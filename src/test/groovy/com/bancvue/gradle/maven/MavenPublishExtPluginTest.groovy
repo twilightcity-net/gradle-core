@@ -142,6 +142,7 @@ class MavenPublishExtPluginTest extends AbstractPluginTest {
 		jarTask.baseName = 'someName'
 		MavenPublishExtPlugin plugin = new MavenPublishExtPlugin()
 		plugin.project = project
+		plugin.addPublishingExtExtension()
 
 		String baseName = plugin.getBaseNameForTask(jarTask)
 
