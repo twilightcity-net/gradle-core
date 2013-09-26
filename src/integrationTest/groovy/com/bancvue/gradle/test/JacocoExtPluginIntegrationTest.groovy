@@ -27,10 +27,10 @@ class JacocoExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 
 	@Before
 	void setUp() {
-		mainSrcFile = file("src/main/java/MainClass.java")
-		mainTestSrcFile = file("src/mainTest/java/MainTestClass.java")
-		testDir = file("src/test/groovy")
-		componentTestDir = file("src/componentTest/groovy")
+		mainSrcFile = file("src/main/java/bv/MainClass.java")
+		mainTestSrcFile = file("src/mainTest/java/bv/MainTestClass.java")
+		testDir = file("src/test/groovy/bv")
+		componentTestDir = file("src/componentTest/groovy/bv")
 
 		buildFile << """
 apply plugin: 'groovy'
@@ -61,12 +61,16 @@ tasks.withType(JacocoReport) { report ->
 		String testName = "${srcName}Test"
 
 		srcFile.write("""
+package bv;
+
 public class ${srcName} {
 	public int twoPlusTwo() { return 2 + 2; }
 }
 """)
 
 		testDir.file("${testName}.groovy").write("""
+package bv
+
 import org.junit.Test
 
 public class ${testName} {
@@ -89,7 +93,7 @@ public class ${testName} {
 	}
 
 	@Test
-	void jacocoReport_ShouldCreateCombinedReportForAllKnownTestConfigurations() {
+	void shouldCreateCombinedReportForAllKnownTestConfigurations() {
 		createSrcAndTestFiles(mainSrcFile, testDir)
 		createSrcAndTestFiles(mainSrcFile, componentTestDir)
 		buildFile << """
@@ -120,7 +124,7 @@ apply plugin: 'test-ext'
 apply plugin: 'component-test'
 
 jacocoComponentTestReport {
-	sourceSets project.sourceSets.main
+	sourceSets sourceSets.main
 }
 """
 		enableXmlReports()
@@ -136,6 +140,19 @@ jacocoComponentTestReport {
 		assertCoverageReportReferencesTestFile(allCoverageReport, mainTestSrcFile)
 		assertCoverageReportReferencesTestFile(componentTestCoverageReport, mainSrcFile)
 		assertCoverageReportDoesNotReferenceTestFile(componentTestCoverageReport, mainTestSrcFile)
+	}
+
+	@Test
+	void shouldLinkToSource() {
+		createSrcAndTestFiles(mainSrcFile, testDir)
+		buildFile << """
+apply plugin: 'jacoco-ext'
+"""
+
+		run("coverage")
+
+		assert file("build/reports/jacoco/test/html/bv/${mainSrcFile.baseName}.html").exists()
+		assert file("build/reports/jacoco/test/html/bv/${mainSrcFile.name}.html").exists()
 	}
 
 }

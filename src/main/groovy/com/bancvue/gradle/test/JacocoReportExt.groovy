@@ -15,6 +15,8 @@
  */
 package com.bancvue.gradle.test
 
+import groovy.util.logging.Slf4j
+import org.gradle.api.file.FileCollection
 import org.gradle.api.reporting.Report
 import org.gradle.api.tasks.SourceSet
 import org.gradle.internal.reflect.Instantiator
@@ -23,9 +25,17 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
 
 import javax.inject.Inject
 
+@Slf4j
 class JacocoReportExt extends JacocoReport {
 
-	Set<SourceSet> sourceSets = []
+	// NOTE: the more appropriate name for this would be 'sourceSets'; however, in the context of a gradle build script,
+	// this ends up intercepting calls which are meant for the project.  for example, if we declared a sourceSets
+	// variable here, the following would not work as intended when declared in build.gradle...
+	// jacocoTestReport {
+	//   reports.additionalSourceDirs files(sourceSets.main.java.srcDirs)
+	// }
+	//
+	Set<SourceSet> internalSourceSets = []
 
 	@Inject
 	JacocoReportExt(Instantiator instantiator) {
@@ -44,15 +54,17 @@ class JacocoReportExt extends JacocoReport {
 	}
 
 	private Set<SourceSet> getSourceSetsOrDefaults() {
-		sourceSets ? sourceSets : getAllMainSourceSets()
+		internalSourceSets ? internalSourceSets : getAllMainSourceSets()
 	}
 
 	private void configureSourceAndClassDirectoriesFromSourceSets() {
 		getSourceSetsOrDefaults().each { SourceSet sourceSet ->
+			log.info("Adding source and output directories from sourceSet ${sourceSet.name}")
+			FileCollection srcDirs = project.files(sourceSet.allJava.srcDirs)
 			if (this.sourceDirectories == null) {
-				this.sourceDirectories = sourceSet.allJava
+				this.sourceDirectories = srcDirs
 			} else {
-				this.sourceDirectories = this.sourceDirectories + sourceSet.allJava
+				this.sourceDirectories = this.sourceDirectories + srcDirs
 			}
 			if (this.classDirectories == null) {
 				this.classDirectories = sourceSet.output
@@ -65,7 +77,7 @@ class JacocoReportExt extends JacocoReport {
 	@Override
 	void sourceSets(SourceSet... sourceSets) {
 		sourceSets.each {
-			this.sourceSets << it
+			this.internalSourceSets << it
 		}
 	}
 
