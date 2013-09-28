@@ -15,6 +15,7 @@
  */
 package com.bancvue.gradle
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet
 
@@ -47,9 +48,13 @@ interface ResourceResolver {
 		}
 
 		URL acquireResourceURL(String resourcePath) {
+			if (resourcePath == null) {
+				throw new GradleException("Invalid input, resourcePath must not be null")
+			}
+
 			def resource = getResourceFromResourceDirOrProjectDirOrPath(resourcePath)
 			if (resource == null) {
-				throw new RuntimeException("Failed to resolve resource with path=${resourcePath}")
+				throw new GradleException("Failed to resolve resource with path=${resourcePath}")
 			}
 			resource
 		}
