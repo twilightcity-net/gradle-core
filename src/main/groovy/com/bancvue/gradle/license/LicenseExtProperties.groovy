@@ -26,7 +26,7 @@ class LicenseExtProperties extends DefaultProjectPropertyContainer {
 
 	String name
 	String resourcePath = "licenses/apache_2.0"
-	List<String> excludedFileExtensions = ["properties", "json", "yml", "yaml"]
+	List<String> excludedFileExtensions = ["properties", "json", "yml", "yaml", "xslt"]
 
 	LicenseExtProperties(Project project) {
 		super(project, NAME)
