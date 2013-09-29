@@ -21,13 +21,10 @@ license {
 	ext.name = "BancVue, LTD"
 }
 
+[licenseMain, licenseFormatMain]*.exclude "licenses/*"
 // exclude the test kit source which was copied from a different project (https://github.com/alkemist/gradle-test-kit)
-// and has it"s own license
-tasks.withType(nl.javadude.gradle.plugins.license.License).each { licenseTask ->
-	licenseTask.exclude "org/gradle/testkit/**"
-}
-licenseMain.exclude "licenses/*"
-
+// and has it's own license
+[licenseMainTest, licenseFormatMainTest]*.exclude "org/gradle/testkit/**"
 
 publishingext {
 	publications {
