@@ -15,12 +15,13 @@
  */
 package com.bancvue.gradle.maven
 
+import com.bancvue.exception.ExceptionSupport
 import com.bancvue.gradle.test.AbstractPluginIntegrationTest
 import com.bancvue.gradle.test.TestFile
-import org.gradle.tooling.BuildException
 import org.junit.Test
 
 
+@Mixin(ExceptionSupport)
 class MavenPublishExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 
 	@Test
@@ -75,7 +76,7 @@ publishingext {
 		assert pomFile.text =~ /build\/reporting/
 	}
 
-	@Test(expected = BuildException)
+	@Test
 	void shouldFailBuild_IfExtendedPublicationDefinedButNoMatchingMavenPublicationIsFound() {
 		buildFile << """
 ext.artifactId='artifact'
@@ -89,7 +90,12 @@ publishingext {
 }
 """
 
-		run("generatePomFileForArtifactPublication")
+		try {
+			run("generatePomFileForArtifactPublication")
+			assert false : "Expected build failure"
+		} catch (Exception ex) {
+			assert getRootCause(ex).message == "Extended publication defined with name 'otherArtifact' but no matching publication found"
+		}
 	}
 
 }
