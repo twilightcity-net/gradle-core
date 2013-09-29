@@ -55,11 +55,18 @@ class PmdCpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 			cpdClasspath = {
 				project.configurations['pmd']
 			}
+			cpdXsltPath = { extension.cpdXsltPath }
 			minimumTokenCount = { extension.minimumTokenCount }
 			ignoreLiterals = { extension.ignoreLiterals }
 			ignoreIdentifiers = { extension.ignoreIdentifiers }
 			ignoreFailures = { extension.ignoreFailures }
-			reportDir = { extension.reportsDir }
+		}
+
+		task.reports.all { report ->
+			report.conventionMapping.with {
+				enabled = { true }
+				destination = { new File(extension.reportsDir, "${baseName}.${report.name}") }
+			}
 		}
 	}
 

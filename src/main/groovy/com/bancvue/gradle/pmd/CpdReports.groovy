@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * 	http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,16 +15,26 @@
  */
 package com.bancvue.gradle.pmd
 
-import org.gradle.api.plugins.quality.CodeQualityExtension
+import org.gradle.api.reporting.ReportContainer
+import org.gradle.api.reporting.SingleFileReport
 
-class CpdExtension extends CodeQualityExtension {
+/**
+ * The reporting configuration for the {@link Cpd} task.
+ */
+interface CpdReports extends ReportContainer<SingleFileReport> {
 
-	int minimumTokenCount = 50
+    /**
+     * The cpd (single file) HTML report
+     *
+     * @return The cpd (single file) HTML report
+     */
+    SingleFileReport getHtml();
 
-	boolean ignoreLiterals = false
-
-	boolean ignoreIdentifiers = false
-
-	String cpdXsltPath = "pmd/cpdhtml.xslt"
+    /**
+     * The cpd (single file) XML report
+     *
+     * @return The cpd (single file) XML report
+     */
+    SingleFileReport getXml();
 
 }

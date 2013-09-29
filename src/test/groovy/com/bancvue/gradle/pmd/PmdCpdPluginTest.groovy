@@ -16,7 +16,6 @@
 package com.bancvue.gradle.pmd
 
 import com.bancvue.gradle.test.AbstractPluginTest
-import com.google.common.io.Files
 import org.junit.Before
 import org.junit.Test
 
@@ -43,13 +42,13 @@ class PmdCpdPluginTest extends AbstractPluginTest {
 		boolean expectedIgnoreLiterals = !extension.ignoreLiterals
 		boolean expectedIgnoreIdentifiers = !extension.ignoreIdentifiers
 		boolean expectedIgnoreFailures = !extension.ignoreFailures
-		File expectedReportsDir = Files.createTempDir()
+		String expectedCpdXsltPath = "${extension.cpdXsltPath}/otherpath"
 		project.cpd {
 			ignoreFailures = expectedIgnoreFailures
 			minimumTokenCount = expectedMinimumTokenCount
 			ignoreLiterals = expectedIgnoreLiterals
 			ignoreIdentifiers = expectedIgnoreIdentifiers
-			reportsDir = expectedReportsDir
+			cpdXsltPath = expectedCpdXsltPath
 		}
 
 		project.tasks.withType(Cpd) { Cpd task ->
@@ -58,7 +57,7 @@ class PmdCpdPluginTest extends AbstractPluginTest {
 			assert task.ignoreLiterals == expectedIgnoreLiterals
 			assert task.ignoreIdentifiers == expectedIgnoreIdentifiers
 			assert task.minimumTokenCount == expectedMinimumTokenCount
-			assert task.reportDir == expectedReportsDir
+			assert task.cpdXsltPath == expectedCpdXsltPath
 		}
 	}
 
@@ -75,7 +74,7 @@ class PmdCpdPluginTest extends AbstractPluginTest {
 			assert task.ignoreLiterals == extension.ignoreLiterals
 			assert task.ignoreIdentifiers == extension.ignoreIdentifiers
 			assert task.minimumTokenCount == extension.minimumTokenCount
-			assert task.reportDir == new File(project.buildDir, 'reports/cpd')
+			assert task.cpdXsltPath == extension.cpdXsltPath
 		}
 	}
 

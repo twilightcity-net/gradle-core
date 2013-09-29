@@ -15,19 +15,24 @@
  */
 package com.bancvue.gradle.pmd
 
+import com.bancvue.gradle.ResourceResolver
 import groovy.util.slurpersupport.GPathResult
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.project.IsolatedAntBuilder
+import org.gradle.api.reporting.Reporting
+import org.gradle.api.reporting.SingleFileReport
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.VerificationTask
+import org.gradle.internal.reflect.Instantiator
 
 import javax.inject.Inject
 
-class Cpd extends SourceTask implements VerificationTask {
+class Cpd extends SourceTask implements VerificationTask, Reporting<CpdReports> {
 
 	/**
 	 * The class path containing the PMD library to be used.
@@ -41,36 +46,71 @@ class Cpd extends SourceTask implements VerificationTask {
 	@Input
 	boolean ignoreIdentifiers
 	@Input
-	File reportDir
+	String cpdXsltPath
+	@Nested
+	private final CpdReportsImpl reports
 	/**
 	 * Whether or not to allow the build to continue if there are warnings.
 	 *
 	 * Example: ignoreFailures = true
 	 */
 	boolean ignoreFailures
-	private final IsolatedAntBuilder antBuilder
+	private IsolatedAntBuilder antBuilder
+	private ResourceResolver resourceResolver
 
 	@Inject
-	Cpd(IsolatedAntBuilder antBuilder) {
+	Cpd(Instantiator instantiator, IsolatedAntBuilder antBuilder) {
+		reports = instantiator.newInstance(CpdReportsImpl, this)
 		this.antBuilder = antBuilder
+		this.resourceResolver = new ResourceResolver.Impl(project)
+	}
+
+	@Override
+	CpdReports getReports() {
+		reports
+	}
+
+	@Override
+	CpdReports reports(Closure closure) {
+		reports.configure(closure)
 	}
 
 	@TaskAction
 	void run() {
-		File cpdOutputFile = new File(getReportDir(), 'cpd.xml')
-		cpdOutputFile.parentFile.mkdirs()
-
-		executeCpdAndWriteResultsToXmlFile(cpdOutputFile)
-		failIfCpdViolationsExceedThresholdElseLog(cpdOutputFile)
+		assertHtmlReportDisabledIfXmlReportDisabled()
+		if (reports.xml.enabled) {
+			executeCpdReport()
+		}
 	}
 
-	private void executeCpdAndWriteResultsToXmlFile(File cpdOutputFile) {
+	private void assertHtmlReportDisabledIfXmlReportDisabled() {
+		if (!reports.xml.enabled && reports.html.enabled) {
+			throw new GradleException("Invalid CPD configuration '${name}' - xml report must be enabled if html report enabled")
+		}
+	}
+
+	private void executeCpdReport() {
+		ensureParentDirectoryExists(reports.xml)
+		executeCpdAndWriteResultsToXmlFile()
+		failIfCpdViolationsExceedThresholdElseLog()
+	}
+
+	private void ensureParentDirectoryExists(SingleFileReport report) {
+		if (!report.destination) {
+			throw new GradleException("Invalid CPD report '${report.name}', no destination directory defined")
+		}
+		report.destination.parentFile.mkdirs()
+	}
+
+	private void executeCpdAndWriteResultsToXmlFile() {
+		ensureParentDirectoryExists(reports.xml)
+
 		Map antCpdArgs = [
 				ignoreLiterals: getIgnoreLiterals(),
 				ignoreIdentifiers: getIgnoreIdentifiers(),
 				minimumtokencount: getMinimumTokenCount(),
 				format: 'xml',
-				outputfile: cpdOutputFile.absolutePath
+				outputfile: reports.xml.destination
 		]
 
 		antBuilder.withClasspath(getCpdClasspath()).execute {
@@ -79,11 +119,33 @@ class Cpd extends SourceTask implements VerificationTask {
 				getSource().addToAntBuilder(ant, 'fileset', FileCollection.AntType.FileSet)
 			}
 		}
+		createHtmlReportIfEnabled()
 	}
 
-	private void failIfCpdViolationsExceedThresholdElseLog(File cpdOutputFile) {
-		if (isCpdViolationDetected(cpdOutputFile)) {
-			String message = "CPD violations found.  See the report at: ${cpdOutputFile}"
+	private void createHtmlReportIfEnabled() {
+		if (reports.html.enabled) {
+			ensureParentDirectoryExists(reports.html)
+			File cpdXsltFile = acquireCpdXsltFile()
+
+			ant.xslt(in: reports.xml.destination,
+					style: cpdXsltFile,
+					out: reports.html.destination)
+		}
+	}
+
+	private File acquireCpdXsltFile() {
+		URL cpdXsltURL = resourceResolver.acquireResourceURL(getCpdXsltPath())
+		File cpdXsltFile = new File(project.buildDir, "pmd/cpdhtml.xslt")
+
+		cpdXsltFile.parentFile.mkdirs()
+		cpdXsltFile.write(cpdXsltURL.text)
+		cpdXsltFile
+	}
+
+	private void failIfCpdViolationsExceedThresholdElseLog() {
+		if (isCpdViolationDetected()) {
+			File cpdReportFile = reports.html.enabled ? reports.html.destination : reports.xml.destination
+			String message = "CPD violations found.  See the report at: ${cpdReportFile}"
 
 			if (getIgnoreFailures()) {
 				logger.warn(message)
@@ -93,8 +155,8 @@ class Cpd extends SourceTask implements VerificationTask {
 		}
 	}
 
-	private boolean isCpdViolationDetected(File cpdOutputFile) {
-		GPathResult pmdCpd = new XmlSlurper().parseText(cpdOutputFile.text)
+	private boolean isCpdViolationDetected() {
+		GPathResult pmdCpd = new XmlSlurper().parseText(reports.xml.destination.text)
 		!pmdCpd.children().isEmpty()
 	}
 
