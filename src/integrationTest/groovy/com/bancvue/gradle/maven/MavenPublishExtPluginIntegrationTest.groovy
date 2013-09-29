@@ -98,4 +98,28 @@ publishingext {
 		}
 	}
 
+	@Test
+	void shouldFailWithMessageRepresentativeOfError_IfCustomPublicationBlockContainsError() {
+		buildFile << """
+ext.artifactId='artifact'
+
+apply plugin: 'maven-publish-ext'
+
+publishingext {
+	publications {
+		"artifact" {
+			undefinedMethod {}
+		}
+	}
+}
+"""
+
+		try {
+			run("generatePomFileForArtifactPublication")
+			assert false : "Expected build failure"
+		} catch (Exception ex) {
+			assert getRootCause(ex).message =~ /^Could not find method undefinedMethod.*/
+		}
+	}
+
 }

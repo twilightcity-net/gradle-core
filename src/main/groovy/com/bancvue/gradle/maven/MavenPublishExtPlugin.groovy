@@ -223,7 +223,11 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 			Closure extPublicationClosure = extPublication.closure
 			extPublicationClosure = extPublicationClosure.rehydrate(delegate, owner, thisObject)
 			extPublicationClosure.resolveStrategy = Closure.DELEGATE_FIRST
-			extPublicationClosure(publication)
+			try {
+				extPublicationClosure(publication)
+			} catch (Exception ex) {
+				throw new GradleException("Failed to apply custom configuration", ex)
+			}
 		}
 	}
 
