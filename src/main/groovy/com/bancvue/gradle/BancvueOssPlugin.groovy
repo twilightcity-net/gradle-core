@@ -15,7 +15,7 @@
  */
 package com.bancvue.gradle
 
-import com.bancvue.gradle.maven.MavenPublishExtPlugin
+import com.bancvue.gradle.maven.MavenExtPlugin
 import com.bancvue.gradle.test.ComponentTestPlugin
 import com.bancvue.gradle.test.JacocoExtPlugin
 import com.bancvue.gradle.test.TestExtPlugin
@@ -23,7 +23,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-class BancvueProjectPlugin implements Plugin<Project> {
+class BancvueOssPlugin implements Plugin<Project> {
 
 	static class VersionNotDefinedException extends GradleException {
 		public VersionNotDefinedException() {
@@ -37,7 +37,7 @@ class BancvueProjectPlugin implements Plugin<Project> {
 		}
 	}
 
-	static final String PLUGIN_NAME = 'bancvue'
+	static final String PLUGIN_NAME = 'bancvue-oss'
 
 	private Project project
 
@@ -86,7 +86,7 @@ class BancvueProjectPlugin implements Plugin<Project> {
 	}
 
 	private void applyMavenPublishExtPlugin() {
-		project.apply(plugin: MavenPublishExtPlugin.PLUGIN_NAME)
+		project.apply(plugin: MavenExtPlugin.PLUGIN_NAME)
 	}
 
 	private void applyTestExtPlugin() {

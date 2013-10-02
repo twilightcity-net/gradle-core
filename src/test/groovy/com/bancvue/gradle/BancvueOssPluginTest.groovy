@@ -15,7 +15,7 @@
  */
 package com.bancvue.gradle
 
-import com.bancvue.gradle.maven.MavenPublishExtPlugin
+import com.bancvue.gradle.maven.MavenExtPlugin
 import com.bancvue.gradle.test.AbstractPluginTest
 import com.bancvue.gradle.test.ComponentTestPlugin
 import com.bancvue.gradle.test.TestExtPlugin
@@ -25,13 +25,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
 
-class BancvueProjectPluginTest extends AbstractPluginTest {
+class BancvueOssPluginTest extends AbstractPluginTest {
 
 	@Rule
 	public ExpectedException exception = ExpectedException.none()
 
-	BancvueProjectPluginTest() {
-		super(BancvueProjectPlugin.PLUGIN_NAME)
+	BancvueOssPluginTest() {
+		super(BancvueOssPlugin.PLUGIN_NAME)
 	}
 
 	@Before
@@ -49,7 +49,7 @@ class BancvueProjectPluginTest extends AbstractPluginTest {
 
 	@Test
 	void apply_ShouldFail_IfVersionNotDefined() {
-		exception.expect(BancvueProjectPlugin.VersionNotDefinedException)
+		exception.expect(BancvueOssPlugin.VersionNotDefinedException)
 		project = ProjectBuilder.builder().withName('project').build()
 		setArtifactId('bancvue')
 
@@ -58,7 +58,7 @@ class BancvueProjectPluginTest extends AbstractPluginTest {
 
 	@Test
 	void apply_ShouldFail_IfArtifactIdNotDefined() {
-		exception.expect(BancvueProjectPlugin.ArtifactIdNotDefinedException)
+		exception.expect(BancvueOssPlugin.ArtifactIdNotDefinedException)
 		project = ProjectBuilder.builder().withName('project').build()
 		project.version = '1.0'
 
@@ -76,7 +76,7 @@ class BancvueProjectPluginTest extends AbstractPluginTest {
 	void apply_ShouldApplyBancvuePublishPlugin() {
 		applyPlugin()
 
-		assertNamedPluginApplied(MavenPublishExtPlugin.PLUGIN_NAME)
+		assertNamedPluginApplied(MavenExtPlugin.PLUGIN_NAME)
 	}
 
 	@Test

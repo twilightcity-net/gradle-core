@@ -1,4 +1,4 @@
-apply plugin: "bancvue"
+apply plugin: "bancvue-oss"
 apply plugin: "integration-test"
 apply plugin: "license-ext"
 
@@ -26,28 +26,22 @@ license {
 // and has it's own license
 [licenseMainTest, licenseFormatMainTest]*.exclude "org/gradle/testkit/**"
 
-publishingext {
-	publications {
-		"gradleCore" {
-			pom.withXml {
-				asNode().children().last() + {
-					resolveStrategy = Closure.DELEGATE_FIRST
-					packaging "jar"
-					url "https://github.com/BancVue/GradlePluginsCore"
-					description "Gradle plugins for general project development"
-					developers {
-						developer {
-							id "bancvue_oss"
-							name "BancVue Open Source Development"
-							email "opensource@bancvue.com"
-						}
-					}
-					scm {
-						url "https://github.com/BancVue/GradlePluginsCore.git"
-						connection "scm:git:git@github.com:BancVue/GradlePluginsCore.git"
-						developerConnection "scm:git:git@github.com:BancVue/GradlePluginsCore.git"
-					}
+uploadArchives {
+	repositories.mavenDeployer {
+		pom.project {
+			packaging "jar"
+			url "https://github.com/BancVue/GradlePluginsCore"
+			developers {
+				developer {
+					id "bancvue_oss"
+					name "BancVue Open Source Development"
+					email "opensource@bancvue.com"
 				}
+			}
+			scm {
+				url "https://github.com/BancVue/GradlePluginsCore.git"
+				connection "scm:git:git@github.com:BancVue/GradlePluginsCore.git"
+				developerConnection "scm:git:git@github.com:BancVue/GradlePluginsCore.git"
 			}
 		}
 	}
