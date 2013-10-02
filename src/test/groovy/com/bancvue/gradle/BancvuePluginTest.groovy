@@ -25,12 +25,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
 
-class BancvueOssPluginTest extends AbstractPluginTest {
+class BancvuePluginTest extends AbstractPluginTest {
 
 	@Rule
 	public ExpectedException exception = ExpectedException.none()
 
-	BancvueOssPluginTest() {
+	BancvuePluginTest() {
 		super(BancvueOssPlugin.PLUGIN_NAME)
 	}
 

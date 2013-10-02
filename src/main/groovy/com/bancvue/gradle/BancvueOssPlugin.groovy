@@ -48,7 +48,7 @@ class BancvueOssPlugin implements Plugin<Project> {
 		applyJavaPlugin()
 		applyGroovyPlugin()
 		applyBancvueDefaultsPlugin()
-		applyMavenPublishExtPlugin()
+		applyMavenExtPlugin()
 		applyTestExtPlugin()
 		applyComponentTestPlugin()
 		applyJacocoExtPlugin()
@@ -85,7 +85,7 @@ class BancvueOssPlugin implements Plugin<Project> {
 		project.apply(plugin: IdeExtPlugin.PLUGIN_NAME)
 	}
 
-	private void applyMavenPublishExtPlugin() {
+	private void applyMavenExtPlugin() {
 		project.apply(plugin: MavenExtPlugin.PLUGIN_NAME)
 	}
 
