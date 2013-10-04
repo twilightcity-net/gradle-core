@@ -17,6 +17,7 @@ package com.bancvue.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.ForkOptions
 import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.compile.GroovyForkOptions
@@ -39,6 +40,7 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 		setCompilerEncoding()
 		addBuildDateAndJdkToJarManifest()
 		setJavaCompatibilityVersion()
+		setDefaultBaseNameForJarTasks()
 	}
 
 	private void setDefaultCompileMemorySettings() {
@@ -84,6 +86,24 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	private void setJavaCompatibilityVersion() {
 		project.setProperty('sourceCompatibility', defaultsProperties.javaVersion)
 		project.setProperty('targetCompatibility', defaultsProperties.javaVersion)
+	}
+
+	private void setDefaultBaseNameForJarTasks() {
+		project.tasks.withType(Jar) { Jar jar ->
+			jar.conventionMapping.baseName = { getDefaultBaseNameForTask(jar) }
+		}
+	}
+
+	private String getDefaultBaseNameForTask(Jar jar) {
+		String baseName = getProjectArtifactId()
+		if (baseName == null) {
+			baseName = jar.baseName
+		}
+		baseName
+	}
+
+	private String getProjectArtifactId() {
+		project.hasProperty('artifactId') ? project.ext.artifactId : null
 	}
 
 }

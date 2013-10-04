@@ -112,19 +112,10 @@ class MavenExtPlugin implements Plugin<Project> {
 		project.hasProperty('artifactId') ? project.ext.artifactId : null
 	}
 
-	private String getBaseNameForTask(Jar task) {
-		String baseName = getProjectArtifactId()
-		if (baseName == null) {
-			baseName = task.baseName
-		}
-		baseName
-	}
-
 	private void addSourcesJarTask() {
 		Jar sourcesJarTask = project.tasks.create("sourcesJar", Jar)
 		sourcesJarTask.configure {
 			group = "Build"
-			baseName = getBaseNameForTask(sourcesJarTask)
 			classifier = "sources"
 			description = "Assembles a jar archive containing the main sources."
 			from project.sourceSets.main.allSource
@@ -137,7 +128,6 @@ class MavenExtPlugin implements Plugin<Project> {
 		javadocJarTask.configure {
 			dependsOn javadocTask
 			group = "Build"
-			baseName = getBaseNameForTask(javadocJarTask)
 			classifier = "javadoc"
 			description = "Assembles a jar archive containing the main javadocs."
 			from javadocTask.destinationDir
