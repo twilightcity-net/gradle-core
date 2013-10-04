@@ -19,7 +19,11 @@ import com.bancvue.gradle.GradlePluginMixin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.plugins.JavaBasePlugin
+import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 
 @Mixin(GradlePluginMixin)
@@ -50,6 +54,7 @@ class TestExtPlugin implements Plugin<Project> {
 			addMainTestConfiguration()
 			addMainTestSourceSet()
 			addMainTestJarTask()
+			addMainTestJavadocTask()
 			updateTestSourceSetToIncludeMainTestConfiguration()
 		}
 	}
@@ -74,6 +79,22 @@ class TestExtPlugin implements Plugin<Project> {
 			classifier = "test"
 			description = "Assembles a jar archive containing the test sources."
 			from project.sourceSets.mainTest.output
+		}
+	}
+
+	private JavaPluginConvention getJavaConvention() {
+		project.getConvention().getPlugins().get("java") as JavaPluginConvention
+	}
+
+	private void addMainTestJavadocTask() {
+		SourceSet mainTestSourceSet = project.sourceSets.mainTest
+		Task mainTestJavadocTask = project.tasks.create("javadocMainTest", Javadoc)
+		mainTestJavadocTask.configure {
+			source = mainTestSourceSet.allJava
+			classpath = mainTestSourceSet.output + mainTestSourceSet.compileClasspath
+			group = JavaBasePlugin.DOCUMENTATION_GROUP
+			description = "Generates Javadoc API documentation for the mainTest source code."
+			destinationDir = new File(javaConvention.docsDir, "mainTestDocs")
 		}
 	}
 
