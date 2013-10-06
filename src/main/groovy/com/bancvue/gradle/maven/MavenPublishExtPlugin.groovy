@@ -16,6 +16,7 @@
 package com.bancvue.gradle.maven
 
 import com.bancvue.gradle.GradlePluginMixin
+import com.bancvue.gradle.license.LicenseExtPlugin
 import com.bancvue.gradle.license.LicenseExtProperties
 import com.bancvue.gradle.license.LicenseModel
 import com.bancvue.gradle.test.TestExtPlugin
@@ -246,13 +247,17 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 	}
 
 	private void attachLicenseToMavenPOMIfLicenseExtPluginApplied(MavenPublication publication) {
-		LicenseExtProperties licenseProperties = new LicenseExtProperties(project)
-		LicenseModel licenseModel = licenseProperties.getLicenseModel()
+		if (project.getPlugins().findPlugin(LicenseExtPlugin)) {
+			LicenseExtProperties licenseProperties = new LicenseExtProperties(project)
+			LicenseModel licenseModel = licenseProperties.getLicenseModel()
 
-		if (licenseModel != null) {
-			attachLicenseModelToMavenPOM(publication, licenseModel)
+			if (licenseModel != null) {
+				attachLicenseModelToMavenPOM(publication, licenseModel)
+			} else {
+				log.warn("license-ext plugin applied but no license model found, bypassing augmentation of maven POM with license info")
+			}
 		} else {
-			log.info("No license model found, bypassing augmentation of maven POM with license info")
+			log.info("license-ext plugin not applied, bypassing augmentation of maven POM with license info")
 		}
 	}
 
