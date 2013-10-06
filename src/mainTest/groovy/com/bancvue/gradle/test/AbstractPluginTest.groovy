@@ -15,13 +15,12 @@
  */
 package com.bancvue.gradle.test
 
-import com.bancvue.gradle.test.ProjectFileSystem
+import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
-
 
 abstract class AbstractPluginTest {
 
@@ -52,8 +51,16 @@ abstract class AbstractPluginTest {
 		project.apply(plugin: pluginName)
 	}
 
+	protected Plugin getPlugin() {
+		project.plugins.getPlugin(pluginName)
+	}
+
+	protected Plugin getNamedPlugin(String pluginName) {
+		project.plugins.getPlugin(pluginName)
+	}
+
 	protected void assertNamedPluginApplied(String pluginName) {
-		assert project.plugins.getPlugin(pluginName) != null
+		assert getNamedPlugin(pluginName) != null
 	}
 
 	protected void setArtifactId(String artifactId) {

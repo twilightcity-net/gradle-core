@@ -109,19 +109,6 @@ class MavenExtPluginTest extends AbstractPluginTest {
 	}
 
 	@Test
-	void getBaseNameForTask_ShouldUseTaskBaseName_IfProjectArtifactIdNotDefined() {
-		project = createProject() // re-create project since artifactId is set as part of setUp
-		Jar jarTask = project.tasks.create('jarTask', Jar)
-		jarTask.baseName = 'someName'
-		MavenExtPlugin plugin = new MavenExtPlugin()
-		plugin.project = project
-
-		String baseName = plugin.getBaseNameForTask(jarTask)
-
-		assert baseName == 'someName'
-	}
-
-	@Test
 	void apply_ShouldSetJarBaseNameToArtifactId_IfArtifactIdSet() {
 		setArtifactId('some-artifact')
 

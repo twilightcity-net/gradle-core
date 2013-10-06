@@ -17,6 +17,7 @@ package com.bancvue.gradle
 
 import com.bancvue.gradle.test.AbstractPluginTest
 import org.gradle.api.tasks.TaskCollection
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.compile.JavaCompile
 import org.junit.Before
@@ -114,6 +115,32 @@ class ProjectDefaultsPluginTest extends AbstractPluginTest {
 
 		assert project.jar.manifest.attributes['Built-Date'] != null
 		assert project.jar.manifest.attributes['Build-Jdk'] == expectedJavaVersion
+	}
+
+	@Test
+	void getDefaultBaseNameForTask_ShouldUseTaskBaseName_IfProjectArtifactIdNotDefined() {
+		project = createProject() // re-create project since artifactId is set as part of setUp
+		Jar jarTask = project.tasks.create('jarTask', Jar)
+		jarTask.baseName = 'someName'
+
+		applyPlugin()
+		ProjectDefaultsPlugin plugin = getPlugin()
+		plugin.project = project
+		String baseName = plugin.getDefaultBaseNameForTask(jarTask)
+
+		assert baseName == 'someName'
+	}
+
+	@Test
+	void getDefaultBaseNameForTask_ShouldUseArtifactId_IfProjectArtifactIdDefined() {
+		applyPlugin()
+		Jar jarTask = project.tasks.create('jarTask', Jar)
+		setArtifactId('some-artifact')
+
+		ProjectDefaultsPlugin plugin = getPlugin()
+		String baseName = plugin.getDefaultBaseNameForTask(jarTask)
+
+		assert baseName == 'some-artifact'
 	}
 
 }
