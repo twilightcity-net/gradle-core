@@ -23,7 +23,7 @@ import org.gradle.api.tasks.TaskAction
 class ClearArtifactCache extends DefaultTask {
 
 	{
-		group = 'Utilities'
+		group = "Utilities"
 	}
 
 	String groupName
@@ -52,7 +52,7 @@ class ClearArtifactCache extends DefaultTask {
 	}
 
 	private static File getUserHome() {
-		String userHome = System.getProperty('user.home')
+		String userHome = System.getProperty("user.home")
 		new File(userHome)
 	}
 
@@ -62,15 +62,33 @@ class ClearArtifactCache extends DefaultTask {
 		project.delete(cacheDirs.toArray())
 	}
 
-	private static List<File> collectGradleCacheDirsWithName(File parentDir, String groupName) {
+	private static List<File> collectGradleCacheDirsWithName(File gradleUserHomeDir, String groupName) {
 		List<File> dirs = []
 
-		parentDir.eachDirRecurse { File dir ->
-			if (dir.name == groupName) {
+		collectGradleCacheArtifactDirs(gradleUserHomeDir).each { File filestoreDir ->
+			filestoreDir.eachDirMatch( { it == groupName } ) { File dir ->
 				dirs << dir
 			}
 		}
 		dirs
+	}
+
+	private static List<File> collectGradleCacheArtifactDirs(File gradleUserHomeDir) {
+		List<File> dirs = []
+
+		new File(gradleUserHomeDir, "caches").eachDir { File dir ->
+			if (dir.name =~ /^artifacts-.*/) {
+				appendToListIfDirExists(dirs, new File(dir, "filestore"))
+				appendToListIfDirExists(dirs, new File(dir, "module-metadata"))
+			}
+		}
+		dirs
+	}
+
+	private static void appendToListIfDirExists(List<File> fileList, File dir) {
+		if (dir.exists()) {
+			fileList << dir
+		}
 	}
 
 }
