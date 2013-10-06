@@ -1,4 +1,5 @@
 import org.apache.ivy.core.module.descriptor.Artifact
+import org.gradle.api.artifacts.maven.MavenDeployment
 import org.gradle.api.artifacts.maven.PomFilterContainer
 import org.gradle.api.artifacts.maven.PublishFilter
 import org.gradle.api.publication.maven.internal.PomFilter
@@ -6,6 +7,7 @@ import org.gradle.api.publication.maven.internal.PomFilter
 apply plugin: "bancvue-oss"
 apply plugin: "integration-test"
 apply plugin: "license-ext"
+apply plugin: "signing"
 
 repositories {
 	mavenCentral()
@@ -67,9 +69,14 @@ artifacts {
 	archives sourcesJarMainTest
 }
 
+signing {
+    sign configurations.archives
+}
 
 uploadArchives {
 	repositories.mavenDeployer {
+		beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
 		pom.project {
 			packaging "jar"
 			url "https://github.com/BancVue/GradlePluginsCore"
