@@ -27,10 +27,10 @@ class TestExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 apply plugin: 'java'
 apply plugin: 'test-ext'
 
-mainTestJar.archiveName='mainTest.jar'
+jarMainTest.archiveName='mainTest.jar'
         """
 
-		run("check", "mainTestJar")
+		run("check", "jarMainTest")
 
 		assert file("build/classes/mainTest/Class.class").exists()
 		ZipArchive mainTestJar = projectFS.archive("build/libs/mainTest.jar")

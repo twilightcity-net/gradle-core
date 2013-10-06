@@ -33,7 +33,7 @@ class TestExtPlugin implements Plugin<Project> {
 	static final String VERIFICATION_GROUP_NAME = "Verification"
 
 	static Jar getMainTestJarTaskOrNullIfMainTestConfigurationNotDefined(Project project) {
-		project.tasks.findByName("mainTestJar")
+		project.tasks.findByName("jarMainTest") as Jar
 	}
 
 
@@ -73,7 +73,7 @@ class TestExtPlugin implements Plugin<Project> {
 	}
 
 	private void addMainTestJarTask() {
-		Task mainTestJarTask = project.tasks.create("mainTestJar", Jar)
+		Jar mainTestJarTask = project.tasks.create("jarMainTest", Jar)
 		mainTestJarTask.configure {
 			group = "Build"
 			classifier = "test"
