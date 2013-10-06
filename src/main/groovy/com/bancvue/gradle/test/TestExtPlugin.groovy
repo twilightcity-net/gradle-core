@@ -76,8 +76,8 @@ class TestExtPlugin implements Plugin<Project> {
 		Jar mainTestJarTask = project.tasks.create("jarMainTest", Jar)
 		mainTestJarTask.configure {
 			group = "Build"
-			classifier = "test"
 			description = "Assembles a jar archive containing the test sources."
+			baseName = baseName + "-test"
 			from project.sourceSets.mainTest.output
 		}
 	}
