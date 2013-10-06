@@ -1,3 +1,8 @@
+import org.apache.ivy.core.module.descriptor.Artifact
+import org.gradle.api.artifacts.maven.PomFilterContainer
+import org.gradle.api.artifacts.maven.PublishFilter
+import org.gradle.api.publication.maven.internal.PomFilter
+
 apply plugin: "bancvue-oss"
 apply plugin: "integration-test"
 apply plugin: "license-ext"
@@ -26,6 +31,43 @@ license {
 // and has it's own license
 [licenseMainTest, licenseFormatMainTest]*.exclude "org/gradle/testkit/**"
 
+
+
+/**********************************************************************************************************************/
+// Everything below is POC
+
+/*
+TODO: create a maven-ext rule which accepts a jar task (or equivalent) and
+ - creates sources task
+ - creates javadoc task
+ - adds sources and javadoc to the publication
+ - add necessary filters by jar name; understands source and javadoc
+ */
+
+task sourcesJarMainTest(type: Jar) {
+	group = "Build"
+	classifier = "sources"
+	description = "Assembles a jar archive containing the mainTest sources."
+	baseName = baseName + "-test"
+	from project.sourceSets.mainTest.allSource
+}
+
+def javadocMainTestTask = project.tasks.getByName('javadocMainTest')
+task javadocJarMainTest(type: Jar) {
+	dependsOn javadocMainTestTask
+	group = "Build"
+	classifier = "javadoc"
+	description = "Assembles a jar archive containing the mainTest javadocs."
+	baseName = baseName + "-test"
+	from javadocMainTestTask.destinationDir
+}
+
+artifacts {
+	archives jarMainTest
+	archives sourcesJarMainTest
+}
+
+
 uploadArchives {
 	repositories.mavenDeployer {
 		pom.project {
@@ -45,4 +87,47 @@ uploadArchives {
 			}
 		}
 	}
+}
+
+uploadArchives {
+	repositories.mavenDeployer {
+		addFilter("test") { Artifact artifact, file ->
+			(artifact.name =~ /.*-test$/).matches()
+		}
+		addFilter("default", new DefaultPublishFilter(it))
+
+		getActivePomFilters().each { PomFilter pomFilter ->
+			pomFilter.setPomTemplate(pom.effectivePom)
+		}
+	}
+}
+
+install {
+	repositories.mavenInstaller {
+		addFilter("test") { Artifact artifact, file ->
+			(artifact.name =~ /.*-test$/).matches()
+		}
+		addFilter("default", new DefaultPublishFilter(it))
+	}
+}
+
+class DefaultPublishFilter implements PublishFilter {
+
+	private PomFilterContainer container
+
+	DefaultPublishFilter(PomFilterContainer container) {
+		this.container = container
+	}
+
+	@Override
+	boolean accept(Artifact artifact, File file) {
+		boolean acceptedByExistingFilter = false
+		container.activePomFilters.each { PomFilter pomFilter ->
+			if (this != pomFilter.filter) {
+				acceptedByExistingFilter = acceptedByExistingFilter || pomFilter.filter.accept(artifact, file)
+			}
+		}
+		!acceptedByExistingFilter
+	}
+
 }
