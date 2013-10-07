@@ -51,19 +51,19 @@ class TestExtPlugin implements Plugin<Project> {
 
 	private void addMainTestConfigurationIfMainTestDirDefined() {
 		if (project.file("src/mainTest").exists()) {
-			addMainTestConfiguration()
-			addMainTestSourceSet()
-			addMainTestJarTask()
-			addMainTestJavadocTask()
-			updateTestSourceSetToIncludeMainTestConfiguration()
+			addConfigurationMainTest()
+			addSourceSetMainTest()
+			addJarMainTestTask()
+			addJavadocMainTestTask()
+			updateSourceSetTestToIncludeConfigurationMainTest()
 		}
 	}
 
-	private void addMainTestConfiguration() {
+	private void addConfigurationMainTest() {
 		createNamedConfigurationExtendingFrom("mainTest", "compile", "runtime")
 	}
 
-	private void addMainTestSourceSet() {
+	private void addSourceSetMainTest() {
 		project.sourceSets {
 			mainTest {
 				compileClasspath = main.output + project.configurations.mainTestCompile
@@ -72,9 +72,9 @@ class TestExtPlugin implements Plugin<Project> {
 		}
 	}
 
-	private void addMainTestJarTask() {
-		Jar mainTestJarTask = project.tasks.create("jarMainTest", Jar)
-		mainTestJarTask.configure {
+	private void addJarMainTestTask() {
+		Jar jarMainTestTask = project.tasks.create("jarMainTest", Jar)
+		jarMainTestTask.configure {
 			group = "Build"
 			description = "Assembles a jar archive containing the test sources."
 			baseName = baseName + "-test"
@@ -86,19 +86,19 @@ class TestExtPlugin implements Plugin<Project> {
 		project.getConvention().getPlugins().get("java") as JavaPluginConvention
 	}
 
-	private void addMainTestJavadocTask() {
-		SourceSet mainTestSourceSet = project.sourceSets.mainTest
-		Task mainTestJavadocTask = project.tasks.create("javadocMainTest", Javadoc)
-		mainTestJavadocTask.configure {
-			source = mainTestSourceSet.allJava
-			classpath = mainTestSourceSet.output + mainTestSourceSet.compileClasspath
+	private void addJavadocMainTestTask() {
+		SourceSet sourceSetMainTest = project.sourceSets.mainTest
+		Task javadocMainTestTask = project.tasks.create("javadocMainTest", Javadoc)
+		javadocMainTestTask.configure {
+			source = sourceSetMainTest.allJava
+			classpath = sourceSetMainTest.output + sourceSetMainTest.compileClasspath
 			group = JavaBasePlugin.DOCUMENTATION_GROUP
 			description = "Generates Javadoc API documentation for the mainTest source code."
 			destinationDir = new File(javaConvention.docsDir, "mainTestDocs")
 		}
 	}
 
-	private void updateTestSourceSetToIncludeMainTestConfiguration() {
+	private void updateSourceSetTestToIncludeConfigurationMainTest() {
 		project.sourceSets {
 			test {
 				compileClasspath = mainTest.output + main.output +
