@@ -41,12 +41,12 @@ version = '1.0'
 	void shouldPublishArtifactAndSources() {
 		emptyClassFile("src/main/java/Class.java")
 		buildFile << """
+apply plugin: 'project-defaults'
 apply plugin: 'maven-ext'
 		"""
 
 		run("publishRemote")
 
-		println projectFS.absolutePath
 		assert file("build/libs/artifact-1.0.jar").exists()
 		assert file("build/libs/artifact-1.0-sources.jar").exists()
 		assert localMavenRepo.file("group/artifact/1.0/artifact-1.0.jar").exists()
