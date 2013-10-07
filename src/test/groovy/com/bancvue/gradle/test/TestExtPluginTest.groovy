@@ -50,7 +50,7 @@ class TestExtPluginTest extends AbstractPluginTest {
 		applyPlugin()
 
 		StyledTestOutput styledOutputTask = project.tasks.getByName('styledTestOutput')
-		use(TaskExtensions) {
+		use(TaskCategory) {
 			styledOutputTask.assertMustRunBefore('test')
 		}
 	}

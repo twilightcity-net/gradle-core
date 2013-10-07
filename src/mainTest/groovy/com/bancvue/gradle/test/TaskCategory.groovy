@@ -18,7 +18,7 @@ package com.bancvue.gradle.test
 import org.gradle.api.Task
 
 
-class TaskExtensions {
+class TaskCategory {
 
 	static void assertMustRunAfter(Task self, String taskName) {
 		Task task = self.getProject().getTasks().getByName(taskName)

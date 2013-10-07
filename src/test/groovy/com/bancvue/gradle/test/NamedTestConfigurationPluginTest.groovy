@@ -88,7 +88,7 @@ class NamedTestConfigurationPluginTest extends AbstractPluginTest {
 		applyPlugin()
 
 		Task functionalTestTask = project.tasks.getByName('functionalTest')
-		use(TaskExtensions) {
+		use(TaskCategory) {
 			functionalTestTask.assertMustRunAfter('test')
 		}
 	}
