@@ -35,34 +35,9 @@ license {
 
 
 
+
 /**********************************************************************************************************************/
 // Everything below is POC
-
-/*
-TODO: create a maven-ext rule which accepts a jar task (or equivalent) and
- - creates sources task
- - creates javadoc task
- - adds sources and javadoc to the publication
- - add necessary filters by jar name; understands source and javadoc
- */
-
-task sourcesJarMainTest(type: Jar) {
-	group = "Build"
-	classifier = "sources"
-	description = "Assembles a jar archive containing the mainTest sources."
-	baseName = baseName + "-test"
-	from project.sourceSets.mainTest.allSource
-}
-
-def javadocMainTestTask = project.tasks.getByName('javadocMainTest')
-task javadocJarMainTest(type: Jar) {
-	dependsOn javadocMainTestTask
-	group = "Build"
-	classifier = "javadoc"
-	description = "Assembles a jar archive containing the mainTest javadocs."
-	baseName = baseName + "-test"
-	from javadocMainTestTask.destinationDir
-}
 
 artifacts {
 	archives jarMainTest

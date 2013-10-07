@@ -16,6 +16,7 @@
 package com.bancvue.gradle.maven
 
 import com.bancvue.gradle.GradlePluginMixin
+import com.bancvue.gradle.categories.ProjectCategory
 import com.bancvue.gradle.license.LicenseExtProperties
 import com.bancvue.gradle.license.LicenseModel
 import groovy.util.logging.Slf4j
@@ -113,23 +114,17 @@ class MavenExtPlugin implements Plugin<Project> {
 	}
 
 	private void addSourcesJarTask() {
-		Jar sourcesJarTask = project.tasks.create("sourcesJar", Jar)
+		Jar sourcesJarTask = ProjectCategory.createJarTask(project, "sourcesJar", "Build", "main", "sources")
 		sourcesJarTask.configure {
-			group = "Build"
-			classifier = "sources"
-			description = "Assembles a jar archive containing the main sources."
 			from project.sourceSets.main.allSource
 		}
 	}
 
 	private void addJavadocJarTask() {
 		Javadoc javadocTask = project.tasks.getByName('javadoc')
-		Jar javadocJarTask = project.tasks.create("javadocJar", Jar)
+		Jar javadocJarTask = ProjectCategory.createJarTask(project, "javadocJar", "Build", "main", "javadoc")
 		javadocJarTask.configure {
-			dependsOn javadocTask
-			group = "Build"
-			classifier = "javadoc"
-			description = "Assembles a jar archive containing the main javadocs."
+			dependsOn { javadocTask }
 			from javadocTask.destinationDir
 		}
 	}

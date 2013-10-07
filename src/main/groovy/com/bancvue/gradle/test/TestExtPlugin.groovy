@@ -16,11 +16,10 @@
 package com.bancvue.gradle.test
 
 import com.bancvue.gradle.GradlePluginMixin
+import com.bancvue.gradle.categories.ProjectCategory
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.plugins.JavaBasePlugin
-import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
@@ -54,7 +53,9 @@ class TestExtPlugin implements Plugin<Project> {
 			addConfigurationMainTest()
 			addSourceSetMainTest()
 			addJarMainTestTask()
+			addSourcesJarMainTestTask()
 			addJavadocMainTestTask()
+			addJavadocJarMainTestTask()
 			updateSourceSetTestToIncludeConfigurationMainTest()
 		}
 	}
@@ -73,28 +74,47 @@ class TestExtPlugin implements Plugin<Project> {
 	}
 
 	private void addJarMainTestTask() {
-		Jar jarMainTestTask = project.tasks.create("jarMainTest", Jar)
+		Jar jarMainTestTask = ProjectCategory.createJarTask(project, "jarMainTest", "Build", "mainTest")
 		jarMainTestTask.configure {
-			group = "Build"
-			description = "Assembles a jar archive containing the test sources."
 			baseName = baseName + "-test"
 			from project.sourceSets.mainTest.output
 		}
 	}
 
-	private JavaPluginConvention getJavaConvention() {
-		project.getConvention().getPlugins().get("java") as JavaPluginConvention
+	private void addSourcesJarMainTestTask() {
+		Jar sourcesJarMainTestTask = ProjectCategory.createJarTask(project, "sourcesJarMainTest", "Build", "mainTest", "sources")
+		sourcesJarMainTestTask.configure {
+			baseName = baseName + "-test"
+			from project.sourceSets.mainTest.allSource
+		}
 	}
 
 	private void addJavadocMainTestTask() {
+		File mainTestDocsDir = getMainTestDocsDir()
 		SourceSet sourceSetMainTest = project.sourceSets.mainTest
-		Task javadocMainTestTask = project.tasks.create("javadocMainTest", Javadoc)
+		Javadoc javadocMainTestTask = project.tasks.create("javadocMainTest", Javadoc)
 		javadocMainTestTask.configure {
 			source = sourceSetMainTest.allJava
 			classpath = sourceSetMainTest.output + sourceSetMainTest.compileClasspath
 			group = JavaBasePlugin.DOCUMENTATION_GROUP
 			description = "Generates Javadoc API documentation for the mainTest source code."
-			destinationDir = new File(javaConvention.docsDir, "mainTestDocs")
+			destinationDir = mainTestDocsDir
+		}
+	}
+
+	private File getMainTestDocsDir() {
+		use(ProjectCategory) {
+			new File(project.getJavaConvention().docsDir, "mainTestDocs")
+		}
+	}
+
+	private void addJavadocJarMainTestTask() {
+		Javadoc javadocMainTestTask = project.tasks.getByName("javadocMainTest")
+		Jar javadocJarMainTestTask = ProjectCategory.createJarTask(project, "javadocJarMainTest", "Build", "mainTest", "javadoc")
+		javadocJarMainTestTask.configure {
+			dependsOn { javadocMainTestTask }
+			baseName = baseName + "-test"
+			from javadocMainTestTask.destinationDir
 		}
 	}
 

@@ -21,7 +21,7 @@ import org.junit.Test
 class TestExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 
 	@Test
-	void shouldCompileMainTestSourceAndCreateJarFromSource() {
+	void jarMainTest_ShouldCompileMainTestSourceAndCreateJarFromSource() {
 		emptyClassFile("src/mainTest/java/Class.java")
 		buildFile << """
 apply plugin: 'java'
@@ -36,6 +36,29 @@ jarMainTest.archiveName='mainTest.jar'
 		ZipArchive mainTestJar = projectFS.archive("build/libs/mainTest.jar")
 		assert mainTestJar.exists()
 		assert mainTestJar.acquireContentForEntryWithNameLike("Class.class")
+	}
+
+	@Test
+	void javadocJarMainTest_ShouldGenerateMainTestJavadocAndCreateJarFromJavadoc() {
+		file("src/mainTest/java/Class.java") << """
+/**
+ * Here are some docs
+ */
+public class Class {}
+"""
+		buildFile << """
+apply plugin: 'java'
+apply plugin: 'test-ext'
+
+javadocJarMainTest.archiveName='mainTestJavadoc.jar'
+        """
+
+		run("check", "javadocJarMainTest")
+
+		assert file("build/docs/mainTestDocs/Class.html").exists()
+		ZipArchive mainTestJavadocJar = projectFS.archive("build/libs/mainTestJavadoc.jar")
+		assert mainTestJavadocJar.exists()
+		assert mainTestJavadocJar.acquireContentForEntryWithNameLike("Class.html")
 	}
 
 }
