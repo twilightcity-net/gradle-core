@@ -1,7 +1,6 @@
+import com.bancvue.gradle.maven.DefaultPublishFilter
 import org.apache.ivy.core.module.descriptor.Artifact
 import org.gradle.api.artifacts.maven.MavenDeployment
-import org.gradle.api.artifacts.maven.PomFilterContainer
-import org.gradle.api.artifacts.maven.PublishFilter
 import org.gradle.api.publication.maven.internal.PomFilter
 
 apply plugin: "bancvue-oss"
@@ -91,25 +90,4 @@ install {
 		}
 		addFilter("default", new DefaultPublishFilter(it))
 	}
-}
-
-class DefaultPublishFilter implements PublishFilter {
-
-	private PomFilterContainer container
-
-	DefaultPublishFilter(PomFilterContainer container) {
-		this.container = container
-	}
-
-	@Override
-	boolean accept(Artifact artifact, File file) {
-		boolean acceptedByExistingFilter = false
-		container.activePomFilters.each { PomFilter pomFilter ->
-			if (this != pomFilter.filter) {
-				acceptedByExistingFilter = acceptedByExistingFilter || pomFilter.filter.accept(artifact, file)
-			}
-		}
-		!acceptedByExistingFilter
-	}
-
 }
