@@ -118,6 +118,20 @@ class ProjectDefaultsPluginTest extends AbstractPluginTest {
 	}
 
 	@Test
+	void apply_ShouldSetDefaultJarBaseName_AndAllowOverride() {
+		Jar jarTask = project.tasks.create('jarTask', Jar)
+		setArtifactId('some-artifact')
+
+		applyPlugin()
+
+		assert jarTask.baseName == 'some-artifact'
+
+		jarTask.baseName = 'other-artifact'
+
+		assert jarTask.baseName == 'other-artifact'
+	}
+
+	@Test
 	void getDefaultBaseNameForTask_ShouldUseTaskBaseName_IfProjectArtifactIdNotDefined() {
 		project = createProject() // re-create project since artifactId is set as part of setUp
 		Jar jarTask = project.tasks.create('jarTask', Jar)
