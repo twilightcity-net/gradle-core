@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bancvue.gradle
+package com.bancvue.gradle.support
 
-import com.bancvue.gradle.tasks.ClearArtifactCache
-import com.bancvue.gradle.tasks.PrintClasspath
+import com.bancvue.gradle.support.ClearArtifactCache
+import com.bancvue.gradle.support.PrintClasspath
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task

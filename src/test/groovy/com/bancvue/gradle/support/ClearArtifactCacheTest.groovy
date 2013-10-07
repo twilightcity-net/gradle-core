@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bancvue.gradle.tasks
+package com.bancvue.gradle.support
 
+import com.bancvue.gradle.support.ClearArtifactCache
 import com.google.common.io.Files
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder

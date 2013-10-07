@@ -16,6 +16,7 @@
 package com.bancvue.gradle
 
 import com.bancvue.gradle.maven.MavenExtPlugin
+import com.bancvue.gradle.support.ProjectSupportPlugin
 import com.bancvue.gradle.test.ComponentTestPlugin
 import com.bancvue.gradle.test.JacocoExtPlugin
 import com.bancvue.gradle.test.TestExtPlugin

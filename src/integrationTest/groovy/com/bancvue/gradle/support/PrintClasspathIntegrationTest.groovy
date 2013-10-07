@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bancvue.gradle.tasks
+package com.bancvue.gradle.support
 
 import com.bancvue.gradle.test.AbstractPluginIntegrationTest
 import org.gradle.testkit.functional.ExecutionResult
 import org.junit.Test
 
 class PrintClasspathIntegrationTest extends AbstractPluginIntegrationTest {
-
 
 	@Test
 	void shouldPrintCompileAndRuntimeClasspathsToConsoleForAllSourceSets() {
@@ -29,7 +28,7 @@ apply plugin: 'java'
 dependencies {
     compile localGroovy()
 }
-task printClasspath(type: com.bancvue.gradle.tasks.PrintClasspath)
+task printClasspath(type: com.bancvue.gradle.support.PrintClasspath)
         """
 
 		ExecutionResult result = run("printClasspath")
@@ -46,7 +45,7 @@ task printClasspath(type: com.bancvue.gradle.tasks.PrintClasspath)
 	void shouldFilterSourceSetByName() {
 		buildFile << """
 apply plugin: 'java'
-task printClasspath(type: com.bancvue.gradle.tasks.PrintClasspath)
+task printClasspath(type: com.bancvue.gradle.support.PrintClasspath)
         """
 
 		ExecutionResult result = run("printClasspath", "-PsourceSetName=main")
