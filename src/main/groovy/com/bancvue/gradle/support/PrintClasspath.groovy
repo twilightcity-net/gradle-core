@@ -22,7 +22,7 @@ import org.gradle.api.tasks.TaskAction
 
 class PrintClasspath extends DefaultTask {
 
-	{
+	PrintClasspath() {
 		description = 'Print classpaths of each source set to console (-Pfullpath=1 to write fully qualified paths, ' +
 				'-PsourceSetName=<name> to filter by source set)'
 	}
