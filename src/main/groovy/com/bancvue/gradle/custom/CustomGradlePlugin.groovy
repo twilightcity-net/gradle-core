@@ -16,7 +16,7 @@
 package com.bancvue.gradle.custom
 
 import com.bancvue.gradle.ResourceResolver
-import com.bancvue.gradle.maven.MavenPublishExtPlugin
+import com.bancvue.gradle.maven.publish.MavenPublishExtPlugin
 import com.bancvue.gradle.maven.MavenRepositoryProperties
 import org.gradle.api.Plugin
 import org.gradle.api.Project

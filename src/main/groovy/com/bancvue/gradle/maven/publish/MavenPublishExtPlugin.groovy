@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bancvue.gradle.maven
+package com.bancvue.gradle.maven.publish
 
 import com.bancvue.gradle.GradlePluginMixin
 import com.bancvue.gradle.JavaExtPlugin
 import com.bancvue.gradle.license.LicenseExtPlugin
 import com.bancvue.gradle.license.LicenseExtProperties
 import com.bancvue.gradle.license.LicenseModel
+import com.bancvue.gradle.maven.MavenRepositoryProperties
 import com.bancvue.gradle.test.TestExtPlugin
 import groovy.util.logging.Slf4j
 import org.gradle.api.GradleException
