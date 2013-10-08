@@ -15,7 +15,6 @@
  */
 package com.bancvue.gradle.maven
 
-import com.bancvue.gradle.GradlePluginMixin
 import com.bancvue.gradle.categories.ProjectCategory
 import com.bancvue.gradle.license.LicenseExtProperties
 import com.bancvue.gradle.license.LicenseModel
@@ -28,7 +27,6 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
 
 @Slf4j
-@Mixin(GradlePluginMixin)
 class MavenExtPlugin implements Plugin<Project> {
 
 	static final String PLUGIN_NAME = 'maven-ext'
