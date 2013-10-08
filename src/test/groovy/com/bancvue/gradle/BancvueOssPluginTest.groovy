@@ -42,6 +42,13 @@ class BancvueOssPluginTest extends AbstractPluginTest {
 	}
 
 	@Test
+	void apply_ShouldApplyJavaExtPlugin() {
+		applyPlugin()
+
+		assertNamedPluginApplied(JavaExtPlugin.PLUGIN_NAME)
+	}
+
+	@Test
 	void apply_ShouldApplyGroovyPlugin() {
 		applyPlugin()
 

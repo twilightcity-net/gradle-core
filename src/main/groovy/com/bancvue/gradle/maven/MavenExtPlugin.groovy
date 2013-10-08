@@ -15,7 +15,7 @@
  */
 package com.bancvue.gradle.maven
 
-import com.bancvue.gradle.categories.ProjectCategory
+import com.bancvue.gradle.JavaExtPlugin
 import com.bancvue.gradle.license.LicenseExtProperties
 import com.bancvue.gradle.license.LicenseModel
 import groovy.util.logging.Slf4j
@@ -23,8 +23,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.maven.MavenPom
-import org.gradle.api.tasks.bundling.Jar
-import org.gradle.api.tasks.javadoc.Javadoc
 
 @Slf4j
 class MavenExtPlugin implements Plugin<Project> {
@@ -37,7 +35,7 @@ class MavenExtPlugin implements Plugin<Project> {
 	public void apply(Project project) {
 		this.project = project
 		this.repositoryProperties = new MavenRepositoryProperties(project)
-		project.apply(plugin: 'java')
+		project.apply(plugin: JavaExtPlugin.PLUGIN_NAME)
 		addArtifactDependencyAndPublishingSupport()
 	}
 
@@ -47,8 +45,6 @@ class MavenExtPlugin implements Plugin<Project> {
 		addMavenLocalAndOrganizationArtifactRepository()
 		addOrganizationPublishingRepository()
 		augmentMavenPom()
-		addSourcesJarTask()
-		addJavadocJarTask()
 
 		// TODO: need some way to optionally configure source and javadoc as archives
 		project.artifacts {
@@ -108,22 +104,6 @@ class MavenExtPlugin implements Plugin<Project> {
 
 	private String getProjectArtifactId() {
 		project.hasProperty('artifactId') ? project.ext.artifactId : null
-	}
-
-	private void addSourcesJarTask() {
-		Jar sourcesJarTask = ProjectCategory.createJarTask(project, "sourcesJar", "main", "sources")
-		sourcesJarTask.configure {
-			from project.sourceSets.main.allSource
-		}
-	}
-
-	private void addJavadocJarTask() {
-		Javadoc javadocTask = project.tasks.getByName('javadoc')
-		Jar javadocJarTask = ProjectCategory.createJarTask(project, "javadocJar", "main", "javadoc")
-		javadocJarTask.configure {
-			dependsOn { javadocTask }
-			from javadocTask.destinationDir
-		}
 	}
 
 	private void augmentMavenPom() {

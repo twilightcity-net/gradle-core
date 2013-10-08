@@ -46,7 +46,7 @@ class BancvueOssPlugin implements Plugin<Project> {
 		this.project = project
 		project.group = 'com.bancvue'
 		assertRequiredPropertiesDefined()
-		applyJavaPlugin()
+		applyJavaExtPlugin()
 		applyGroovyPlugin()
 		applyBancvueDefaultsPlugin()
 		applyMavenExtPlugin()
@@ -74,8 +74,8 @@ class BancvueOssPlugin implements Plugin<Project> {
 		}
 	}
 
-	private void applyJavaPlugin() {
-		project.apply(plugin: 'java')
+	private void applyJavaExtPlugin() {
+		project.apply(plugin: JavaExtPlugin.PLUGIN_NAME)
 	}
 
 	private void applyGroovyPlugin() {

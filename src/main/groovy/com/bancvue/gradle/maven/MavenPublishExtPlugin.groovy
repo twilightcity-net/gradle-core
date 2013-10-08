@@ -16,6 +16,7 @@
 package com.bancvue.gradle.maven
 
 import com.bancvue.gradle.GradlePluginMixin
+import com.bancvue.gradle.JavaExtPlugin
 import com.bancvue.gradle.license.LicenseExtPlugin
 import com.bancvue.gradle.license.LicenseExtProperties
 import com.bancvue.gradle.license.LicenseModel
@@ -29,7 +30,6 @@ import org.gradle.api.publish.Publication
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.api.tasks.javadoc.Javadoc
 
 @Slf4j
 @Mixin(GradlePluginMixin)
@@ -49,7 +49,7 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 	public void apply(Project project) {
 		this.project = project
 		this.repositoryProperties = new MavenRepositoryProperties(project)
-		project.apply(plugin: 'java')
+		project.apply(plugin: JavaExtPlugin.PLUGIN_NAME)
 		addPublishingExtExtension()
 		addArtifactDependencyAndPublishingSupport()
 		project.afterEvaluate {
@@ -94,8 +94,6 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		renamePublishTasks()
 		addMavenLocalAndOrganizationArtifactRepository()
 		addOrganizationPublishingRepository()
-		addSourceJarTask()
-		addJavadocJarTask()
 		addProjectPublicationIfCustomPublicationNotDefined()
 	}
 
@@ -153,38 +151,6 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 					}
 				}
 			}
-		}
-	}
-
-	private String getBaseNameForTask(Jar task) {
-		String baseName = getExtension().projectArtifactId
-		if (baseName == null) {
-			baseName = task.baseName
-		}
-		baseName
-	}
-
-	private void addSourceJarTask() {
-		Jar sourceJarTask = project.tasks.create("sourceJar", Jar)
-		sourceJarTask.configure {
-			group = "Build"
-			baseName = getBaseNameForTask(sourceJarTask)
-			classifier = "sources"
-			description = "Assembles a jar archive containing the main sources."
-			from project.sourceSets.main.allSource
-		}
-	}
-
-	private void addJavadocJarTask() {
-		Javadoc javadocTask = project.tasks.getByName('javadoc')
-		Jar javadocJarTask = project.tasks.create("javadocJar", Jar)
-		javadocJarTask.configure {
-			dependsOn javadocTask
-			group = "Build"
-			baseName = getBaseNameForTask(javadocJarTask)
-			classifier = "javadoc"
-			description = "Assembles a jar archive containing the main javadocs."
-			from javadocTask.destinationDir
 		}
 	}
 
@@ -275,7 +241,7 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 	}
 
 	private void attachAdditionalArtifactsToMavenPublication(MavenPublication publication) {
-		attachArtifactToMavenPublication(publication, "sourceJar")
+		attachArtifactToMavenPublication(publication, "sourcesJar")
 //		attachArtifactToMavenPublication(publication, "javadocJar")
 		// TODO: should publish test as separate publication so source and javadoc can be attached
 		attachTestArtifactToMavenPublicationIfMainTestConfigurationDefined(publication)
@@ -289,7 +255,6 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 	private void attachTestArtifactToMavenPublicationIfMainTestConfigurationDefined(MavenPublication publication) {
 		Jar mainTestJarTask = TestExtPlugin.getMainTestJarTaskOrNullIfMainTestConfigurationNotDefined(project)
 		if (mainTestJarTask != null) {
-			mainTestJarTask.baseName = getBaseNameForTask(mainTestJarTask)
 			publication.artifact(mainTestJarTask)
 		}
 	}
