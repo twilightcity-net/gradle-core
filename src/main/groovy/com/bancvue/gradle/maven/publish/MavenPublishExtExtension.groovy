@@ -34,11 +34,15 @@ class MavenPublishExtExtension {
 	}
 
 	private String getDefaultPrimaryArtifactName() {
-		String projectName = ProjectCategory.getArtifactId(project)
+		String projectName = getProjectArtifactId()
 		if (projectName == null) {
 			projectName = project.name
 		}
 		projectName.replaceAll(/[-](\S)/) { it[1].toUpperCase() }
+	}
+
+	String getProjectArtifactId() {
+		ProjectCategory.getArtifactId(project)
 	}
 
 	void publications(Closure configure) {
