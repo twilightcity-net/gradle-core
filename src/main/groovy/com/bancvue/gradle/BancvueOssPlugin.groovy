@@ -15,6 +15,7 @@
  */
 package com.bancvue.gradle
 
+import com.bancvue.gradle.license.LicenseExtPlugin
 import com.bancvue.gradle.maven.MavenExtPlugin
 import com.bancvue.gradle.support.ProjectSupportPlugin
 import com.bancvue.gradle.test.ComponentTestPlugin
@@ -48,13 +49,14 @@ class BancvueOssPlugin implements Plugin<Project> {
 		assertRequiredPropertiesDefined()
 		applyJavaExtPlugin()
 		applyGroovyPlugin()
-		applyBancvueDefaultsPlugin()
+		applyProjectDefaultsPlugin()
+		applyLicenseExtPlugin()
 		applyMavenExtPlugin()
 		applyTestExtPlugin()
 		applyComponentTestPlugin()
 		applyJacocoExtPlugin()
 		applyIdeExtPlugin()
-		applyBancvueUtilPlugin()
+		applyProjectSupportPlugin()
 	}
 
 	private void assertRequiredPropertiesDefined() {
@@ -86,6 +88,10 @@ class BancvueOssPlugin implements Plugin<Project> {
 		project.apply(plugin: IdeExtPlugin.PLUGIN_NAME)
 	}
 
+	private void applyLicenseExtPlugin() {
+		project.apply(plugin: LicenseExtPlugin.PLUGIN_NAME)
+	}
+
 	private void applyMavenExtPlugin() {
 		project.apply(plugin: MavenExtPlugin.PLUGIN_NAME)
 	}
@@ -102,11 +108,11 @@ class BancvueOssPlugin implements Plugin<Project> {
 		project.apply(plugin: JacocoExtPlugin.PLUGIN_NAME)
 	}
 
-	private void applyBancvueUtilPlugin() {
+	private void applyProjectSupportPlugin() {
 		project.apply(plugin: ProjectSupportPlugin.PLUGIN_NAME)
 	}
 
-	private void applyBancvueDefaultsPlugin() {
+	private void applyProjectDefaultsPlugin() {
 		project.apply(plugin: ProjectDefaultsPlugin.PLUGIN_NAME)
 	}
 

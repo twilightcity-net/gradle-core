@@ -5,7 +5,6 @@ import org.gradle.api.publication.maven.internal.PomFilter
 
 apply plugin: "bancvue-oss"
 apply plugin: "integration-test"
-apply plugin: "license-ext"
 apply plugin: "signing"
 
 repositories {

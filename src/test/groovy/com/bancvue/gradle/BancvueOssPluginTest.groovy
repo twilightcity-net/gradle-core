@@ -15,6 +15,7 @@
  */
 package com.bancvue.gradle
 
+import com.bancvue.gradle.license.LicenseExtPlugin
 import com.bancvue.gradle.maven.MavenExtPlugin
 import com.bancvue.gradle.support.ProjectSupportPlugin
 import com.bancvue.gradle.test.AbstractPluginTest
@@ -74,14 +75,14 @@ class BancvueOssPluginTest extends AbstractPluginTest {
 	}
 
 	@Test
-	void apply_ShouldApplyBancvueIdePlugin() {
+	void apply_ShouldApplyIdeExtPlugin() {
 		applyPlugin()
 
 		assertNamedPluginApplied(IdeExtPlugin.PLUGIN_NAME)
 	}
 
 	@Test
-	void apply_ShouldApplyBancvuePublishPlugin() {
+	void apply_ShouldApplyMavenExtPlugin() {
 		applyPlugin()
 
 		assertNamedPluginApplied(MavenExtPlugin.PLUGIN_NAME)
@@ -95,24 +96,31 @@ class BancvueOssPluginTest extends AbstractPluginTest {
 	}
 
 	@Test
-	void apply_ShouldApplyBancvueComponentTestPlugin() {
+	void apply_ShouldApplyComponentTestPlugin() {
 		applyPlugin()
 
 		assertNamedPluginApplied(ComponentTestPlugin.PLUGIN_NAME)
 	}
 
 	@Test
-	void apply_ShouldApplyBancvueUtilitiesPlugin() {
+	void apply_ShouldApplyProjectSupportPlugin() {
 		applyPlugin()
 
 		assertNamedPluginApplied(ProjectSupportPlugin.PLUGIN_NAME)
 	}
 
 	@Test
-	void apply_ShouldApplyBancvueDefaultsPlugin() {
+	void apply_ShouldApplyProjectDefaultsPlugin() {
 		applyPlugin()
 
 		assertNamedPluginApplied(ProjectDefaultsPlugin.PLUGIN_NAME)
+	}
+
+	@Test
+	void apply_ShouldApplyLicenseExtPlugin() {
+		applyPlugin()
+
+		assertNamedPluginApplied(LicenseExtPlugin.PLUGIN_NAME)
 	}
 
 }
