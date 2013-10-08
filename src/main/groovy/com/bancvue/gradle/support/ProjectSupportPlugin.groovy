@@ -15,8 +15,6 @@
  */
 package com.bancvue.gradle.support
 
-import com.bancvue.gradle.support.ClearArtifactCache
-import com.bancvue.gradle.support.PrintClasspath
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -43,6 +41,7 @@ class ProjectSupportPlugin implements Plugin<Project> {
 
 	private void addClearGroupCacheTask() {
 		ClearArtifactCache clearCacheTask = project.task("clearGroupCache", type: ClearArtifactCache)
+		clearCacheTask.group = TASK_GROUP_NAME
 		clearCacheTask.groupName = project.group
 	}
 

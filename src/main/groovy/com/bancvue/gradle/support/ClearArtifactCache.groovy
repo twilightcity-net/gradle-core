@@ -22,10 +22,6 @@ import org.gradle.api.tasks.TaskAction
 
 class ClearArtifactCache extends DefaultTask {
 
-	{
-		group = "Utilities"
-	}
-
 	String groupName
 
 	void setGroupName(String groupName) {
