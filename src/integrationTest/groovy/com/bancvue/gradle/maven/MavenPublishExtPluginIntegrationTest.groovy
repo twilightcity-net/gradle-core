@@ -33,6 +33,7 @@ ext.repositoryReleaseUrl='${mavenRepo.toURI()}'
 ext.artifactId='artifact'
 
 apply plugin: 'maven-publish-ext'
+apply plugin: 'project-defaults' // set jar baseName to artifactId
 
 group = 'group'
 version = '1.0'

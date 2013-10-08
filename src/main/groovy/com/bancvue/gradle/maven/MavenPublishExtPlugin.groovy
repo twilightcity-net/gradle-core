@@ -52,7 +52,6 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		project.apply(plugin: 'java')
 		addPublishingExtExtension()
 		addArtifactDependencyAndPublishingSupport()
-		setJarBaseNameToArtifactIdIfArtifactIdSet()
 		project.afterEvaluate {
 			assertDeclaredExtendedPublicationsHaveMatchingDeclaredPublications()
 		}
@@ -292,13 +291,6 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		if (mainTestJarTask != null) {
 			mainTestJarTask.baseName = getBaseNameForTask(mainTestJarTask)
 			publication.artifact(mainTestJarTask)
-		}
-	}
-
-	private void setJarBaseNameToArtifactIdIfArtifactIdSet() {
-		String artifactId = getExtension().projectArtifactId
-		if (artifactId != null) {
-			project.jar.baseName = artifactId
 		}
 	}
 

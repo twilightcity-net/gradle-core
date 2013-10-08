@@ -21,7 +21,6 @@ import org.gradle.api.artifacts.ArtifactRepositoryContainer
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
-import org.gradle.api.tasks.bundling.Jar
 import org.junit.Before
 import org.junit.Test
 
@@ -133,29 +132,6 @@ class MavenPublishExtPluginTest extends AbstractPluginTest {
 
 		List dependencies = getDependenciesForTask('publish')
 		assert dependencies.size() == 0
-	}
-
-	@Test
-	void getBaseNameForTask_ShouldUseTaskBaseName_IfProjectArtifactIdNotDefined() {
-		project = createProject() // re-create project since artifactId is set as part of setUp
-		Jar jarTask = project.tasks.create('jarTask', Jar)
-		jarTask.baseName = 'someName'
-		MavenPublishExtPlugin plugin = new MavenPublishExtPlugin()
-		plugin.project = project
-		plugin.addPublishingExtExtension()
-
-		String baseName = plugin.getBaseNameForTask(jarTask)
-
-		assert baseName == 'someName'
-	}
-
-	@Test
-	void apply_ShouldSetJarBaseNameToArtifactId_IfArtifactIdSet() {
-		setArtifactId('some-artifact')
-
-		applyPlugin()
-
-		assert project.jar.baseName == 'some-artifact'
 	}
 
 }

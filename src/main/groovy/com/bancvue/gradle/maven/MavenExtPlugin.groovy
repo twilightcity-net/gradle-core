@@ -41,7 +41,6 @@ class MavenExtPlugin implements Plugin<Project> {
 		this.repositoryProperties = new MavenRepositoryProperties(project)
 		project.apply(plugin: 'java')
 		addArtifactDependencyAndPublishingSupport()
-		setJarBaseNameToArtifactIdIfArtifactIdSet()
 	}
 
 	private void addArtifactDependencyAndPublishingSupport() {
@@ -169,13 +168,6 @@ class MavenExtPlugin implements Plugin<Project> {
 					distribution licenseModel.distribution
 				}
 			}
-		}
-	}
-
-	private void setJarBaseNameToArtifactIdIfArtifactIdSet() {
-		String artifactId = getProjectArtifactId()
-		if (artifactId != null) {
-			project.jar.baseName = artifactId
 		}
 	}
 
