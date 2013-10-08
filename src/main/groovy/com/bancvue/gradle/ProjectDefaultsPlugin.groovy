@@ -15,6 +15,7 @@
  */
 package com.bancvue.gradle
 
+import com.bancvue.gradle.categories.ProjectCategory
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Jar
@@ -95,15 +96,11 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	}
 
 	private String getDefaultBaseNameForTask(Jar jar) {
-		String baseName = getProjectArtifactId()
+		String baseName = ProjectCategory.getArtifactId(project)
 		if (baseName == null) {
 			baseName = jar.baseName
 		}
 		baseName
-	}
-
-	private String getProjectArtifactId() {
-		project.hasProperty('artifactId') ? project.ext.artifactId : null
 	}
 
 }

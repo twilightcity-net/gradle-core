@@ -22,6 +22,10 @@ import org.gradle.api.tasks.bundling.Jar
 
 class ProjectCategory {
 
+	static String getArtifactId(Project self) {
+		self.hasProperty('artifactId') ? self.ext.artifactId : null
+	}
+
 	static JavaPluginConvention getJavaConvention(Project self) {
 		self.getConvention().getPlugins().get("java") as JavaPluginConvention
 	}
