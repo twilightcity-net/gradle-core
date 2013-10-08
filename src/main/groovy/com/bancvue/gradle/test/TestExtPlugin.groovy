@@ -74,18 +74,20 @@ class TestExtPlugin implements Plugin<Project> {
 	}
 
 	private void addJarMainTestTask() {
-		Jar jarMainTestTask = ProjectCategory.createJarTask(project, "jarMainTest", "mainTest")
-		jarMainTestTask.configure {
-			baseName = baseName + "-test"
-			from project.sourceSets.mainTest.output
+		use(ProjectCategory) {
+			project.createJarTask("jarMainTest", "mainTest").configure {
+				baseName = baseName + "-test"
+				from project.sourceSets.mainTest.output
+			}
 		}
 	}
 
 	private void addSourcesJarMainTestTask() {
-		Jar sourcesJarMainTestTask = ProjectCategory.createJarTask(project, "sourcesJarMainTest", "mainTest", "sources")
-		sourcesJarMainTestTask.configure {
-			baseName = baseName + "-test"
-			from project.sourceSets.mainTest.allSource
+		use(ProjectCategory) {
+			project.createJarTask("sourcesJarMainTest", "mainTest", "sources").configure {
+				baseName = baseName + "-test"
+				from project.sourceSets.mainTest.allSource
+			}
 		}
 	}
 
@@ -110,11 +112,12 @@ class TestExtPlugin implements Plugin<Project> {
 
 	private void addJavadocJarMainTestTask() {
 		Javadoc javadocMainTestTask = project.tasks.getByName("javadocMainTest")
-		Jar javadocJarMainTestTask = ProjectCategory.createJarTask(project, "javadocJarMainTest", "mainTest", "javadoc")
-		javadocJarMainTestTask.configure {
-			dependsOn { javadocMainTestTask }
-			baseName = baseName + "-test"
-			from javadocMainTestTask.destinationDir
+		use(ProjectCategory) {
+			project.createJarTask("javadocJarMainTest", "mainTest", "javadoc").configure {
+				dependsOn { javadocMainTestTask }
+				baseName = baseName + "-test"
+				from javadocMainTestTask.destinationDir
+			}
 		}
 	}
 
