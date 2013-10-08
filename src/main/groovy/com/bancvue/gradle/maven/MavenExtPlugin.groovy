@@ -111,7 +111,7 @@ class MavenExtPlugin implements Plugin<Project> {
 	}
 
 	private void addSourcesJarTask() {
-		Jar sourcesJarTask = ProjectCategory.createJarTask(project, "sourcesJar", "Build", "main", "sources")
+		Jar sourcesJarTask = ProjectCategory.createJarTask(project, "sourcesJar", "main", "sources")
 		sourcesJarTask.configure {
 			from project.sourceSets.main.allSource
 		}
@@ -119,7 +119,7 @@ class MavenExtPlugin implements Plugin<Project> {
 
 	private void addJavadocJarTask() {
 		Javadoc javadocTask = project.tasks.getByName('javadoc')
-		Jar javadocJarTask = ProjectCategory.createJarTask(project, "javadocJar", "Build", "main", "javadoc")
+		Jar javadocJarTask = ProjectCategory.createJarTask(project, "javadocJar", "main", "javadoc")
 		javadocJarTask.configure {
 			dependsOn { javadocTask }
 			from javadocTask.destinationDir

@@ -30,11 +30,11 @@ class ProjectCategory {
 		self.getConvention().getPlugins().get("java") as JavaPluginConvention
 	}
 
-	static Jar createJarTask(Project self, String taskName, String groupName, String sourceSetName, String classifierString = null) {
+	static Jar createJarTask(Project self, String taskName, String sourceSetName, String classifierString = null) {
 		String jarContent = classifierString || "classes"
 		Jar jarTask = self.tasks.create(taskName, Jar)
 		jarTask.configure {
-			group = groupName
+			group = "Build"
 			description = "Assembles a jar archive containing the ${sourceSetName} ${jarContent}."
 			if (classifierString) {
 				classifier = classifierString

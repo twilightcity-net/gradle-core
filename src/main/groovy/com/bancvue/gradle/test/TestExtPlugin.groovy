@@ -74,7 +74,7 @@ class TestExtPlugin implements Plugin<Project> {
 	}
 
 	private void addJarMainTestTask() {
-		Jar jarMainTestTask = ProjectCategory.createJarTask(project, "jarMainTest", "Build", "mainTest")
+		Jar jarMainTestTask = ProjectCategory.createJarTask(project, "jarMainTest", "mainTest")
 		jarMainTestTask.configure {
 			baseName = baseName + "-test"
 			from project.sourceSets.mainTest.output
@@ -82,7 +82,7 @@ class TestExtPlugin implements Plugin<Project> {
 	}
 
 	private void addSourcesJarMainTestTask() {
-		Jar sourcesJarMainTestTask = ProjectCategory.createJarTask(project, "sourcesJarMainTest", "Build", "mainTest", "sources")
+		Jar sourcesJarMainTestTask = ProjectCategory.createJarTask(project, "sourcesJarMainTest", "mainTest", "sources")
 		sourcesJarMainTestTask.configure {
 			baseName = baseName + "-test"
 			from project.sourceSets.mainTest.allSource
@@ -110,7 +110,7 @@ class TestExtPlugin implements Plugin<Project> {
 
 	private void addJavadocJarMainTestTask() {
 		Javadoc javadocMainTestTask = project.tasks.getByName("javadocMainTest")
-		Jar javadocJarMainTestTask = ProjectCategory.createJarTask(project, "javadocJarMainTest", "Build", "mainTest", "javadoc")
+		Jar javadocJarMainTestTask = ProjectCategory.createJarTask(project, "javadocJarMainTest", "mainTest", "javadoc")
 		javadocJarMainTestTask.configure {
 			dependsOn { javadocMainTestTask }
 			baseName = baseName + "-test"
