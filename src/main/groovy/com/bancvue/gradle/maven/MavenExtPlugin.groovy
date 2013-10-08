@@ -46,7 +46,7 @@ class MavenExtPlugin implements Plugin<Project> {
 
 	private void addArtifactDependencyAndPublishingSupport() {
 		project.apply(plugin: 'maven')
-		renamePublishTasks()
+		createPublishTaskAliases()
 		addMavenLocalAndOrganizationArtifactRepository()
 		addOrganizationPublishingRepository()
 		augmentMavenPom()
@@ -59,7 +59,7 @@ class MavenExtPlugin implements Plugin<Project> {
 		}
 	}
 
-	private void renamePublishTasks() {
+	private void createPublishTaskAliases() {
 		createPublishRemoteTaskAsAliasForUploadArchives()
 		createPublishTaskAsAliasForInstallTask()
 	}
