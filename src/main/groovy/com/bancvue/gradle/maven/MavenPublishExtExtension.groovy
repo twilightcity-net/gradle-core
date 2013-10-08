@@ -15,6 +15,7 @@
  */
 package com.bancvue.gradle.maven
 
+import com.bancvue.gradle.categories.ProjectCategory
 import org.gradle.api.Project
 
 class MavenPublishExtExtension {
@@ -33,15 +34,11 @@ class MavenPublishExtExtension {
 	}
 
 	private String getDefaultPrimaryArtifactName() {
-		String projectName = getProjectArtifactId()
+		String projectName = ProjectCategory.getArtifactId(project)
 		if (projectName == null) {
 			projectName = project.name
 		}
 		projectName.replaceAll(/[-](\S)/) { it[1].toUpperCase() }
-	}
-
-	String getProjectArtifactId() {
-		project.hasProperty('artifactId') ? project.ext.artifactId : null
 	}
 
 	void publications(Closure configure) {

@@ -16,6 +16,7 @@
 package com.bancvue.gradle.maven
 
 import com.bancvue.gradle.JavaExtPlugin
+import com.bancvue.gradle.categories.ProjectCategory
 import com.bancvue.gradle.license.LicenseExtProperties
 import com.bancvue.gradle.license.LicenseModel
 import groovy.util.logging.Slf4j
@@ -102,10 +103,6 @@ class MavenExtPlugin implements Plugin<Project> {
 		string != null ? string : ""
 	}
 
-	private String getProjectArtifactId() {
-		project.hasProperty('artifactId') ? project.ext.artifactId : null
-	}
-
 	private void augmentMavenPom() {
 		project.uploadArchives {
 			repositories.mavenDeployer {
@@ -117,7 +114,7 @@ class MavenExtPlugin implements Plugin<Project> {
 
 	private void addBasicDescriptionToMavenPOM(MavenPom pom) {
 		pom.project {
-			name getProjectArtifactId()
+			name ProjectCategory.getArtifactId(project)
 			description project.description
 			// TODO: add packaging
 			// packaging "jar"
