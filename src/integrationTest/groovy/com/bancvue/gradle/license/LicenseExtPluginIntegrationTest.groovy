@@ -102,4 +102,19 @@ apply plugin: 'license-ext'
 		assert result.standardOutput =~ /Missing header in: .*${srcFile.name}/
 	}
 
+	@Test
+	void licenseCheck_ShouldCheckClassFilesForConfigurationsAddedAfterLicensePluginIsApplied() {
+		File srcFile = emptyClassFile('src/mainTest/java/Class.java')
+		buildFile << """
+apply plugin: 'java'
+apply plugin: 'license-ext'
+apply plugin: 'test-ext'
+        """
+
+		ExecutionResult result = run("licenseCheck", "--info")
+
+		println result.standardOutput
+		assert result.standardOutput =~ /Missing header in: .*${srcFile.name}/
+	}
+
 }

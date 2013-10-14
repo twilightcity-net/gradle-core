@@ -33,7 +33,6 @@ class LicenseExtPlugin implements Plugin<Project> {
 		init(project)
 		applyLicensePlugin()
 		configureApache2LicenseHeader()
-		setGroupOnAllFormatLicenseTasks()
 		excludedConfiguredFileExtensions()
 		addFormatAllLicenseTask()
 		addCheckAllLicenseTask()
@@ -65,7 +64,7 @@ class LicenseExtPlugin implements Plugin<Project> {
 			writeLicenseHeaderToBuildDir()
 		}
 
-		project.tasks.withType(License).findAll { License task ->
+		project.tasks.withType(License) { License task ->
 			task.dependsOn(writeLicenseHeaderToBuildDirTask)
 		}
 	}
@@ -80,12 +79,6 @@ class LicenseExtPlugin implements Plugin<Project> {
 
 	private File getHeaderFile() {
 		new File(project.buildDir, "license/HEADER")
-	}
-
-	private void setGroupOnAllFormatLicenseTasks() {
-		getFormatLicensesTasks().each { License task ->
-			task.group = GROUP_NAME
-		}
 	}
 
 	private void excludedConfiguredFileExtensions() {
@@ -112,7 +105,7 @@ class LicenseExtPlugin implements Plugin<Project> {
 		licenseFormat.group = GROUP_NAME
 		licenseFormat.description = 'Apply license on files from all available source sets'
 
-		getFormatLicensesTasks().each { License task ->
+		applyToFormatLicenseTasks { License task ->
 			licenseFormat.dependsOn(task)
 		}
 	}
@@ -122,20 +115,29 @@ class LicenseExtPlugin implements Plugin<Project> {
 		licenseCheck.group = GROUP_NAME
 		licenseCheck.description = 'Check license on files from all available source sets'
 
-		getCheckLicensesTasks().each { License task ->
+		applyToCheckLicenseTasks { License task ->
 			licenseCheck.dependsOn(task)
 		}
 	}
 
-	private Set<License> getCheckLicensesTasks() {
-		project.tasks.withType(License).findAll { License task ->
-			task.check
-		}
+	private void applyToCheckLicenseTasks(Closure closure) {
+		applyToLicenseTasksWithGivenValueForCheck(true, closure)
 	}
 
-	private Set<License> getFormatLicensesTasks() {
-		project.tasks.withType(License).findAll { License task ->
-			task.check == false
+	private void applyToFormatLicenseTasks(Closure closure) {
+		applyToLicenseTasksWithGivenValueForCheck(false, closure)
+	}
+
+	private void applyToLicenseTasksWithGivenValueForCheck(boolean check, Closure closure) {
+		// this must be done after evaluation, otherwise - if a License task is added after this plugin
+		// is applied - the closure will be called when the task is added to the container, which will probably
+		// be before the check value is set
+		project.afterEvaluate {
+			project.tasks.withType(License) { License task ->
+				if (task.check == check) {
+					closure.call(task)
+				}
+			}
 		}
 	}
 
