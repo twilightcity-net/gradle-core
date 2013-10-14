@@ -245,7 +245,9 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		attachArtifactToMavenPublication(publication, "sourcesJar")
 //		attachArtifactToMavenPublication(publication, "javadocJar")
 		// TODO: should publish test as separate publication so source and javadoc can be attached
-		attachTestArtifactToMavenPublicationIfMainTestConfigurationDefined(publication)
+		// disabling for now since the classifier has been removed from the test jar, need
+		// to solidify publication mechanism to support multi-artifact publication before adding back
+//		attachTestArtifactToMavenPublicationIfMainTestConfigurationDefined(publication)
 	}
 
 	private void attachArtifactToMavenPublication(MavenPublication publication, String jarTaskName) {
