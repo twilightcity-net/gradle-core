@@ -130,7 +130,7 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		project.version =~ /SNAPSHOT$/
 	}
 
-	private String acquireNexusPublishUrl() {
+	private String acquireRepositoryPublishUrl() {
 		if (isSnapshotProject()) {
 			repositoryProperties.snapshotUrl
 		} else {
@@ -143,7 +143,7 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 			repositories {
 				maven {
 					name repositoryProperties.name
-					url acquireNexusPublishUrl()
+					url acquireRepositoryPublishUrl()
 					if (repositoryProperties.hasCredentialsDefined()) {
 						credentials {
 							username repositoryProperties.username
