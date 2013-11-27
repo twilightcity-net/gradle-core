@@ -114,7 +114,7 @@ class MavenExtPlugin implements Plugin<Project> {
 
 	private void addBasicDescriptionToMavenPOM(MavenPom pom) {
 		pom.project {
-			name ProjectCategory.getArtifactId(project)
+			name ProjectCategory.getArtifactIdOrNull(project)
 			description project.description
 			// TODO: add packaging
 			// packaging "jar"

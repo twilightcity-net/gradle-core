@@ -42,7 +42,7 @@ class MavenPublishExtExtension {
 	}
 
 	String getProjectArtifactId() {
-		ProjectCategory.getArtifactId(project)
+		ProjectCategory.getArtifactIdOrNull(project)
 	}
 
 	void publications(Closure configure) {

@@ -96,7 +96,7 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	}
 
 	private String getDefaultBaseNameForTask(Jar jar) {
-		String baseName = ProjectCategory.getArtifactId(project)
+		String baseName = ProjectCategory.getArtifactIdOrNull(project)
 		if (baseName == null) {
 			baseName = jar.baseName
 		}

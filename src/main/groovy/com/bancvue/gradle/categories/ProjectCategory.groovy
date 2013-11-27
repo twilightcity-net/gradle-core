@@ -15,6 +15,7 @@
  */
 package com.bancvue.gradle.categories
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Jar
@@ -22,7 +23,21 @@ import org.gradle.api.tasks.bundling.Jar
 
 class ProjectCategory {
 
+	static class ArtifactIdNotDefinedException extends GradleException {
+		public ArtifactIdNotDefinedException() {
+			super('Required property "artifactId" must be specified')
+		}
+	}
+
 	static String getArtifactId(Project self) {
+		String artifactId = getArtifactIdOrNull(self)
+		if (artifactId == null) {
+			throw new ArtifactIdNotDefinedException()
+		}
+		self.hasProperty('artifactId') ? self.ext.artifactId : null
+	}
+
+	static String getArtifactIdOrNull(Project self) {
 		self.hasProperty('artifactId') ? self.ext.artifactId : null
 	}
 
