@@ -21,6 +21,7 @@ import java.util.zip.ZipFile
 
 class ZipArchive extends File {
 
+	@Delegate
 	private ZipFile zip
 
 	ZipArchive(File file) {

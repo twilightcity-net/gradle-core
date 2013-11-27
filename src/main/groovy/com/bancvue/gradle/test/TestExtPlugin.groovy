@@ -31,10 +31,6 @@ class TestExtPlugin implements Plugin<Project> {
 	static final String PLUGIN_NAME = "test-ext"
 	static final String VERIFICATION_GROUP_NAME = "Verification"
 
-	static Jar getMainTestJarTaskOrNullIfMainTestConfigurationNotDefined(Project project) {
-		project.tasks.findByName("jarMainTest") as Jar
-	}
-
 
 	private Project project
 

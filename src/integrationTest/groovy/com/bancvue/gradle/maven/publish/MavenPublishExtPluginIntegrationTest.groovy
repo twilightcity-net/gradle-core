@@ -18,16 +18,22 @@ package com.bancvue.gradle.maven.publish
 import com.bancvue.exception.ExceptionSupport
 import com.bancvue.gradle.test.AbstractPluginIntegrationTest
 import com.bancvue.gradle.test.TestFile
+import com.bancvue.zip.ZipArchive
+import org.junit.Before
 import org.junit.Test
 
 
 @Mixin(ExceptionSupport)
 class MavenPublishExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
 
-	@Test
-	void shouldPublishArtifactAndSources() {
-		emptyClassFile("src/main/java/Class.java")
-		TestFile mavenRepo = mkdir("build/maven-repo")
+	private TestFile mavenRepo
+
+	@Before
+	void setUp() {
+		mavenRepo = mkdir("build/maven-repo")
+	}
+
+	private void setupLocalMavenRepoAndApplyPlugin() {
 		buildFile << """
 ext.repositoryReleaseUrl='${mavenRepo.toURI()}'
 ext.artifactId='artifact'
@@ -37,90 +43,207 @@ apply plugin: 'project-defaults' // set jar baseName to artifactId
 
 group = 'group'
 version = '1.0'
-		"""
+"""
+	}
+
+	private String getArchiveName(String artifactId, String classifier = null) {
+		"${artifactId}-1.0" + (classifier ? "-${classifier}" : "")
+	}
+
+	private TestFile getBuildArtifact(String artifactId, String classifier = null) {
+		String jarName = getArchiveName(artifactId, classifier)
+		file("build/libs/${jarName}.jar")
+	}
+
+	private TestFile getUploadedArtifact(String artifactId, String classifier = null) {
+		String jarName = getArchiveName(artifactId, classifier)
+		mavenRepo.file("group/${artifactId}/1.0/${jarName}.jar")
+	}
+
+	private TestFile getPomFile(String artifactId) {
+		mavenRepo.file("group/${artifactId}/1.0/${artifactId}-1.0.pom")
+	}
+
+	private ZipArchive assertArchiveBuiltAndUploadedToMavenRepo(String artifactId, String classifier = null) {
+		assert getBuildArtifact(artifactId, classifier).exists()
+		assert getUploadedArtifact(artifactId, classifier).exists()
+		new ZipArchive(getBuildArtifact(artifactId, classifier))
+	}
+
+	@Test
+	void shouldByDefaultPublishMainArtifactAndSources() {
+		emptyClassFile("src/main/java/Class.java")
+		setupLocalMavenRepoAndApplyPlugin()
 
 		run("publishRemote")
 
-		assert file("build/libs/artifact-1.0.jar").exists()
-		assert file("build/libs/artifact-1.0-sources.jar").exists()
-		assert mavenRepo.file("group/artifact/1.0/artifact-1.0.jar").exists()
-		assert mavenRepo.file("group/artifact/1.0/artifact-1.0-sources.jar").exists()
+		ZipArchive archive = assertArchiveBuiltAndUploadedToMavenRepo("artifact")
+		assert archive.getEntry("Class.class")
+		ZipArchive sourcesArchive = assertArchiveBuiltAndUploadedToMavenRepo("artifact", "sources")
+		assert sourcesArchive.getEntry("Class.java")
 	}
 
 	@Test
-	void customizeDefaultArtifact() {
+	void shouldSkipPublication_IfEnabledIsFalse() {
+		emptyClassFile("src/other/java/MainClass.java")
 		buildFile << """
-ext.artifactId='artifact'
-
 apply plugin: 'maven-publish-ext'
 
-publishingext {
-	publications {
-		"artifact" {
-			pom.withXml {
-				asNode().children().last() + {
-					resolveStrategy = Closure.DELEGATE_FIRST
-					reporting {
-						outputDirectory = file("build/reporting")
-					}
-				}
-			}
-		}
+publishing_ext {
+	publication("main") {
+		enabled false
 	}
 }
 """
 
-		run("generatePomFileForArtifactPublication")
+		run("publishRemote")
 
-		TestFile pomFile = file("build/publications/artifact/pom-default.xml")
-
-		assert pomFile.text =~ /build\/reporting/
+		assert !getBuildArtifact("artifact").exists()
+		assert !getUploadedArtifact("artifact").exists()
 	}
 
 	@Test
-	void shouldFailBuild_IfExtendedPublicationDefinedButNoMatchingMavenPublicationIsFound() {
+	void shouldPublishBothMainAndCustomConfiguration_IfCustomConfigurationManuallyConfigured() {
+		emptyClassFile("src/main/java/MainClass.java")
+		emptyClassFile("src/custom/java/CustomClass.java")
+		setupLocalMavenRepoAndApplyPlugin()
 		buildFile << """
-ext.artifactId='artifact'
+configurations {
+	custom
+}
 
-apply plugin: 'maven-publish-ext'
+sourceSets {
+	custom {
+		java {
+			srcDir 'src/custom/java'
+		}
+	}
+}
 
-publishingext {
-	publications {
-		"otherArtifact" {}
+publishing_ext {
+	publication("custom")
+}
+"""
+
+		run("publishRemote")
+
+		assertArchiveBuiltAndUploadedToMavenRepo("artifact")
+		assertArchiveBuiltAndUploadedToMavenRepo("artifact", "sources")
+		assertArchiveBuiltAndUploadedToMavenRepo("artifact-custom")
+		assertArchiveBuiltAndUploadedToMavenRepo("artifact-custom", "sources")
+	}
+
+	@Test
+	void shouldUseCustomSourceSetAndConfiguration_IfConfigured() {
+		emptyClassFile("src/other/java/MainClass.java")
+		setupLocalMavenRepoAndApplyPlugin()
+		buildFile << """
+configurations {
+	doesNotMatchConvention
+}
+
+sourceSets {
+	doesNotMatchConvention {
+		java {
+			srcDir 'src/other/java'
+		}
+	}
+}
+
+publishing_ext {
+	publication("other") {
+		sourceSet sourceSets.doesNotMatchConvention
+		runtimeConfiguration configurations.doesNotMatchConvention
 	}
 }
 """
 
-		try {
-			run("generatePomFileForArtifactPublication")
-			assert false : "Expected build failure"
-		} catch (Exception ex) {
-			assert getRootCause(ex).message == "Extended publication defined with name 'otherArtifact' but no matching publication found"
-		}
+		run("publishRemote")
+
+		assertArchiveBuiltAndUploadedToMavenRepo("artifact-other")
+		assertArchiveBuiltAndUploadedToMavenRepo("artifact-other", "sources")
 	}
 
 	@Test
-	void shouldFailWithMessageRepresentativeOfError_IfCustomPublicationBlockContainsError() {
+	void shouldUseCustomArchiveTasks_IfConfigured() {
+		emptyClassFile("src/main/java/MainClass.java")
+		setupLocalMavenRepoAndApplyPlugin()
 		buildFile << """
-ext.artifactId='artifact'
+task outZip(type: Zip) {
+	from sourceSets.main.output
+}
 
-apply plugin: 'maven-publish-ext'
+task srcZip(type: Zip) {
+    classifier = 'sources'
+	from sourceSets.main.allSource
+}
 
-publishingext {
-	publications {
-		"artifact" {
-			undefinedMethod {}
-		}
+publishing_ext {
+	publication("main") {
+		archiveTask outZip
+		sourcesArchiveTask srcZip
 	}
 }
 """
 
-		try {
-			run("generatePomFileForArtifactPublication")
-			assert false : "Expected build failure"
-		} catch (Exception ex) {
-			assert getRootCause(ex).message =~ /^Could not find method undefinedMethod.*/
+		run("publishRemote")
+
+		String archiveName = getArchiveName("artifact")
+		assert mavenRepo.file("group/artifact/1.0/${archiveName}.zip").exists()
+		assert mavenRepo.file("group/artifact/1.0/${archiveName}-sources.zip").exists()
+	}
+
+	@Test
+	void shouldNotPublishSources_IfPublishSourcesSetToFalse() {
+		emptyClassFile("src/main/java/MainClass.java")
+		setupLocalMavenRepoAndApplyPlugin()
+		buildFile << """
+task outZip(type: Zip) {
+	from sourceSets.main.output
+}
+
+publishing_ext {
+	publication("main") {
+		archiveTask outZip
+		publishSources false
+	}
+}
+"""
+
+		run("publishRemote")
+
+		String archiveName = getArchiveName("artifact")
+		assert mavenRepo.file("group/artifact/1.0/${archiveName}.zip").exists()
+		File sourcesArchive = mavenRepo.file("group/artifact/1.0/").listFiles().find { File file ->
+			file.name =~ /sources/
 		}
+		assert !sourcesArchive
+	}
+
+	@Test
+	void shouldApplyCompileAndRuntimeDependenciesToMainPom() {
+		emptyClassFile("src/main/java/MainClass.java")
+		setupLocalMavenRepoAndApplyPlugin()
+		buildFile << """
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile "org.slf4j:log4j-over-slf4j:1.7.5"
+	runtime "ch.qos.logback:logback:0.5"
+}
+"""
+
+		run("publishRemote")
+
+		TestFile pomFile = getPomFile("artifact")
+		assert pomFile.exists()
+		// TODO: create abstraction for pom file
+		def pom = new XmlParser().parse(pomFile)
+		assert pom.dependencies.dependency.size() == 2
+		assert pom.dependencies.dependency.find { it.artifactId.text() == "logback" }
+		assert pom.dependencies.dependency.find { it.artifactId.text() == "log4j-over-slf4j" }
 	}
 
 }

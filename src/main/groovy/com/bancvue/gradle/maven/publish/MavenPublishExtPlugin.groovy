@@ -36,12 +36,6 @@ import org.gradle.api.tasks.bundling.Jar
 @Mixin(GradlePluginMixin)
 class MavenPublishExtPlugin implements Plugin<Project> {
 
-	public static class MissingPublicationException extends GradleException {
-		MissingPublicationException(String message) {
-			super(message)
-		}
-	}
-
 	static final String PLUGIN_NAME = 'maven-publish-ext'
 
 	private Project project
@@ -51,43 +45,12 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		this.project = project
 		this.repositoryProperties = new MavenRepositoryProperties(project)
 		project.apply(plugin: JavaExtPlugin.PLUGIN_NAME)
-		addPublishingExtExtension()
 		addArtifactDependencyAndPublishingSupport()
-		project.afterEvaluate {
-			assertDeclaredExtendedPublicationsHaveMatchingDeclaredPublications()
-		}
-	}
-
-	private void assertDeclaredExtendedPublicationsHaveMatchingDeclaredPublications() {
-		List<String> declaredPublicationNames = getDeclaredPublicationNames()
-
-		getDeclaredExtendedPublicationNames().each { String declaredExtendedPublicationName ->
-			if (!declaredPublicationNames.contains(declaredExtendedPublicationName)) {
-				throw new MissingPublicationException("Extended publication defined with name " +
-						"'${declaredExtendedPublicationName}' but no matching publication found")
-			}
-		}
-	}
-
-	private List<String> getDeclaredPublicationNames() {
-		PublishingExtension publishing = project.extensions.getByName(PublishingExtension.NAME)
-		publishing.publications.collect { Publication publication ->
-			publication.name
-		}
-	}
-
-	private List<String> getDeclaredExtendedPublicationNames() {
-		extension.getExtendedPublications().collect { ExtendedPublication publication ->
-			publication.name
-		}
+		addPublishingExtExtension()
 	}
 
 	private void addPublishingExtExtension() {
 		project.extensions.create(MavenPublishExtExtension.NAME, MavenPublishExtExtension, project)
-	}
-
-	private MavenPublishExtExtension getExtension() {
-		project.extensions.getByName(MavenPublishExtExtension.NAME) as MavenPublishExtExtension
 	}
 
 	private void addArtifactDependencyAndPublishingSupport() {
@@ -95,7 +58,6 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		renamePublishTasks()
 		addMavenLocalAndOrganizationArtifactRepository()
 		addOrganizationPublishingRepository()
-		addProjectPublicationIfCustomPublicationNotDefined()
 	}
 
 	private void renamePublishTasks() {
@@ -152,113 +114,6 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 					}
 				}
 			}
-		}
-	}
-
-	private void addProjectPublicationIfCustomPublicationNotDefined() {
-		// TODO: move customPublication to extension class
-		if (project.hasProperty("customPublication")) {
-			log.info("Project property 'customPublication' defined, default publication disabled")
-		} else {
-			addProjectPublication()
-		}
-	}
-
-	private void addProjectPublication() {
-		project.publishing {
-			publications {
-				String publicationName = extension.primaryArtifactName
-				String projectArtifactId = extension.projectArtifactId
-
-				"${publicationName}"(MavenPublication) { MavenPublication publication ->
-					from project.components.java
-					if (projectArtifactId != null) {
-						artifactId = projectArtifactId
-					}
-					addBasicDescriptionToMavenPOM(publication)
-					attachLicenseToMavenPOMIfLicenseExtPluginApplied(publication)
-					attachAdditionalArtifactsToMavenPublication(publication)
-					applyCustomConfigurationToPublication(publication, delegate, owner, getThisObject())
-				}
-			}
-		}
-	}
-
-	private void applyCustomConfigurationToPublication(MavenPublication publication, Object delegate, Object owner, Object thisObject) {
-		ExtendedPublication extPublication = extension.getExtendedPublication(publication.name)
-		if (extPublication != null) {
-			Closure extPublicationClosure = extPublication.closure
-			extPublicationClosure = extPublicationClosure.rehydrate(delegate, owner, thisObject)
-			extPublicationClosure.resolveStrategy = Closure.DELEGATE_FIRST
-			try {
-				extPublicationClosure(publication)
-			} catch (Exception ex) {
-				throw new GradleException("Failed to apply custom configuration", ex)
-			}
-		}
-	}
-
-	private void addBasicDescriptionToMavenPOM(MavenPublication publication) {
-		publication.pom.withXml {
-			asNode().children().last() + {
-				name extension.projectArtifactId
-				// TODO: add packaging
-				// packaging "jar"
-				// TODO: add description
-				// description project.description
-				// TODO: add project url
-				// url projectUrl
-			}
-		}
-	}
-
-	private void attachLicenseToMavenPOMIfLicenseExtPluginApplied(MavenPublication publication) {
-		if (project.getPlugins().findPlugin(LicenseExtPlugin)) {
-			LicenseExtProperties licenseProperties = new LicenseExtProperties(project)
-			LicenseModel licenseModel = licenseProperties.getLicenseModel()
-
-			if (licenseModel != null) {
-				attachLicenseModelToMavenPOM(publication, licenseModel)
-			} else {
-				log.warn("license-ext plugin applied but no license model found, bypassing augmentation of maven POM with license info")
-			}
-		} else {
-			log.info("license-ext plugin not applied, bypassing augmentation of maven POM with license info")
-		}
-	}
-
-	private void attachLicenseModelToMavenPOM(MavenPublication publication, licenseModel) {
-		publication.pom.withXml {
-			asNode().children().last() + {
-				licenses {
-					license {
-						name licenseModel.name
-						url licenseModel.url
-						distribution licenseModel.distribution
-					}
-				}
-			}
-		}
-	}
-
-	private void attachAdditionalArtifactsToMavenPublication(MavenPublication publication) {
-		attachArtifactToMavenPublication(publication, "sourcesJar")
-//		attachArtifactToMavenPublication(publication, "javadocJar")
-		// TODO: should publish test as separate publication so source and javadoc can be attached
-		// disabling for now since the classifier has been removed from the test jar, need
-		// to solidify publication mechanism to support multi-artifact publication before adding back
-//		attachTestArtifactToMavenPublicationIfMainTestConfigurationDefined(publication)
-	}
-
-	private void attachArtifactToMavenPublication(MavenPublication publication, String jarTaskName) {
-		Task sourceJarTask = project.tasks.getByName(jarTaskName)
-		publication.artifact(sourceJarTask)
-	}
-
-	private void attachTestArtifactToMavenPublicationIfMainTestConfigurationDefined(MavenPublication publication) {
-		Jar mainTestJarTask = TestExtPlugin.getMainTestJarTaskOrNullIfMainTestConfigurationNotDefined(project)
-		if (mainTestJarTask != null) {
-			publication.artifact(mainTestJarTask)
 		}
 	}
 

@@ -15,46 +15,145 @@
  */
 package com.bancvue.gradle.maven.publish
 
-import com.bancvue.gradle.categories.ProjectCategory
+import com.bancvue.gradle.license.LicenseExtPlugin
+import com.bancvue.gradle.license.LicenseExtProperties
+import com.bancvue.gradle.license.LicenseModel
+import groovy.util.logging.Slf4j
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.DependencySet
+import org.gradle.api.publish.maven.MavenPublication
 
+@Slf4j
 class MavenPublishExtExtension {
 
-	static final String NAME = "publishingext"
-
-	String primaryArtifactName
+	static final String NAME = "publishing_ext"
 
 	private Project project
-	private ExtendedPublicationContainer closureMap
+	private Map<String,ExtendedPublication> publicationMap
 
 	MavenPublishExtExtension(Project project) {
 		this.project = project
-		this.closureMap = new ExtendedPublicationContainer()
-		primaryArtifactName = getDefaultPrimaryArtifactName()
-	}
+		this.publicationMap = [:]
 
-	private String getDefaultPrimaryArtifactName() {
-		String projectName = getProjectArtifactId()
-		if (projectName == null) {
-			projectName = project.name
+		project.publishing {
+			publications(createPublicationsClosure())
 		}
-		projectName.replaceAll(/[-](\S)/) { it[1].toUpperCase() }
 	}
 
-	String getProjectArtifactId() {
-		ProjectCategory.getArtifactIdOrNull(project)
+	void publication(String id, Closure configure = null) {
+		ExtendedPublication publication = createExtendedPublication(id, configure)
+		publicationMap.put(id, publication)
 	}
 
-	void publications(Closure configure) {
-		closureMap.capture(configure)
+	private ExtendedPublication createExtendedPublication(String id, Closure configure) {
+		ExtendedPublication publication = new ExtendedPublication(id, project)
+
+		if (configure != null) {
+			publication.configure(configure)
+		}
+		publication
 	}
 
-	List<ExtendedPublication> getExtendedPublications() {
-		closureMap.getExtendedPublications()
+	private Closure createPublicationsClosure() {
+		Closure publicationsClosure = {
+			getPublicationsToApply().each { ExtendedPublication extendedPublication ->
+				extendedPublication.deriveUnsetVariables()
+
+				"${extendedPublication.name}"(MavenPublication) { MavenPublication mavenPublication ->
+					configureMavenPublication(extendedPublication, mavenPublication)
+				}
+			}
+		}
+
+		publicationsClosure
 	}
 
-	ExtendedPublication getExtendedPublication(String publicationName) {
-		closureMap.getExtendedPublication(publicationName)
+	private List<ExtendedPublication> getPublicationsToApply() {
+		if (!publicationMap.containsKey("main")) {
+			publication("main")
+		}
+
+		publicationMap.values().findAll { ExtendedPublication publication ->
+			publication.enabled
+		}
+	}
+
+	private void configureMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
+		mavenPublication.artifact(extendedPublication.archiveTask)
+		if (extendedPublication.artifactId != null) {
+			mavenPublication.artifactId = extendedPublication.artifactId
+		}
+		addBasicDescriptionToMavenPOM(extendedPublication, mavenPublication)
+		attachLicenseToMavenPOMIfLicenseExtPluginApplied(mavenPublication)
+		attachAdditionalArtifactsToMavenPublication(extendedPublication, mavenPublication)
+		attachDependenciesToMavenPublication(extendedPublication, mavenPublication)
+	}
+
+	private void addBasicDescriptionToMavenPOM(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
+		mavenPublication.pom.withXml {
+			asNode().children().last() + {
+				name extendedPublication.artifactId
+				// TODO: add description
+				// description project.description
+				// TODO: add project url
+				// url projectUrl
+			}
+		}
+	}
+
+	private void attachLicenseToMavenPOMIfLicenseExtPluginApplied(MavenPublication mavenPublication) {
+		if (project.getPlugins().findPlugin(LicenseExtPlugin)) {
+			LicenseExtProperties licenseProperties = new LicenseExtProperties(project)
+			LicenseModel licenseModel = licenseProperties.getLicenseModel()
+
+			if (licenseModel != null) {
+				attachLicenseModelToMavenPOM(mavenPublication, licenseModel)
+			} else {
+				log.warn("license-ext plugin applied but no license model found, bypassing augmentation of maven POM with license info")
+			}
+		} else {
+			log.info("license-ext plugin not applied, bypassing augmentation of maven POM with license info")
+		}
+	}
+
+	private void attachLicenseModelToMavenPOM(MavenPublication publication, LicenseModel licenseModel) {
+		publication.pom.withXml {
+			asNode().children().last() + {
+				licenses {
+					license {
+						name licenseModel.name
+						url licenseModel.url
+						distribution licenseModel.distribution
+					}
+				}
+			}
+		}
+	}
+
+	private void attachAdditionalArtifactsToMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
+		if (extendedPublication.publishSources) {
+			mavenPublication.artifact(extendedPublication.sourcesArchiveTask)
+		}
+	}
+
+	private void attachDependenciesToMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
+		DependencySet allDependencies = extendedPublication.runtimeConfiguration.allDependencies
+
+		mavenPublication.pom.withXml {
+			asNode().children().last() + {
+				dependencies {
+					allDependencies.each { Dependency aDependency ->
+						dependency {
+							groupId aDependency.group
+							artifactId aDependency.name
+							version aDependency.version
+							scope "runtime"
+						}
+					}
+				}
+			}
+		}
 	}
 
 }

@@ -15,7 +15,6 @@
  */
 package com.bancvue.gradle.maven.publish
 
-import com.bancvue.gradle.maven.publish.MavenPublishExtPlugin
 import com.bancvue.gradle.test.AbstractPluginTest
 import org.gradle.api.Task
 import org.gradle.api.artifacts.ArtifactRepositoryContainer
@@ -123,16 +122,6 @@ class MavenPublishExtPluginTest extends AbstractPluginTest {
 
 		Task publishRemoteDependency = acquireSingleDependencyForTask('publish')
 		assert publishRemoteDependency instanceof PublishToMavenLocal
-	}
-
-	@Test
-	void apply_ShouldNotCreatePublishArtifactTasks_IfCustomPublicationDefined() {
-		project.ext.customPublication = true
-		applyPlugin()
-		project.evaluate()
-
-		List dependencies = getDependenciesForTask('publish')
-		assert dependencies.size() == 0
 	}
 
 }

@@ -36,7 +36,7 @@ class CustomGradlePlugin implements Plugin<Project> {
 		this.project = project
 		gradleProperties = new CustomGradleProperties(project)
 		applyJavaPlugin()
-		applyMavenPublishExtPlugin()
+		applyMavenPublishExtPluginAndDisableMainPublication()
 		addBuildCustomGradleDistroTask()
 		addMavenPublication()
 		addCustomWrapperTask()
@@ -46,8 +46,14 @@ class CustomGradlePlugin implements Plugin<Project> {
 		project.apply(plugin: 'java')
 	}
 
-	private void applyMavenPublishExtPlugin() {
+	private void applyMavenPublishExtPluginAndDisableMainPublication() {
 		project.apply(plugin: MavenPublishExtPlugin.PLUGIN_NAME)
+
+		project.publishing_ext {
+			publication("main") {
+				enabled false
+			}
+		}
 	}
 
 	private DownloadGradle addDownloadGradleTask() {
