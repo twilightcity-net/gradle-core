@@ -61,8 +61,11 @@ class ExtendedPublicationNameResolver {
 	}
 
 	private String createJarTaskName(String jarBaseName) {
-		String jarTaskNamePrefix = getPublicationIdAppendix()
-		!jarTaskNamePrefix ? jarBaseName : jarTaskNamePrefix + jarBaseName.capitalize()
+		String jarTaskNamePostfix = publicationId
+		if (jarTaskNamePostfix == "main") {
+			jarTaskNamePostfix = ""
+		}
+		jarBaseName + jarTaskNamePostfix.capitalize()
 	}
 
 	String getRuntimeConfigurationName() {

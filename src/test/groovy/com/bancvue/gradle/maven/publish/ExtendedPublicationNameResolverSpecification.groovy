@@ -53,4 +53,20 @@ class ExtendedPublicationNameResolverSpecification extends Specification {
 		resolver.getArtifactIdAppendix() == "id-with-camel-case"
 	}
 
+	def "createJarTaskName should use base name if publication id is main"() {
+		when:
+		resolver = new ExtendedPublicationNameResolver("main")
+
+		then:
+		resolver.createJarTaskName("jar") == "jar"
+	}
+
+	def "createJarTaskName should append publication id to base name if base name is not main"() {
+		when:
+		resolver = new ExtendedPublicationNameResolver("mainTest")
+
+		then:
+		resolver.createJarTaskName("jar") == "jarMainTest"
+	}
+
 }

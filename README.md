@@ -107,8 +107,8 @@ In this case, two publications would be configured, 'main' (applied by default) 
 2. publicationId = client
  * sourceSet = client
  * configuration = clientRuntime
- * archiveTask = clientJar
- * sourcesArchiveTask = clientSourcesJar
+ * archiveTask = jarClient
+ * sourcesArchiveTask = sourcesJarClient
  * mavenPath = com.example/service-client/1.0/service-client.jar
 
 See the [integration test](https://github.com/BancVue/GradlePluginsCore/blob/master/src/integrationTest/groovy/com/bancvue/gradle/maven/publish/MavenPublishExtPluginIntegrationSpecification.groovy)
