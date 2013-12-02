@@ -15,18 +15,14 @@
  */
 package com.bancvue.gradle.test
 
-import org.junit.Before
-import org.junit.Test
-
-class JacocoExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
+class JacocoExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
 	private TestFile mainSrcFile
 	private TestFile mainTestSrcFile
 	private TestFile testDir
 	private TestFile componentTestDir
 
-	@Before
-	void setUp() {
+	void setup() {
 		mainSrcFile = file("src/main/java/bv/MainClass.java")
 		mainTestSrcFile = file("src/mainTest/java/bv/MainTestClass.java")
 		testDir = file("src/test/groovy/bv")
@@ -92,8 +88,8 @@ public class ${testName} {
 		assert !(xmlCoverageReport.text =~ /${expectedTestFile.baseName}/)
 	}
 
-	@Test
-	void shouldCreateCombinedReportForAllKnownTestConfigurations() {
+	def "should create combined report for all known test configurations"() {
+		given:
 		createSrcAndTestFiles(mainSrcFile, testDir)
 		createSrcAndTestFiles(mainSrcFile, componentTestDir)
 		buildFile << """
@@ -102,20 +98,22 @@ apply plugin: 'jacoco-ext'
 apply plugin: 'component-test'
 """
 
+		when:
 		run("coverage")
 
-		assert file("build/jacoco/test.exec").size() > 0
+		then:
+		file("build/jacoco/test.exec").size() > 0
 		// verify coverage of an externally added test configuration
-		assert file("build/jacoco/componentTest.exec").size() > 0
-		assert file("build/jacoco/jacocoAllMerge.exec").size() > 0
+		file("build/jacoco/componentTest.exec").size() > 0
+		file("build/jacoco/jacocoAllMerge.exec").size() > 0
 		// verify coverage was generated for all test configurations
-		assert file("build/reports/jacoco/test/html/index.html").exists()
-		assert file("build/reports/jacoco/componentTest/html/index.html").exists()
-		assert file("build/reports/jacoco/all/html/index.html").exists()
+		file("build/reports/jacoco/test/html/index.html").exists()
+		file("build/reports/jacoco/componentTest/html/index.html").exists()
+		file("build/reports/jacoco/all/html/index.html").exists()
 	}
 
-	@Test
-	void shouldIncludeAllMainSourceSetsByDefault_AndAlsoRespectOverridesWhenConfigured() {
+	def "should include all main source sets by default and also respect overrides when configured"() {
+		given:
 		createSrcAndTestFiles(mainSrcFile, testDir)
 		createSrcAndTestFiles(mainTestSrcFile, componentTestDir)
 		buildFile << """
@@ -129,8 +127,10 @@ jacocoComponentTestReport {
 """
 		enableXmlReports()
 
+		when:
 		run("coverage")
 
+		then:
 		TestFile testCoverageReport = file("build/reports/jacoco/test/test.xml")
 		TestFile componentTestCoverageReport = file("build/reports/jacoco/componentTest/componentTest.xml")
 		TestFile allCoverageReport = file("build/reports/jacoco/all/all.xml")
@@ -142,17 +142,19 @@ jacocoComponentTestReport {
 		assertCoverageReportDoesNotReferenceTestFile(componentTestCoverageReport, mainTestSrcFile)
 	}
 
-	@Test
-	void shouldLinkToSource() {
+	def "should link to source"() {
+		given:
 		createSrcAndTestFiles(mainSrcFile, testDir)
 		buildFile << """
 apply plugin: 'jacoco-ext'
 """
 
+		when:
 		run("coverage")
 
-		assert file("build/reports/jacoco/test/html/bv/${mainSrcFile.baseName}.html").exists()
-		assert file("build/reports/jacoco/test/html/bv/${mainSrcFile.name}.html").exists()
+		then:
+		file("build/reports/jacoco/test/html/bv/${mainSrcFile.baseName}.html").exists()
+		file("build/reports/jacoco/test/html/bv/${mainSrcFile.name}.html").exists()
 	}
 
 }

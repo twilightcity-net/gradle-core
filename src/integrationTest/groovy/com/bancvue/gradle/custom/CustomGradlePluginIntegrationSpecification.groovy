@@ -15,15 +15,14 @@
  */
 package com.bancvue.gradle.custom
 
-import com.bancvue.gradle.test.AbstractPluginIntegrationTest
+import com.bancvue.gradle.test.AbstractPluginIntegrationSpecification
 import com.bancvue.gradle.test.TestFile
 import com.bancvue.zip.ZipArchive
-import org.junit.Test
 
-class CustomGradlePluginIntegrationTest extends AbstractPluginIntegrationTest {
+class CustomGradlePluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
-	@Test
-	void buildCustomGradleDistro_ShouldBundleGradleCustomizationScript() {
+	def "should download standard gradle distribution and bundle gradle customization script"() {
+		given:
 		TestFile mavenRepo = mkdir("build/maven-repo")
 		TestFile zipBaseDir = mkdir("zipBase")
 		zipBaseDir.file('emptyfile.txt') << ""
@@ -61,15 +60,17 @@ downloadGradle.gradleDownloadBase = "file:///\${createDownloadArchive.destinatio
 println "Created cutomized gradle dist at \${buildCustomGradleDistro.archivePath}"
         """
 
+		when:
 		run('publishCustomGradleDistroPublicationToRepoRepository')
 
+		then:
 		File expectedZipFile = mavenRepo.file("com/bancvue/gradle-bancvue/1.7-bv.1.0/gradle-bancvue-1.7-bv.1.0-bin.zip")
-		assert expectedZipFile.exists()
+		expectedZipFile.exists()
 		ZipArchive archive = new ZipArchive(expectedZipFile)
 		String expectedCustomScript = archive.acquireContentForEntryWithNameLike('customized.gradle')
-		assert expectedCustomScript =~ "repositoryPublicUrl = 'http://repo.domain/public'"
-		assert expectedCustomScript =~ "repositorySnapshotUrl = 'http://repo.domain/snapshots'"
-		assert expectedCustomScript =~ "repositoryReleaseUrl = 'http://repo.domain/releases'"
+		expectedCustomScript =~ "repositoryPublicUrl = 'http://repo.domain/public'"
+		expectedCustomScript =~ "repositorySnapshotUrl = 'http://repo.domain/snapshots'"
+		expectedCustomScript =~ "repositoryReleaseUrl = 'http://repo.domain/releases'"
 	}
 
 }

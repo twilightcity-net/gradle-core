@@ -16,13 +16,11 @@
 package com.bancvue.gradle.test
 
 import org.gradle.testkit.functional.ExecutionResult
-import org.junit.Test
 
+class ComponentTestPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
-class ComponentTestPluginIntegrationTest extends AbstractPluginIntegrationTest {
-
-	@Test
-	void sourceSetModificationsShouldBeAppliedToTestClasspath() {
+	def "should apply source set modifications to test classpath"() {
+		given:
 		file("resource-dir/resource.txt") << "resource content"
 		file("src/componentTest/groovy/SomeTest.groovy") << """
 import org.junit.Test
@@ -57,9 +55,11 @@ sourceSets {
 componentTest.testLogging.showStandardStreams = true
 """
 
+		when:
 		ExecutionResult result = run("check")
-		assert result.standardOutput =~ /Located resource .*resource.txt/
 
+		then:
+		result.standardOutput =~ /Located resource .*resource.txt/
 	}
 
 }

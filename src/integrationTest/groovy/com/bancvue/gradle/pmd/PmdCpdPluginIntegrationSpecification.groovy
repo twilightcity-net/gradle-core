@@ -15,14 +15,13 @@
  */
 package com.bancvue.gradle.pmd
 
-import com.bancvue.gradle.test.AbstractPluginIntegrationTest
+import com.bancvue.gradle.test.AbstractPluginIntegrationSpecification
 import org.gradle.tooling.BuildException
-import org.junit.Test
 
-class PmdCpdPluginIntegrationTest extends AbstractPluginIntegrationTest {
+class PmdCpdPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
-	@Test
-	void shouldDetectCpdViolationAndWriteXmlAndHtmlReport() {
+	def "should detect cpd violation and write xml and html report"() {
+		given:
 		file("src/main/java/Class.java") << """
 public class Class {
 	public void violate() {
@@ -31,7 +30,6 @@ public class Class {
 	}
 }
 """
-
 		buildFile << """
 apply plugin: 'java'
 apply plugin: 'pmdcpd'
@@ -45,12 +43,13 @@ cpd {
 }
 		"""
 
-		try {
-			run("check")
-		} catch (BuildException ex) {}
+		when:
+		run("check")
 
-		assert file("build/reports/cpd/main.xml").exists()
-		assert file("build/reports/cpd/main.html").exists()
+		then:
+		thrown(BuildException)
+		file("build/reports/cpd/main.xml").exists()
+		file("build/reports/cpd/main.html").exists()
 	}
 
 }

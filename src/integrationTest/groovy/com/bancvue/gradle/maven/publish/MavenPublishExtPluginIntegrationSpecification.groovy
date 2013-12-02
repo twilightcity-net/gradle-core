@@ -16,20 +16,16 @@
 package com.bancvue.gradle.maven.publish
 
 import com.bancvue.exception.ExceptionSupport
-import com.bancvue.gradle.test.AbstractPluginIntegrationTest
+import com.bancvue.gradle.test.AbstractPluginIntegrationSpecification
 import com.bancvue.gradle.test.TestFile
 import com.bancvue.zip.ZipArchive
-import org.junit.Before
-import org.junit.Test
-
 
 @Mixin(ExceptionSupport)
-class MavenPublishExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
+class MavenPublishExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
 	private TestFile mavenRepo
 
-	@Before
-	void setUp() {
+	void setup() {
 		mavenRepo = mkdir("build/maven-repo")
 	}
 
@@ -70,21 +66,23 @@ version = '1.0'
 		new ZipArchive(getBuildArtifact(artifactId, classifier))
 	}
 
-	@Test
-	void shouldByDefaultPublishMainArtifactAndSources() {
+	def "should by default publish main artifact and sources"() {
+		given:
 		emptyClassFile("src/main/java/Class.java")
 		setupLocalMavenRepoAndApplyPlugin()
 
+		when:
 		run("publishRemote")
 
+		then:
 		ZipArchive archive = assertArchiveBuiltAndUploadedToMavenRepo("artifact")
-		assert archive.getEntry("Class.class")
+		archive.getEntry("Class.class")
 		ZipArchive sourcesArchive = assertArchiveBuiltAndUploadedToMavenRepo("artifact", "sources")
-		assert sourcesArchive.getEntry("Class.java")
+		sourcesArchive.getEntry("Class.java")
 	}
 
-	@Test
-	void shouldSkipPublication_IfEnabledIsFalse() {
+	def "should skip publication if enabled is false"() {
+		given:
 		emptyClassFile("src/other/java/MainClass.java")
 		buildFile << """
 apply plugin: 'maven-publish-ext'
@@ -96,14 +94,16 @@ publishing_ext {
 }
 """
 
+		when:
 		run("publishRemote")
 
-		assert !getBuildArtifact("artifact").exists()
-		assert !getUploadedArtifact("artifact").exists()
+		then:
+		!getBuildArtifact("artifact").exists()
+		!getUploadedArtifact("artifact").exists()
 	}
 
-	@Test
-	void shouldPublishBothMainAndCustomConfiguration_IfCustomConfigurationManuallyConfigured() {
+	def "should publish both main and custom configuration if custom configuration manually configured"() {
+		given:
 		emptyClassFile("src/main/java/MainClass.java")
 		emptyClassFile("src/custom/java/CustomClass.java")
 		setupLocalMavenRepoAndApplyPlugin()
@@ -125,16 +125,18 @@ publishing_ext {
 }
 """
 
+		when:
 		run("publishRemote")
 
+		then:
 		assertArchiveBuiltAndUploadedToMavenRepo("artifact")
 		assertArchiveBuiltAndUploadedToMavenRepo("artifact", "sources")
 		assertArchiveBuiltAndUploadedToMavenRepo("artifact-custom")
 		assertArchiveBuiltAndUploadedToMavenRepo("artifact-custom", "sources")
 	}
 
-	@Test
-	void shouldUseCustomSourceSetAndConfiguration_IfConfigured() {
+	def "should use custom source set and configuration if configured"() {
+		given:
 		emptyClassFile("src/other/java/MainClass.java")
 		setupLocalMavenRepoAndApplyPlugin()
 		buildFile << """
@@ -158,14 +160,16 @@ publishing_ext {
 }
 """
 
+		when:
 		run("publishRemote")
 
+		then:
 		assertArchiveBuiltAndUploadedToMavenRepo("artifact-other")
 		assertArchiveBuiltAndUploadedToMavenRepo("artifact-other", "sources")
 	}
 
-	@Test
-	void shouldUseCustomArchiveTasks_IfConfigured() {
+	def "should use custom archive tasks if configured"() {
+		given:
 		emptyClassFile("src/main/java/MainClass.java")
 		setupLocalMavenRepoAndApplyPlugin()
 		buildFile << """
@@ -186,15 +190,17 @@ publishing_ext {
 }
 """
 
+		when:
 		run("publishRemote")
 
+		then:
 		String archiveName = getArchiveName("artifact")
-		assert mavenRepo.file("group/artifact/1.0/${archiveName}.zip").exists()
-		assert mavenRepo.file("group/artifact/1.0/${archiveName}-sources.zip").exists()
+		mavenRepo.file("group/artifact/1.0/${archiveName}.zip").exists()
+		mavenRepo.file("group/artifact/1.0/${archiveName}-sources.zip").exists()
 	}
 
-	@Test
-	void shouldNotPublishSources_IfPublishSourcesSetToFalse() {
+	def "should not publish sources if publish sources set to false"() {
+		given:
 		emptyClassFile("src/main/java/MainClass.java")
 		setupLocalMavenRepoAndApplyPlugin()
 		buildFile << """
@@ -210,18 +216,20 @@ publishing_ext {
 }
 """
 
+		when:
 		run("publishRemote")
 
+		then:
 		String archiveName = getArchiveName("artifact")
-		assert mavenRepo.file("group/artifact/1.0/${archiveName}.zip").exists()
+		mavenRepo.file("group/artifact/1.0/${archiveName}.zip").exists()
 		File sourcesArchive = mavenRepo.file("group/artifact/1.0/").listFiles().find { File file ->
 			file.name =~ /sources/
 		}
-		assert !sourcesArchive
+		!sourcesArchive
 	}
 
-	@Test
-	void shouldApplyCompileAndRuntimeDependenciesToMainPom() {
+	def "should apply compile and runtime dependencies to main pom"() {
+		given:
 		emptyClassFile("src/main/java/MainClass.java")
 		setupLocalMavenRepoAndApplyPlugin()
 		buildFile << """
@@ -235,15 +243,17 @@ dependencies {
 }
 """
 
+		when:
 		run("publishRemote")
 
+		then:
 		TestFile pomFile = getPomFile("artifact")
-		assert pomFile.exists()
+		pomFile.exists()
 		// TODO: create abstraction for pom file
 		def pom = new XmlParser().parse(pomFile)
-		assert pom.dependencies.dependency.size() == 2
-		assert pom.dependencies.dependency.find { it.artifactId.text() == "logback" }
-		assert pom.dependencies.dependency.find { it.artifactId.text() == "log4j-over-slf4j" }
+		pom.dependencies.dependency.size() == 2
+		pom.dependencies.dependency.find { it.artifactId.text() == "logback" }
+		pom.dependencies.dependency.find { it.artifactId.text() == "log4j-over-slf4j" }
 	}
 
 }

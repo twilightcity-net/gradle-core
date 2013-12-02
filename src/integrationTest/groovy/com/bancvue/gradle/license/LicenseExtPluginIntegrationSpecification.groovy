@@ -15,19 +15,18 @@
  */
 package com.bancvue.gradle.license
 
-import com.bancvue.gradle.test.AbstractPluginIntegrationTest
+import com.bancvue.gradle.test.AbstractPluginIntegrationSpecification
 import org.gradle.testkit.functional.ExecutionResult
-import org.junit.Test
 
-class LicenseExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
+class LicenseExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
 	/**************************************************************************************************************
 	 * NOTE: if these test fail in an IDE, you may need to add 'licenses/*' to the compiler settings so resources
 	 * are copied appropriately
 	 **************************************************************************************************************/
 
-	@Test
-	void licenseFormat_ShouldWriteLicenseHeaderToSourceFiles() {
+	def "licenseFormat should write license header to source files"() {
+		given:
 		List<File> srcFiles = ["src/main/java", "src/mainTest/java", "src/test/java"].collect{ String path ->
 			emptyClassFile("${path}/Class.java")
 		}
@@ -40,8 +39,10 @@ apply plugin: 'test-ext'
 apply plugin: 'license-ext'
         """
 
+		when:
 		run("licenseFormat")
 
+		then:
 		String year = Calendar.getInstance().get(Calendar.YEAR)
 		srcFiles.each { File srcFile ->
 			String text = srcFile.text
@@ -50,8 +51,8 @@ apply plugin: 'license-ext'
 		}
 	}
 
-	@Test
-	void licenseFormat_ShouldNotFailIfBuildIsFirstCleaned() {
+	def "licenseFormat should not fail if build is first cleaned"() {
+		given:
 		File srcFile = emptyClassFile('src/main/java/Class.java')
 		buildFile << """
 apply plugin: 'java'
@@ -63,15 +64,17 @@ license {
 }
 		"""
 
+		when:
 		run("clean", "licenseFormat")
 
+		then:
 		String text = srcFile.text
-		assert text =~ /Copyright 1975 BancVue/
-		assert text =~ /www.apache.org/
+		text =~ /Copyright 1975 BancVue/
+		text =~ /www.apache.org/
 	}
 
-	@Test
-	void licenseFormat_ShouldUseAlternativeHeaderIfProvided() {
+	def "licenseFormat should use alternative header if provided"() {
+		given:
 		File srcFile = emptyClassFile('src/main/java/Class.java')
 		file('src/main/resources/ALT_LICENSE') << 'header: "ALTERNATIVE HEADER"'
 		buildFile << """
@@ -83,27 +86,31 @@ apply plugin: 'java'
 apply plugin: 'license-ext'
         """
 
+		when:
 		run("assemble", "licenseFormat", "--info")
 
+		then:
 		String text = srcFile.text
-		assert text =~ /ALTERNATIVE HEADER/
+		text =~ /ALTERNATIVE HEADER/
 	}
 
-	@Test
-	void licenseCheck_ShouldCheckLicenseHeaderInSourceFiles() {
+	def "licenseCheck should check license header in source files"() {
+		given:
 		File srcFile = emptyClassFile('src/main/java/Class.java')
 		buildFile << """
 apply plugin: 'java'
 apply plugin: 'license-ext'
         """
 
+		when:
 		ExecutionResult result = run("licenseCheck")
 
-		assert result.standardOutput =~ /Missing header in: .*${srcFile.name}/
+		then:
+		result.standardOutput =~ /Missing header in: .*${srcFile.name}/
 	}
 
-	@Test
-	void licenseCheck_ShouldCheckClassFilesForConfigurationsAddedAfterLicensePluginIsApplied() {
+	def "licenseCheck should check class files for configurations added after license plugin is applied"() {
+		given:
 		File srcFile = emptyClassFile('src/mainTest/java/Class.java')
 		buildFile << """
 apply plugin: 'java'
@@ -111,10 +118,11 @@ apply plugin: 'license-ext'
 apply plugin: 'test-ext'
         """
 
+		when:
 		ExecutionResult result = run("licenseCheck", "--info")
 
-		println result.standardOutput
-		assert result.standardOutput =~ /Missing header in: .*${srcFile.name}/
+		then:
+		result.standardOutput =~ /Missing header in: .*${srcFile.name}/
 	}
 
 }

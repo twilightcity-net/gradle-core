@@ -21,16 +21,16 @@ import org.gradle.testkit.functional.GradleRunnerFactory
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import spock.lang.Specification
 
-class AbstractPluginIntegrationTest {
+class AbstractPluginIntegrationSpecification extends Specification {
 
 	@Rule
 	public TemporaryFolder projectDir = new TemporaryFolder()
 	protected ProjectFileSystem projectFS
 	protected GradleRunner runner
 
-	@Before
-	void setUpRunner() {
+	void setup() {
 		runner = GradleRunnerFactory.create()
 		runner.directory = projectDir.root
 		projectFS = new ProjectFileSystem(projectDir.root)

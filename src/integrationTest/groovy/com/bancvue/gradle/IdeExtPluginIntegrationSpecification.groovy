@@ -15,15 +15,14 @@
  */
 package com.bancvue.gradle
 
-import com.bancvue.gradle.test.AbstractPluginIntegrationTest
-import org.junit.Test
+import com.bancvue.gradle.test.AbstractPluginIntegrationSpecification
 
 import static org.junit.Assert.fail
 
-class IdeExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
+class IdeExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
-	@Test
-	void idea_ShouldAddStandardSourceDirectoriesAndAdditionalTestConfigurations_IfIdePluginDeclaredBeforeTestPlugin() {
+	def "idea should add standard source directories and additional test configurations if ide plugin declared before test plugin"() {
+		given:
 		buildFile << """
 apply plugin: 'groovy'
 apply plugin: 'ide-ext'
@@ -33,10 +32,12 @@ apply plugin: 'integration-test'
 		mkdir("src/test/groovy")
 		mkdir("src/integrationTest/groovy")
 
+		when:
 		run("idea")
 
+		then:
 		File expectedImlFile = file("${projectFS.name}.iml")
-		assert expectedImlFile.exists()
+		expectedImlFile.exists()
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/main/java", false)
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/test/groovy", true)
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/integrationTest/groovy", true)
@@ -61,8 +62,8 @@ apply plugin: 'integration-test'
 		assert Boolean.parseBoolean(result[0].@isTestSource) == isTestFolder
 	}
 
-	@Test
-	void eclipse_ShouldAddStandardSourceDirectoriesAndAdditionalTestConfigurations_IfIdePluginDeclaredAfterTestPlugin() {
+	def "eclipse should add standard source directories and additional test configurations if ide plugin declared after test plugin"() {
+		given:
 		buildFile << """
 apply plugin: 'groovy'
 apply plugin: 'component-test'
@@ -72,8 +73,10 @@ apply plugin: 'ide-ext'
 		mkdir("src/test/groovy")
 		mkdir("src/componentTest/groovy")
 
+		when:
 		run("eclipse")
 
+		then:
 		File expectedClasspathFile = file(".classpath")
 		assert expectedClasspathFile.exists()
 		assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, "src/main/java")

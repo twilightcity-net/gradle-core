@@ -18,10 +18,10 @@ package com.bancvue.gradle.test
 import com.bancvue.zip.ZipArchive
 import org.junit.Test
 
-class TestExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
+class TestExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
-	@Test
-	void jarMainTest_ShouldCompileMainTestSourceAndCreateJarFromSource() {
+	def "jarMainTest should compile mainTest source and create jar from source"() {
+		given:
 		emptyClassFile("src/mainTest/java/Class.java")
 		buildFile << """
 apply plugin: 'java'
@@ -30,16 +30,18 @@ apply plugin: 'test-ext'
 jarMainTest.archiveName='mainTest.jar'
         """
 
+		when:
 		run("check", "jarMainTest")
 
-		assert file("build/classes/mainTest/Class.class").exists()
+		then:
+		file("build/classes/mainTest/Class.class").exists()
 		ZipArchive mainTestJar = projectFS.archive("build/libs/mainTest.jar")
-		assert mainTestJar.exists()
-		assert mainTestJar.acquireContentForEntryWithNameLike("Class.class")
+		mainTestJar.exists()
+		mainTestJar.acquireContentForEntryWithNameLike("Class.class")
 	}
 
-	@Test
-	void javadocJarMainTest_ShouldGenerateMainTestJavadocAndCreateJarFromJavadoc() {
+	def "javadocJarMainTest should generate mainTest javadoc and create jar from javadoc"() {
+		given:
 		file("src/mainTest/java/Class.java") << """
 /**
  * Here are some docs
@@ -53,12 +55,14 @@ apply plugin: 'test-ext'
 javadocJarMainTest.archiveName='mainTestJavadoc.jar'
         """
 
+		when:
 		run("check", "javadocJarMainTest")
 
-		assert file("build/docs/mainTestDocs/Class.html").exists()
+		then:
+		file("build/docs/mainTestDocs/Class.html").exists()
 		ZipArchive mainTestJavadocJar = projectFS.archive("build/libs/mainTestJavadoc.jar")
-		assert mainTestJavadocJar.exists()
-		assert mainTestJavadocJar.acquireContentForEntryWithNameLike("Class.html")
+		mainTestJavadocJar.exists()
+		mainTestJavadocJar.acquireContentForEntryWithNameLike("Class.html")
 	}
 
 }

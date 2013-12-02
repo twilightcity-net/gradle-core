@@ -15,14 +15,13 @@
  */
 package com.bancvue.gradle.support
 
-import com.bancvue.gradle.test.AbstractPluginIntegrationTest
+import com.bancvue.gradle.test.AbstractPluginIntegrationSpecification
 import org.gradle.testkit.functional.ExecutionResult
-import org.junit.Test
 
-class PrintClasspathIntegrationTest extends AbstractPluginIntegrationTest {
+class PrintClasspathIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
-	@Test
-	void shouldPrintCompileAndRuntimeClasspathsToConsoleForAllSourceSets() {
+	def "should print compile and runtime classpaths to console for all source sets"() {
+		given:
 		buildFile << """
 apply plugin: 'java'
 dependencies {
@@ -31,30 +30,34 @@ dependencies {
 task printClasspath(type: com.bancvue.gradle.support.PrintClasspath)
         """
 
+		when:
 		ExecutionResult result = run("printClasspath")
 
+		then:
 		String output = result.standardOutput
-		assert output =~ /main.compileClasspath/
-		assert output =~ /main.runtimeClasspath/
-		assert output =~ /test.compileClasspath/
-		assert output =~ /test.runtimeClasspath/
-		assert output =~ /groovy-all.*jar/
+		output =~ /main.compileClasspath/
+		output =~ /main.runtimeClasspath/
+		output =~ /test.compileClasspath/
+		output =~ /test.runtimeClasspath/
+		output =~ /groovy-all.*jar/
 	}
 
-	@Test
-	void shouldFilterSourceSetByName() {
+	def "should filter source set by name"() {
+		given:
 		buildFile << """
 apply plugin: 'java'
 task printClasspath(type: com.bancvue.gradle.support.PrintClasspath)
         """
 
+		when:
 		ExecutionResult result = run("printClasspath", "-PsourceSetName=main")
 
+		then:
 		String output = result.standardOutput
-		assert output =~ /main.compileClasspath/
-		assert output =~ /main.runtimeClasspath/
-		assert !(output =~ /test.compileClasspath/)
-		assert !(output =~ /test.runtimeClasspath/)
+		output =~ /main.compileClasspath/
+		output =~ /main.runtimeClasspath/
+		!(output =~ /test.compileClasspath/)
+		!(output =~ /test.runtimeClasspath/)
 	}
 
 }

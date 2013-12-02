@@ -15,17 +15,14 @@
  */
 package com.bancvue.gradle.maven
 
-import com.bancvue.gradle.test.AbstractPluginIntegrationTest
+import com.bancvue.gradle.test.AbstractPluginIntegrationSpecification
 import com.bancvue.gradle.test.TestFile
-import org.junit.Before
-import org.junit.Test
 
-class MavenExtPluginIntegrationTest extends AbstractPluginIntegrationTest {
+class MavenExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
 	private TestFile localMavenRepo
 
-	@Before
-	void setUp() {
+	void setup() {
 		localMavenRepo = mkdir("build/maven-repo")
 		buildFile << """
 ext.repositoryReleaseUrl='${localMavenRepo.toURI()}'
@@ -37,24 +34,26 @@ version = '1.0'
 """
 	}
 
-	@Test
-	void shouldPublishArtifactAndSources() {
+	def "should publish artifact and sources"() {
+		given:
 		emptyClassFile("src/main/java/Class.java")
 		buildFile << """
 apply plugin: 'project-defaults'
 apply plugin: 'maven-ext'
 		"""
 
+		when:
 		run("publishRemote")
 
-		assert file("build/libs/artifact-1.0.jar").exists()
-		assert file("build/libs/artifact-1.0-sources.jar").exists()
-		assert localMavenRepo.file("group/artifact/1.0/artifact-1.0.jar").exists()
-		assert localMavenRepo.file("group/artifact/1.0/artifact-1.0-sources.jar").exists()
+		then:
+		file("build/libs/artifact-1.0.jar").exists()
+		file("build/libs/artifact-1.0-sources.jar").exists()
+		localMavenRepo.file("group/artifact/1.0/artifact-1.0.jar").exists()
+		localMavenRepo.file("group/artifact/1.0/artifact-1.0-sources.jar").exists()
 	}
 
-	@Test
-	void shouldSupportDeployerCustomizationsInBuildFile() {
+	def "should supportdeployer customizations in build file"() {
+		given:
 		buildFile << """
 apply plugin: 'maven-ext'
 
@@ -69,11 +68,12 @@ project.uploadArchives {
 }
 """
 
+		when:
 		run("publishRemote")
 
+		then:
 		TestFile pomFile = file("build/poms/pom-default.xml")
-
-		assert pomFile.text =~ /build\/reporting/
+		pomFile.text =~ /build\/reporting/
 	}
 
 }
