@@ -27,18 +27,6 @@ import org.gradle.api.Project
 
 class BancvueOssPlugin implements Plugin<Project> {
 
-	static class VersionNotDefinedException extends GradleException {
-		public VersionNotDefinedException() {
-			super('Required property "version" must be specified')
-		}
-	}
-
-	static class ArtifactIdNotDefinedException extends GradleException {
-		public ArtifactIdNotDefinedException() {
-			super('Required property "artifactId" must be specified')
-		}
-	}
-
 	static final String PLUGIN_NAME = 'bancvue-oss'
 
 	private Project project
@@ -46,7 +34,6 @@ class BancvueOssPlugin implements Plugin<Project> {
 	public void apply(Project project) {
 		this.project = project
 		project.group = 'com.bancvue'
-		assertRequiredPropertiesDefined()
 		applyJavaExtPlugin()
 		applyGroovyPlugin()
 		applyProjectDefaultsPlugin()
@@ -57,23 +44,6 @@ class BancvueOssPlugin implements Plugin<Project> {
 		applyJacocoExtPlugin()
 		applyIdeExtPlugin()
 		applyProjectSupportPlugin()
-	}
-
-	private void assertRequiredPropertiesDefined() {
-		assertVersionDefined()
-		assertArtifactIdDefined()
-	}
-
-	private void assertVersionDefined() {
-		if (!project.version || (project.version == Project.DEFAULT_VERSION)) {
-			throw new VersionNotDefinedException()
-		}
-	}
-
-	private void assertArtifactIdDefined() {
-		if (!project.ext.properties.containsKey('artifactId')) {
-			throw new ArtifactIdNotDefinedException()
-		}
 	}
 
 	private void applyJavaExtPlugin() {
