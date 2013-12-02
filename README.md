@@ -3,38 +3,21 @@
 A collection of gradle plugins meant to codify and streamline project development within an organization.  
 
 
-
-## DefaultProjectPropertyContainer
-
-It can be useful to configure a plugin before the plugin is actually applied.  For example, organization-wide defaults
-can be configured in a custom gradle build and distributed to all projects; a given project may use all or just some of
-these settings, depending on which plugins that project actually applies.  
-
-	class ProjectDefaultsProperties extends DefaultProjectPropertyContainer {
-
-		private static final String NAME = 'default'
-
-		String javaVersion = '1.7'
-
-		String compilerEncoding = 'UTF-8'
-
-		...
-	}
-
-
-## ProjectDefaultsPlugin (bancvue-defaults)
+## ProjectDefaultsPlugin (project-defaults)
 
 This plugin sets system-level gradle project defaults.  Specifically, java version and memory settings for spawned
 processes.  By default, gradle forks processes for both compilation and testing and the memory settings of these spawned
 processes default to the settings of the underlying system, which may be very different between dev machine and CI server.
 
 The plugin defaults (jdk, compiler encoding, [min/max heap size, max perm gen size] for compile and test) can be found
-in <TODO: add link> com.bancvue.gradle.ProjectDefaultsProperties.  If the plugin is applied and nothing more is done, these
-project defaults will be applied.  Alternative defaults can be defined through a customized gradle build <TODO: add link>.
-Finally, any setting can be overridden on a per-project basis.
+[here](https://github.com/BancVue/GradlePluginsCore/blob/master/src/main/groovy/com/bancvue/gradle/ProjectDefaultsProperties.groovy).
+If the plugin is applied and nothing more is done, these project defaults will be applied.  Alternative defaults can be
+defined through a customized gradle build <TODO: add link>.  Finally, any setting can be overridden on a per-project basis.
 
-The project jar's manifest is updated with the following attribute/values...
+In addition, the plugin modifies all jar tasks in the following way...
 
+1. If the project defines a property named 'artifactId', the jar's base name is set to the artifactId
+2. The jar's manifest is updated with the following attribute/values...
  * Built-Date - the current date
  * Build-Jdk - the value of the 'java.version' system property
 
@@ -57,7 +40,7 @@ The [maven-publish](http://www.gradle.org/docs/current/userguide/publishing_mave
 and [maven-publish-auth](https://github.com/sebersole/gradle-maven-publish-auth)
 plugins are applied, adding support for dependency resolution and artifact publishing.
 
-The 'repository' [project defaults](https://github.com/BancVue/GradlePluginsCore/blob/master/src/main/groovy/com/bancvue/gradle/maven/MavenRepositoryProperties.groovy)
+The 'repository' [property defaults](https://github.com/BancVue/GradlePluginsCore/blob/master/src/main/groovy/com/bancvue/gradle/maven/MavenRepositoryProperties.groovy)
 allow for local maven publication with no configuration.  Organization defaults can be defined to retrieve dependencies
 from and publish to a central repository.  This can be used in conjunction with the CustomGradlePlugin to set up a
 standard repository configuration for all projects across an organization.  The customization script would look
@@ -217,6 +200,24 @@ on all Bancvue OSS projects.  The following plugins are applied:
 * jacoco-ext
 * ide-ext
 * project-support
+
+
+## DefaultProjectPropertyContainer
+
+It can be useful to configure a plugin before the plugin is actually applied.  For example, organization-wide defaults
+can be configured in a custom gradle build and distributed to all projects; a given project may use all or just some of
+these settings, depending on which plugins that project actually applies.
+
+	class ProjectDefaultsProperties extends DefaultProjectPropertyContainer {
+
+		private static final String NAME = 'default'
+
+		String javaVersion = '1.7'
+
+		String compilerEncoding = 'UTF-8'
+
+		...
+	}
 
 
 # Gradle Test Kit
