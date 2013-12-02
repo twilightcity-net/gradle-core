@@ -39,8 +39,8 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 		setDefaultCompileMemorySettings()
 		setDefaultTestMemorySettings()
 		setCompilerEncoding()
-		addBuildDateAndJdkToJarManifest()
 		setJavaCompatibilityVersion()
+		addBuildDateAndJdkToJarManifest()
 		setDefaultBaseNameForJarTasks()
 	}
 
@@ -75,18 +75,18 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 		}
 	}
 
+	private void setJavaCompatibilityVersion() {
+		project.setProperty('sourceCompatibility', defaultsProperties.javaVersion)
+		project.setProperty('targetCompatibility', defaultsProperties.javaVersion)
+	}
+
 	private void addBuildDateAndJdkToJarManifest() {
-		project.jar {
+		project.tasks.withType(Jar) { Jar jar ->
 			manifest {
 				attributes 'Built-Date': new Date()
 				attributes 'Build-Jdk': System.getProperty('java.version')
 			}
 		}
-	}
-
-	private void setJavaCompatibilityVersion() {
-		project.setProperty('sourceCompatibility', defaultsProperties.javaVersion)
-		project.setProperty('targetCompatibility', defaultsProperties.javaVersion)
 	}
 
 	private void setDefaultBaseNameForJarTasks() {
