@@ -39,7 +39,16 @@ The project jar's manifest is updated with the following attribute/values...
  * Build-Jdk - the value of the 'java.version' system property
 
 
+## JavaExtPlugin (java-ext)
 
+The [java](http://www.gradle.org/docs/current/userguide/java_plugin.html)
+plugin is applied, adding basic java project support.
+
+
+#### Added tasks
+
+* sourcesJar, generate a jar with project source files (main.allSource)
+* javadocJar, generate a jar with project javadoc (output from the java plugin-provided 'javadoc' task)
 
 
 ## MavenPublishExtPlugin (maven-publish-ext)
@@ -48,22 +57,85 @@ The [maven-publish](http://www.gradle.org/docs/current/userguide/publishing_mave
 and [maven-publish-auth](https://github.com/sebersole/gradle-maven-publish-auth)
 plugins are applied, adding support for dependency resolution and artifact publishing.
 
-The 'repository' project defaults (found here <TODO: add link> com.bancvue.gradle.maven.MavenRepositoryProperties)
-are allow for local maven publication with no configuration.  Organization defaults can be defined to retrieve
-dependencies from and publish to a central repository.
+The 'repository' [project defaults](https://github.com/BancVue/GradlePluginsCore/blob/master/src/main/groovy/com/bancvue/gradle/maven/MavenRepositoryProperties.groovy)
+allow for local maven publication with no configuration.  Organization defaults can be defined to retrieve dependencies
+from and publish to a central repository.  This can be used in conjunction with the CustomGradlePlugin to set up a
+standard repository configuration for all projects across an organization.  The customization script would look
+something like this...
 
+    allprojects {
+	    project.group = 'com.organization'
+	    project.ext {
+            repositoryName = "dev"
+            repositoryPublicUrl = "http://organization.com/nexus/content/groups/public"
+            repositorySnapshotUrl = "http://organization.com/nexus/content/repositories/snapshots"
+            repositoryReleaseUrl = "http://organization.com/nexus/content/repositories/releases"
+        }
+    }
 
-#### Added tasks
+The plugin adds a maven artifact repository to the project using the configured repositoryName and repositoryPublicUrl.
+It also adds a maven publishing repository using the configured repositoryName and either repositorySnapshotUrl
+or repositoryReleaseUrl, depending on whether the version contains the string 'SNAPSHOT'.
 
-* sourceJar, generate a jar with project source files
-* javadocJar, generate a jar with project javadoc
-* maven publication, publish the project artifact.  source jar is published with the 'sources' classifier.  source test
-jar is published with the 'test' classifier.
+The plugin also implements a convention-based approach for configuring artifacts to publish.  The only required
+parameter is the publication id, a string which is used to derive the various required components like so...
+
+* sourceSet = ${publicationId}; used in archive task generation
+* configuration = ${publicatinId}Runtime; used to configure dependencies in the resulting pom
+* archiveTask = ${publicationId}Jar; looks for a task with the given name and if not found, creates one from the sourceSet
+* sourcesArchiveTask = ${publicationId}SourcesJar; looks for a task with the given name and if not found, creates one from the sourceSet
+
+For example, the following build file excerpt sets up a 'client' configuration and sourceSet.
+
+    group = 'com.example'
+    version = '1.0'
+    ext.artifactId='service'
+
+    configurations {
+        client
+    }
+
+    sourceSets {
+        main {
+            java {
+                exclude "com/example/service/client/**"
+            }
+        }
+        client {
+            java {
+                srcDir 'src/main/java'
+                include "com/example/service/client/**"
+            }
+        }
+    }
+
+    publishing_ext {
+    	publication("client") {
+    }
+
+In this case, two publications would be configured, 'main' (applied by default) and 'client'.
+
+1. publicationId = "main"
+ * sourceSet = main
+ * configuration = runtime
+ * archiveTask = jar
+ * sourcesArchiveTask = sourcesJar
+ * mavenPath = com.example/service/1.0/service.jar
+2. publicationId = client
+ * sourceSet = client
+ * configuration = clientRuntime
+ * archiveTask = clientJar
+ * sourcesArchiveTask = clientSourcesJar
+ * mavenPath = com.example/service-client/1.0/service-client.jar
+
+See the [integration test](https://github.com/BancVue/GradlePluginsCore/blob/master/src/integrationTest/groovy/com/bancvue/gradle/maven/publish/MavenPublishExtPluginIntegrationTest.groovy)
+for various example examples usages.
 
 
 ## TestExtPlugin (test-ext)
 
-        addMainTestConfigurationIfMainTestDirDefined()
+The [java](http://www.gradle.org/docs/current/userguide/java_plugin.html)
+plugin is applied, adding basic java project support.
 
 #### Added tasks
 
@@ -131,15 +203,21 @@ organization.  The idea is to provide a gradle wrapper customized to an organiza
 which can used for all internal projects.
 
 
-## BancvueProjectPlugin (bancvue)
+## BancvueOssPlugin (bancvue-oss)
 
-The 'root' of the Bancvue plugin heirarchy, this plugin defines behavior all Bancvue projects will likely need.
+With no behavior of it's own, this plugin simply aggregates a number of other plugins which are likely to be needed
+on all Bancvue OSS projects.  The following plugins are applied:
 
-The [java](http://www.gradle.org/docs/current/userguide/java_plugin.html)
-and [groovy](http://www.gradle.org/docs/current/userguide/groovy_plugin.html) plugins are applied first.
+* java-ext
+* groovy
+* project-defaults
+* maven-ext
+* test-ext
+* component-test
+* jacoco-ext
+* ide-ext
+* project-support
 
-All other behavior is split into individual plugins covered below.  Each of these plugins (except integration test)
-is applied as part of the BancvuePlugin.
 
 # Gradle Test Kit
 
