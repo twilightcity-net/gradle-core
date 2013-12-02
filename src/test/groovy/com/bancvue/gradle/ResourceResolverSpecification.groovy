@@ -15,86 +15,89 @@
  */
 package com.bancvue.gradle
 
-import com.bancvue.gradle.test.AbstractPluginSupportTest
+import com.bancvue.gradle.test.AbstractPluginSupportSpecification
 import com.bancvue.gradle.test.TestFile
 import org.junit.Before
 import org.junit.Test
 
-class ResourceResolverTest extends AbstractPluginSupportTest {
+class ResourceResolverSpecification extends AbstractPluginSupportSpecification {
 
 	private static final class Model {
 		String key
 	}
 
 
-	private static final String CLASSPATH_RESOURCE_PATH = "com/bancvue/gradle/ResourceResolverTest.class"
+	private static final String CLASSPATH_RESOURCE_PATH = "com/bancvue/gradle/ResourceResolverSpecification.class"
 
 	private ResourceResolver.Impl resolver
 
-	@Before
-	void setUp() {
+	void setup() {
 		resolver = new ResourceResolver.Impl(project)
 		project.apply(plugin: "java")
 	}
 
-	@Test
-	void getNamedResourceAsURLFromProjectResourceDirs_ShouldResolveURL() {
+	def "getNamedResourceAsURLFromProjectResourceDirs should resolve URL"() {
+		given:
 		TestFile resourceFile = projectFS.file("src/main/resources/resource.txt") << "content"
 
+		when:
 		URL resourceUrl = resolver.getNamedResourceAsURLFromProjectResourceDirs("resource.txt")
 
-		assert resourceUrl
-		assert resourceUrl == resourceFile.toURL()
+		then:
+		resourceUrl == resourceFile.toURL()
 	}
 
-	@Test
-	void getNamedResourceAsURLFromProjectRoot_ShoudlResolveURL() {
+	def "getNamedResourceAsURLFromProjectRoot shoudl resolve URL"() {
+		given:
 		TestFile resourceFile = projectFS.file("resource.txt") << "content"
 
+		when:
 		URL resourceUrl = resolver.getNamedResourceAsURLFromProjectRoot("resource.txt")
 
-		assert resourceUrl
-		assert resourceUrl == resourceFile.toURL()
+		then:
+		resourceUrl == resourceFile.toURL()
 	}
 
-	@Test
-	void getNamedResourceFromClasspath_ShouldResolveResource() {
-		URL resource = resolver.getNamedResourceFromClasspath(CLASSPATH_RESOURCE_PATH)
-
-		assert resource
+	def "getNamedResourceFromClasspath should resolve resource"() {
+		expect:
+		resolver.getNamedResourceFromClasspath(CLASSPATH_RESOURCE_PATH)
 	}
 
-	@Test
-	void acquireResourceURL_ShouldResolveFromResourceDirBeforeProjectRoot() {
+	def "acquireResourceURL should resolve from resource dir before project root"() {
+		given:
 		TestFile resourceDirFile = projectFS.file("src/main/resources/resource.txt") << "content"
 		projectFS.file("resource.txt") << "content"
 
+		when:
 		URL resourceUrl = resolver.acquireResourceURL("resource.txt")
 
-		assert resourceUrl
-		assert resourceUrl == resourceDirFile.toURL()
+		then:
+		resourceUrl == resourceDirFile.toURL()
 	}
 
-	@Test
-	void acquireResourceURL_ShouldResolveResourceFromProjectRootBeforeClasspath() {
+	def "acquireResourceURL should resolve resource from project root before classpath"() {
+		given:
+		assert resolver.getNamedResourceFromClasspath(CLASSPATH_RESOURCE_PATH)
 		TestFile projectRootFile = projectFS.file(CLASSPATH_RESOURCE_PATH) << "content"
 
+		when:
 		URL resourceUrl = resolver.acquireResourceURL(CLASSPATH_RESOURCE_PATH)
 
-		assert resourceUrl
-		assert resourceUrl == projectRootFile.toURL()
+		then:
+		resourceUrl == projectRootFile.toURL()
 	}
 
-	@Test
-	void resolveObjectFromMap_ShouldCreateInstanceOfInputTypeAndInitializeWithMapFromResourceFile() {
+	def "resolveObjectFromMap should create instance of input type and initialize with map from resource file"() {
+		given:
 		projectFS.file("src/main/resources/map_file") << """
 key: "value"
 """
 
+		when:
 		Model model = resolver.resolveObjectFromMap("map_file", Model)
 
-		assert model != null
-		assert model.key == "value"
+		then:
+		model.key == "value"
 	}
 
 }

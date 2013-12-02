@@ -15,83 +15,88 @@
  */
 package com.bancvue.gradle.maven.publish
 
-import com.bancvue.gradle.test.AbstractPluginTest
+import com.bancvue.gradle.test.AbstractPluginSpecification
 import org.gradle.api.Task
 import org.gradle.api.artifacts.ArtifactRepositoryContainer
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
-import org.junit.Before
-import org.junit.Test
 
-class MavenPublishExtPluginTest extends AbstractPluginTest {
+class MavenPublishExtPluginSpecification extends AbstractPluginSpecification {
 
-	MavenPublishExtPluginTest() {
-		super(MavenPublishExtPlugin.PLUGIN_NAME)
+	String getPluginName() {
+		MavenPublishExtPlugin.PLUGIN_NAME
 	}
 
-	@Before
-	void setUp() {
+	void setup() {
 		setArtifactId('1.0')
 	}
 
-	@Test
-	void apply_ShouldApplyMavenPlugins() {
+	def "apply should apply maven plugin"() {
+		when:
 		applyPlugin()
 
+		then:
 		assertNamedPluginApplied('maven-publish')
 	}
 
-	@Test
-	void apply_ShouldAddNexusDependencyRepository() {
+	def "apply should add maven artifact repository configured with public url"() {
+		given:
 		project.ext.repositoryName = 'repo'
 		project.ext.repositoryPublicUrl = 'http://public-url'
 
+		when:
 		applyPlugin()
 
-		MavenArtifactRepository nexusRepo = getMavenRepo('repo')
-		assert nexusRepo != null
-		assert nexusRepo.url.toString() == 'http://public-url'
+		then:
+		MavenArtifactRepository repo = getMavenRepo('repo')
+		repo != null
+		repo.url.toString() == 'http://public-url'
 	}
 
 	private MavenArtifactRepository getMavenRepo(String name) {
 		project.repositories.getByName(name) as MavenArtifactRepository
 	}
 
-	@Test
-	void apply_ShouldAddMavenLocalDependencyRepository() {
+	def "apply should add maven local artifact repository"() {
+		when:
 		applyPlugin()
 
+		then:
 		MavenArtifactRepository mavenLocal = getMavenRepo(ArtifactRepositoryContainer.DEFAULT_MAVEN_LOCAL_REPO_NAME)
-		assert mavenLocal != null
+		mavenLocal != null
 	}
 
 	private MavenArtifactRepository getMavenPublishingRepo(String name) {
 		project.publishing.repositories.getByName(name)
 	}
 
-	@Test
-	void apply_ShouldAddNexusSnapshotPublishingRepository_IfVersionSnapshot() {
+	def "apply should add snapshot repository if version is snapshot"() {
+		given:
 		project.version = '1.0-SNAPSHOT'
 		project.ext.repositoryName = 'repo'
 		project.ext.repositorySnapshotUrl = 'http://snapshot-url'
 
+		when:
 		applyPlugin()
 
-		MavenArtifactRepository nexusRepo = getMavenPublishingRepo('repo')
-		assert nexusRepo.url.toString() == 'http://snapshot-url'
+		then:
+		MavenArtifactRepository repo = getMavenPublishingRepo('repo')
+		repo.url.toString() == 'http://snapshot-url'
 	}
 
-	@Test
-	void apply_ShouldAddNexusReleasePublishingRepository_IfVersionNotSnapshot() {
+	def "apply should add release repository if version is not snapshot"() {
+		given:
 		project.version = '1.0'
 		project.ext.repositoryName = 'repo'
 		project.ext.repositoryReleaseUrl = 'http://release-url'
 
+		when:
 		applyPlugin()
 
-		MavenArtifactRepository nexusRepo = getMavenPublishingRepo('repo')
-		assert nexusRepo.url.toString() == 'http://release-url'
+		then:
+		MavenArtifactRepository repo = getMavenPublishingRepo('repo')
+		repo.url.toString() == 'http://release-url'
 	}
 
 	private Task acquireSingleDependencyForTask(String taskName) {
@@ -105,23 +110,25 @@ class MavenPublishExtPluginTest extends AbstractPluginTest {
 		task.taskDependencies.getDependencies(task).toList()
 	}
 
-	@Test
-	void apply_ShouldRemapPublishTaskToPublishRemote() {
+	def "apply should remap publish task to publish remote"() {
+		when:
 		applyPlugin()
 		project.evaluate()
 
+		then:
 		Task publishRemoteDependency = acquireSingleDependencyForTask('publishRemote')
-		assert publishRemoteDependency instanceof PublishToMavenRepository
-		assert !(publishRemoteDependency instanceof PublishToMavenLocal)
+		publishRemoteDependency instanceof PublishToMavenRepository
+		!(publishRemoteDependency instanceof PublishToMavenLocal)
 	}
 
-	@Test
-	void apply_ShouldRemapPublishToMavenLocalTaskToPublish() {
+	def "apply should remap publish to maven local task to publish"() {
+		when:
 		applyPlugin()
 		project.evaluate()
 
+		then:
 		Task publishRemoteDependency = acquireSingleDependencyForTask('publish')
-		assert publishRemoteDependency instanceof PublishToMavenLocal
+		publishRemoteDependency instanceof PublishToMavenLocal
 	}
 
 }

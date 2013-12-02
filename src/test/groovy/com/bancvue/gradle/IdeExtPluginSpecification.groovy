@@ -15,26 +15,27 @@
  */
 package com.bancvue.gradle
 
-import com.bancvue.gradle.test.AbstractPluginTest
-import org.junit.Test
+import com.bancvue.gradle.test.AbstractPluginSpecification
 
-class IdeExtPluginTest extends AbstractPluginTest {
+class IdeExtPluginSpecification extends AbstractPluginSpecification {
 
-	IdeExtPluginTest() {
-		super(IdeExtPlugin.PLUGIN_NAME)
+	String getPluginName() {
+		IdeExtPlugin.PLUGIN_NAME
 	}
 
-	@Test
-	void apply_ShouldApplyIdeaPlugin() {
+	def "apply should apply idea plugin"() {
+		when:
 		applyPlugin()
 
+		then:
 		assertNamedPluginApplied('idea')
 	}
 
-	@Test
-	void apply_ShouldApplyEclipsePlugin() {
+	def "apply should apply eclipse plugin"() {
+		when:
 		applyPlugin()
 
+		then:
 		assertNamedPluginApplied('eclipse')
 	}
 

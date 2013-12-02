@@ -15,67 +15,69 @@
  */
 package com.bancvue.gradle.maven
 
-import com.bancvue.gradle.test.AbstractPluginTest
+import com.bancvue.gradle.test.AbstractPluginSpecification
 import org.gradle.api.Task
 import org.gradle.api.artifacts.ArtifactRepositoryContainer
 import org.gradle.api.artifacts.maven.MavenDeployer
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
-import org.junit.Before
-import org.junit.Test
 
-class MavenExtPluginTest extends AbstractPluginTest {
+class MavenExtPluginSpecification extends AbstractPluginSpecification {
 
-	MavenExtPluginTest() {
-		super(MavenExtPlugin.PLUGIN_NAME)
+	String getPluginName() {
+		MavenExtPlugin.PLUGIN_NAME
 	}
 
-	@Before
-	void setUp() {
+	void setup() {
 		setArtifactId('artifact')
 	}
 
-	@Test
-	void apply_ShouldApplyMavenPlugins() {
+	def "apply should apply maven plugins"() {
+		when:
 		applyPlugin()
 
+		then:
 		assertNamedPluginApplied('maven')
 	}
 
-	@Test
-	void apply_ShouldAddNexusDependencyRepository() {
+	def "apply should add maven artifact repository configured with public url"() {
+		given:
 		project.ext.repositoryName = 'repo'
 		project.ext.repositoryPublicUrl = 'http://public-url'
 
+		when:
 		applyPlugin()
 
-		MavenArtifactRepository nexusRepo = getMavenRepo('repo')
-		assert nexusRepo != null
-		assert nexusRepo.url.toString() == 'http://public-url'
+		then:
+		MavenArtifactRepository repo = getMavenRepo('repo')
+		repo != null
+		repo.url.toString() == 'http://public-url'
 	}
 
 	private MavenArtifactRepository getMavenRepo(String name) {
 		project.repositories.getByName(name) as MavenArtifactRepository
 	}
 
-	@Test
-	void apply_ShouldAddMavenLocalDependencyRepository() {
+	def "apply should add maven local artifact repository"() {
+		when:
 		applyPlugin()
 
-		MavenArtifactRepository mavenLocal = getMavenRepo(ArtifactRepositoryContainer.DEFAULT_MAVEN_LOCAL_REPO_NAME)
-		assert mavenLocal != null
+		then:
+		getMavenRepo(ArtifactRepositoryContainer.DEFAULT_MAVEN_LOCAL_REPO_NAME) != null
 	}
 
-	@Test
-	void apply_ShouldConfigureMavenDeployerReleaseAndSnapshotRepositories() {
+	def "apply should configure maven deployer release and snapshot repositories"() {
+		given:
 		project.version = '1.0'
 		project.ext.repositoryReleaseUrl = 'http://release-url'
 		project.ext.repositorySnapshotUrl = 'http://snapshot-url'
 
+		when:
 		applyPlugin()
 
+		then:
 		MavenDeployer deployer = project.uploadArchives.repositories.mavenDeployer
-		assert deployer.repository.url == 'http://release-url'
-		assert deployer.snapshotRepository.url == 'http://snapshot-url'
+		deployer.repository.url == 'http://release-url'
+		deployer.snapshotRepository.url == 'http://snapshot-url'
 	}
 
 	private Task acquireSingleDependencyForTask(String taskName) {
@@ -89,22 +91,24 @@ class MavenExtPluginTest extends AbstractPluginTest {
 		task.taskDependencies.getDependencies(task).toList()
 	}
 
-	@Test
-	void apply_ShouldAliasUploadArchivesTaskToPublishRemote() {
+	def "apply should alias uploadArchives task to publishRemote"() {
+		when:
 		applyPlugin()
 		project.evaluate()
 
+		then:
 		Task publishRemoteDependency = acquireSingleDependencyForTask('publishRemote')
-		assert publishRemoteDependency.name == 'uploadArchives'
+		publishRemoteDependency.name == 'uploadArchives'
 	}
 
-	@Test
-	void apply_ShouldAliasInstallTaskToPublish() {
+	def "apply should alias install task to publish"() {
+		when:
 		applyPlugin()
 		project.evaluate()
 
+		then:
 		Task publishDependency = acquireSingleDependencyForTask('publish')
-		assert publishDependency.name == 'install'
+		publishDependency.name == 'install'
 	}
 
 }

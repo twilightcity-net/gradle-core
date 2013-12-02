@@ -20,54 +20,41 @@ import org.gradle.api.artifacts.maven.PomFilterContainer
 import org.gradle.api.artifacts.maven.PublishFilter
 import org.gradle.api.publication.maven.internal.DefaultPomFilter
 import org.gradle.api.publication.maven.internal.PomFilter
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.runners.MockitoJUnitRunner
+import spock.lang.Specification
 
-import static org.mockito.Matchers.anyObject
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.when
+class DefaultPublishFilterSpecification extends Specification {
 
-@RunWith(MockitoJUnitRunner)
-class DefaultPublishFilterTest {
-
-	@Mock
 	private PomFilterContainer container
-	@Mock
 	private Artifact artifact
 	private DefaultPublishFilter defaultFilter
 	private List<PomFilter> activePomFilters
 
-	@Before
-	void setUp() {
-		activePomFilters = []
+	void setup() {
+		container = Mock()
+		artifact = Mock()
 		defaultFilter = new DefaultPublishFilter(container)
+		activePomFilters = []
 		addActivePomFilter(defaultFilter)
-		when(container.getActivePomFilters()).thenReturn(activePomFilters)
+		container.getActivePomFilters() >> activePomFilters
 	}
 
 	private void addActivePomFilter(PublishFilter filter) {
 		activePomFilters << new DefaultPomFilter(null, null, filter)
 	}
 
-	@Test
-	void accept_ShouldAcceptAllArtifacts_IfNoOtherFilterConfigured() {
-		boolean accept = defaultFilter.accept(artifact, null)
-
-		assert accept
+	def "accept should accept all artifacts if no other filter configured"() {
+		expect:
+		defaultFilter.accept(artifact, null)
 	}
 
-	@Test
-	void accept_ShouldNotAcceptArtifact_IfAcceptedByOtherFilter() {
-		PublishFilter otherFilter = mock(PublishFilter)
-		when(otherFilter.accept(anyObject(), anyObject())).thenReturn(true)
+	def "accept should not accept artifact if accepted by other filter"() {
+		given:
+		PublishFilter otherFilter = Mock()
 		addActivePomFilter(otherFilter)
+		otherFilter.accept(_, _) >> true
 
-		boolean accept = defaultFilter.accept(artifact, null)
-
-		assert !accept
+		expect:
+		!defaultFilter.accept(artifact, null)
 	}
 
 }

@@ -17,11 +17,9 @@ package com.bancvue.gradle
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.junit.Test
+import spock.lang.Specification
 
-
-class DefaultProjectPropertyContainerTest {
+class DefaultProjectPropertyContainerSpecification extends Specification {
 
 	static class TestContainer extends DefaultProjectPropertyContainer {
 
@@ -37,40 +35,43 @@ class DefaultProjectPropertyContainerTest {
 	private Project project
 	private TestContainer container
 
-	@Before
-	void setUp() {
+	void setup() {
 		project = ProjectBuilder.builder().build()
 		container = new TestContainer(project)
 	}
 
-	@Test
-	void propertyAccess_ShouldUseProjectDefault_IfProjectDefaultValueProvided() {
+	def "propertyAccess should use project default if project default value provided"() {
+		when:
 		project.ext["testValue"] = "projectDefaultValue"
 
-		assert container.value == "projectDefaultValue"
+		then:
+		container.value == "projectDefaultValue"
 	}
 
-	@Test
-	void propertyAccess_ShouldUseProjectDefault_IfProjectDefaultAndPropertyValueProvided() {
+	def "propertyAccess should use project default if project default and property value provided"() {
+		when:
 		project.ext["testValue"] = "projectDefaultValue"
 		container.value = "propertyValue"
 
-		assert container.value == "projectDefaultValue"
+		then:
+		container.value == "projectDefaultValue"
 	}
 
-	@Test
-	void propertyAccess_ShouldUsePropertyValue_IfProjectDefaultNotProvided() {
+	def "propertyAccess should use property value if project default not provided"() {
+		when:
 		container.value = "propertyValue"
 
-		assert container.value == "propertyValue"
+		then:
+		container.value == "propertyValue"
 	}
 
-	@Test
-	void propertyAccess_ShouldRespectNonStringTypes() {
+	def "propertyAccess should respect non string types"() {
+		when:
 		container.boolValue = true
 
-		assert container.boolValue
-		assert container.boolValue.class == Boolean.class
+		then:
+		container.boolValue
+		container.boolValue.class == Boolean.class
 	}
 
 }

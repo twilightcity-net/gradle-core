@@ -15,38 +15,42 @@
  */
 package com.bancvue.gradle.maven.publish
 
-import org.junit.Test
+import spock.lang.Specification
 
-class ExtendedPublicationNameResolverTest {
+class ExtendedPublicationNameResolverSpecification extends Specification {
 
 	private ExtendedPublicationNameResolver resolver
 
-	@Test
-	void getPublicationIdAppendix_ShouldReturnEmptyString_IfIdIsMain() {
+	def "getPublicationIdAppendix should return empty string if id is main"() {
+		when:
 		resolver = new ExtendedPublicationNameResolver("main")
 
+		then:
 		assert resolver.getPublicationIdAppendix() == ""
 	}
 
-	@Test
-	void getPublicationIdAppendix_ShouldStripMain_IfIdStartsWithMain() {
+	def "getPublicationIdAppendix should strip main if id starts with main"() {
+		when:
 		resolver = new ExtendedPublicationNameResolver("mainTest")
 
-		assert resolver.getPublicationIdAppendix() == "test"
+		then:
+		resolver.getPublicationIdAppendix() == "test"
 	}
 
-	@Test
-	void getPublicationIdAppendix_ShouldReturnPublicationId_IfIdDoesNotStartWithMain() {
+	def "getPublicationIdAppendix should return publication id if id does not start with main"() {
+		when:
 		resolver = new ExtendedPublicationNameResolver("isnotmain")
 
-		assert resolver.getPublicationIdAppendix() == "isnotmain"
+		then:
+		resolver.getPublicationIdAppendix() == "isnotmain"
 	}
 
-	@Test
-	void getArtifactIdAppendix_ShouldDeCamelCasePublicationId() {
+	def "getArtifactIdAppendix should de-camel case publication id"() {
+		when:
 		resolver = new ExtendedPublicationNameResolver("idWithCamelCase")
 
-		assert resolver.getArtifactIdAppendix() == "id-with-camel-case"
+		then:
+		resolver.getArtifactIdAppendix() == "id-with-camel-case"
 	}
 
 }

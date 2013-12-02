@@ -15,28 +15,17 @@
  */
 package com.bancvue.gradle.test
 
-import org.gradle.api.Task
-import org.junit.Before
-import org.junit.Test
+import spock.lang.Specification
 
-class ComponentTestPluginTest extends AbstractPluginTest {
+class TestFileSpecification extends Specification {
 
-	ComponentTestPluginTest() {
-		super(ComponentTestPlugin.PLUGIN_NAME)
-	}
+	def "getBaseName should return class name sans extension"() {
+		given:
+		TestFile file = new TestFile(new File("dir/SomeFile.java"))
 
-	@Before
-	void setUp() {
-		project.file('src/componentTest').mkdirs()
-	}
-
-	@Test
-	void apply_ShouldAddComponentTestAsCheckDependency() {
-		applyPlugin()
-
-		Task checkTask = project.tasks.getByName('check')
-		Set checkDependencies = checkTask.getDependsOn()
-		assert checkDependencies.contains(project.tasks.getByName('componentTest'))
+		expect:
+		file.name == "SomeFile.java"
+		file.baseName == "SomeFile"
 	}
 
 }

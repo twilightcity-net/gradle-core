@@ -15,28 +15,24 @@
  */
 package com.bancvue.gradle.pmd
 
-import com.bancvue.gradle.test.AbstractPluginTest
-import org.junit.Before
-import org.junit.Test
+import com.bancvue.gradle.test.AbstractPluginSpecification
 
-class PmdCpdPluginTest extends AbstractPluginTest {
+class PmdCpdPluginSpecification extends AbstractPluginSpecification {
 
-	PmdCpdPluginTest() {
-		super(PmdCpdPlugin.PLUGIN_NAME)
+	String getPluginName() {
+		PmdCpdPlugin.PLUGIN_NAME
 	}
 
-	@Before
 	void setup() {
 		project.apply(plugin: 'java')
-		project.apply(plugin: PmdCpdPlugin.PLUGIN_NAME)
+		applyPlugin()
 	}
 
-	@Test
-	void apply_ShouldConfigureTaskFromExtension() {
+	def "apply should configure task from extension"() {
+		when:
 		project.sourceSets {
 			main
 		}
-
 		CpdExtension extension = new CpdExtension()
 		int expectedMinimumTokenCount = extension.minimumTokenCount + 10
 		boolean expectedIgnoreLiterals = !extension.ignoreLiterals
@@ -51,6 +47,7 @@ class PmdCpdPluginTest extends AbstractPluginTest {
 			cpdXsltPath = expectedCpdXsltPath
 		}
 
+		then:
 		project.tasks.withType(Cpd) { Cpd task ->
 			assert task != null
 			assert task.ignoreFailures == expectedIgnoreFailures
@@ -61,12 +58,13 @@ class PmdCpdPluginTest extends AbstractPluginTest {
 		}
 	}
 
-	@Test
-	void apply_ShouldUseExtensionDefaults_IfValuesNotProvidedInTask() {
+	def "apply should use extension defaults if values not provided in task"() {
+		when:
 		project.sourceSets {
 			main
 		}
 
+		then:
 		CpdExtension extension = new CpdExtension()
 		project.tasks.withType(Cpd) { Cpd task ->
 			assert task != null

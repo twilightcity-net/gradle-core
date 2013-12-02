@@ -20,20 +20,20 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import spock.lang.Specification
 
 /**
  * Extended by tests which are not testing a plugin itself, but testing classes which are used by plugins and
  * require a project.
  */
-class AbstractPluginSupportTest {
+class AbstractPluginSupportSpecification extends Specification {
 
 	@Rule
 	public TemporaryFolder projectDir = new TemporaryFolder()
 	protected Project project
 	protected ProjectFileSystem projectFS
 
-	@Before
-	void setUpProject() {
+	void setup() {
 		project = createProject()
 		projectFS = new ProjectFileSystem(project.rootDir)
 	}

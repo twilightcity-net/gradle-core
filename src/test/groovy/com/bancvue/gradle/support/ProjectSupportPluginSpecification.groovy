@@ -15,41 +15,39 @@
  */
 package com.bancvue.gradle.support
 
-import com.bancvue.gradle.support.ClearArtifactCache
-import com.bancvue.gradle.support.PrintClasspath
-import com.bancvue.gradle.support.ProjectSupportPlugin
-import com.bancvue.gradle.test.AbstractPluginTest
-import org.junit.Before
-import org.junit.Test
+import com.bancvue.gradle.test.AbstractPluginSpecification
 
-class ProjectSupportPluginTest extends AbstractPluginTest {
+class ProjectSupportPluginSpecification extends AbstractPluginSpecification {
 
 
-	ProjectSupportPluginTest() {
-		super(ProjectSupportPlugin.PLUGIN_NAME)
+	String getPluginName() {
+		ProjectSupportPlugin.PLUGIN_NAME
 	}
 
-	@Before
-	void setUp() {
+	void setup() {
 		setArtifactId('1.0')
 	}
 
-	@Test
-	void apply_ShouldAddPrintClasspathTask() {
+	def "apply should add printClasspath task"() {
+		given:
 		assert project.tasks.withType(PrintClasspath).isEmpty()
 
+		when:
 		applyPlugin()
 
-		assert !project.tasks.withType(PrintClasspath).isEmpty()
+		then:
+		!project.tasks.withType(PrintClasspath).isEmpty()
 	}
 
-	@Test
-	void apply_ShouldAddClearGroupCacheTask() {
+	def "apply should add clearGroupCache task"() {
+		given:
 		assert project.tasks.findByName('clearGroupCache') == null
 
+		when:
 		applyPlugin()
 
-		assert project.tasks.findByName('clearGroupCache') instanceof ClearArtifactCache
+		then:
+		project.tasks.findByName('clearGroupCache') instanceof ClearArtifactCache
 	}
 
 }

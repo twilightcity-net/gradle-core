@@ -17,53 +17,54 @@ package com.bancvue.gradle.maven
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.junit.Test
+import spock.lang.Specification
 
-
-class MavenRepositoryPropertiesTest {
+class MavenRepositoryPropertiesSpecification extends Specification {
 
 	private Project project
 	private MavenRepositoryProperties properties
 
-	@Before
-	void setUp() {
+	void setup() {
 		project = ProjectBuilder.builder().build()
 		properties = new MavenRepositoryProperties(project)
 	}
 
-	@Test
-	void hasCredentialsDefined_ShouldReturnFalse_IfUsernameOnlyDefined() {
+	def "hasCredentialsDefined should return false if username only defined"() {
+		when:
 		properties.username = "username"
 
-		assert !properties.hasCredentialsDefined()
+		then:
+		!properties.hasCredentialsDefined()
 	}
 
-	@Test
-	void hasCredentialsDefined_ShouldReturnFalse_IfPasswordOnlyDefined() {
+	def "hasCredentialsDefined should return false if password only defined"() {
+		when:
 		properties.password = "password"
 
-		assert !properties.hasCredentialsDefined()
+		then:
+		!properties.hasCredentialsDefined()
 	}
 
-	@Test
-	void hasCredentialsDefined_ShouldReturnFalse_IfUsernameAndPasswordNotDefined() {
-		assert !properties.hasCredentialsDefined()
+	def "hasCredentialsDefined should return false if username and password not defined"() {
+		expect:
+		!properties.hasCredentialsDefined()
 	}
 	
-	@Test
-	void hasCredentialsDefined_ShouldReturnTrue_IfUsernameAndPasswordDefined() {
+	def "hasCredentialsDefined should return true if username and password defined"() {
+		when:
 		properties.username = "username"
 		properties.password = "password"
 
-		assert properties.hasCredentialsDefined()
+		then:
+		properties.hasCredentialsDefined()
 	}
 
-	@Test
-	void hasCredentialsDefined_ShouldReturnTrue_IfUsernameAndPasswordDefinedOnProject() {
+	def "hasCredentialsDefined should return true if username and password dDefined on project"() {
+		when:
 		project.ext["repositoryUsername"] = 'username'
 		project.ext["repositoryPassword"] = 'password'
 
-		assert properties.hasCredentialsDefined()
+		then:
+		properties.hasCredentialsDefined()
 	}
 }

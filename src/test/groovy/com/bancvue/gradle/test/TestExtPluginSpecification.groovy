@@ -18,41 +18,39 @@ package com.bancvue.gradle.test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.api.tasks.testing.logging.TestStackTraceFilter
-import org.junit.Test
 
-class TestExtPluginTest extends AbstractPluginTest {
+class TestExtPluginSpecification extends AbstractPluginSpecification {
 
-	TestExtPluginTest() {
-		super(TestExtPlugin.PLUGIN_NAME)
+	String getPluginName() {
+		TestExtPlugin.PLUGIN_NAME
 	}
 
-	@Test
-	void apply_ShouldWriteStackTraceOnTestFailure() {
+	def "apply should write stack trace on test failure"() {
+		when:
 		applyPlugin()
 
+		then:
 		org.gradle.api.tasks.testing.Test test = project.tasks.getByName('test')
-
-		assert test.testLogging.exceptionFormat == TestExceptionFormat.FULL
-		assert test.testLogging.stackTraceFilters.contains(TestStackTraceFilter.GROOVY)
+		test.testLogging.exceptionFormat == TestExceptionFormat.FULL
+		test.testLogging.stackTraceFilters.contains(TestStackTraceFilter.GROOVY)
 	}
 
-	@Test
-	void apply_ShouldWriteSkippedEvents() {
+	def "apply should write skipped events"() {
+		when:
 		applyPlugin()
 
+		then:
 		org.gradle.api.tasks.testing.Test test = project.tasks.getByName('test')
-
-		assert test.testLogging.events.contains(TestLogEvent.SKIPPED)
+		test.testLogging.events.contains(TestLogEvent.SKIPPED)
 	}
 
-	@Test
-	void apply_ShouldAddStyledTestOutputTaskAndConfigureToExecuteBeforeTestTasks() {
+	def "apply should add styledTestOutput task and configure to execute before test tasks"() {
+		when:
 		applyPlugin()
 
+		then:
 		StyledTestOutput styledOutputTask = project.tasks.getByName('styledTestOutput')
-		use(TaskCategory) {
-			styledOutputTask.assertMustRunBefore('test')
-		}
+		TaskCategory.assertMustRunBefore(styledOutputTask, 'test')
 	}
 
 }

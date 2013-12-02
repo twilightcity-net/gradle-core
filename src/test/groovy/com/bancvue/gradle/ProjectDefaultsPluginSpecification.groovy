@@ -15,74 +15,70 @@
  */
 package com.bancvue.gradle
 
-import com.bancvue.gradle.test.AbstractPluginTest
+import com.bancvue.gradle.test.AbstractPluginSpecification
 import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.compile.JavaCompile
-import org.junit.Before
-import org.junit.Test
 
-class ProjectDefaultsPluginTest extends AbstractPluginTest {
+class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 
-	ProjectDefaultsPluginTest() {
-		super(ProjectDefaultsPlugin.PLUGIN_NAME)
+	String getPluginName() {
+		ProjectDefaultsPlugin.PLUGIN_NAME
 	}
 
-	@Before
-	void setUp() {
+	void setup() {
 		project.version = '1.0'
 		setArtifactId('bancvue')
 	}
 
-	@Test
-	void apply_ShouldSetGroupNameToBancvue() {
-		applyPlugin()
-
-		project.group == 'com.bancvue'
-	}
-
-	@Test
-	void apply_ShouldApplyJavaPluginAndSetCompatibility() {
+	def "apply should apply java plugin and set compatibility"() {
+		given:
 		project.ext.defaultJavaVersion = '1.8'
 
+		when:
 		applyPlugin()
 
+		then:
 		assertNamedPluginApplied('java')
-		assert "${project.sourceCompatibility}" == '1.8'
-		assert "${project.targetCompatibility}" == '1.8'
+		"${project.sourceCompatibility}" == '1.8'
+		"${project.targetCompatibility}" == '1.8'
 	}
 
-	@Test
-	void apply_ShouldSetCompilerEncodingToUtf8() {
+	def "apply should set compiler encoding to Utf8"() {
+		when:
 		applyPlugin()
 
+		then:
 		TaskCollection tasks = project.tasks.withType(JavaCompile)
-		assert tasks.size() > 0
+		tasks.size() > 0
 		tasks.each { JavaCompile task ->
 			assert task.options.encoding == 'UTF-8'
 		}
 	}
 
-	@Test
-	void apply_ShouldSetMemorySettingsForJavaAndGroovyCompileTasks() {
+	def "apply should set memory settings for java and groovy compile tasks"() {
+		given:
 		project.ext.defaultMinHeapSize = '16m'
 		project.ext.defaultMaxHeapSize = '24m'
 		project.ext.defaultMaxPermSize = '8m'
 
+		when:
 		project.apply(plugin: 'groovy')
 		applyPlugin()
 
+		then:
 		TaskCollection javaTasks = project.tasks.withType(JavaCompile)
-		assert javaTasks.size() > 0
+		javaTasks.size() > 0
 		javaTasks.each { JavaCompile compile ->
 			assert compile.options.forkOptions.memoryInitialSize == '16m'
 			assert compile.options.forkOptions.memoryMaximumSize == '24m'
 			assert compile.options.forkOptions.jvmArgs.contains('-XX:MaxPermSize=8m')
 		}
 
+		and:
 		TaskCollection groovyTasks = project.tasks.withType(GroovyCompile)
-		assert groovyTasks.size() > 0
+		groovyTasks.size() > 0
 		groovyTasks.each { GroovyCompile compile ->
 			assert compile.groovyOptions.forkOptions.memoryInitialSize == '16m'
 			assert compile.groovyOptions.forkOptions.memoryMaximumSize == '24m'
@@ -90,16 +86,18 @@ class ProjectDefaultsPluginTest extends AbstractPluginTest {
 		}
 	}
 
-	@Test
-	void apply_ShouldSetHeapSizeForTestTasks() {
+	def "apply should set heap size for test tasks"() {
+		given:
 		project.ext.defaultMinTestHeapSize = '17m'
 		project.ext.defaultMaxTestHeapSize = '23m'
 		project.ext.defaultMaxTestPermSize = '5m'
 
+		when:
 		applyPlugin()
 
+		then:
 		TaskCollection tasks = project.tasks.withType(org.gradle.api.tasks.testing.Test)
-		assert tasks.size() > 0
+		tasks.size() > 0
 		tasks.each { org.gradle.api.tasks.testing.Test test ->
 			assert test.minHeapSize == '17m'
 			assert test.maxHeapSize == '23m'
@@ -107,54 +105,60 @@ class ProjectDefaultsPluginTest extends AbstractPluginTest {
 		}
 	}
 
-	@Test
-	void apply_ShouldAddBuildDateAndJdkToJarManifest() {
+	def "apply should add Built-Date and Build-Jdk to jar manifest"() {
+		given:
 		String expectedJavaVersion = System.getProperty('java.version')
 
+		when:
 		applyPlugin()
 
-		assert project.jar.manifest.attributes['Built-Date'] != null
-		assert project.jar.manifest.attributes['Build-Jdk'] == expectedJavaVersion
+		then:
+		project.jar.manifest.attributes['Built-Date'] != null
+		project.jar.manifest.attributes['Build-Jdk'] == expectedJavaVersion
 	}
 
-	@Test
-	void apply_ShouldSetDefaultJarBaseName_AndAllowOverride() {
+	def "apply should set default jar baseName and allow override"() {
+		given:
 		Jar jarTask = project.tasks.create('jarTask', Jar)
 		setArtifactId('some-artifact')
 
+		when:
 		applyPlugin()
 
-		assert jarTask.baseName == 'some-artifact'
+		then:
+		jarTask.baseName == 'some-artifact'
 
+		when:
 		jarTask.baseName = 'other-artifact'
 
-		assert jarTask.baseName == 'other-artifact'
+		then:
+		jarTask.baseName == 'other-artifact'
 	}
 
-	@Test
-	void getDefaultBaseNameForTask_ShouldUseTaskBaseName_IfProjectArtifactIdNotDefined() {
+	def "getDefaultBaseNameForTask should use task baseName if project artifactId not defined"() {
+		given:
 		project = createProject() // re-create project since artifactId is set as part of setUp
 		Jar jarTask = project.tasks.create('jarTask', Jar)
 		jarTask.baseName = 'someName'
 
+		when:
 		applyPlugin()
 		ProjectDefaultsPlugin plugin = getPlugin()
 		plugin.project = project
-		String baseName = plugin.getDefaultBaseNameForTask(jarTask)
 
-		assert baseName == 'someName'
+		then:
+		plugin.getDefaultBaseNameForTask(jarTask) == 'someName'
 	}
 
-	@Test
-	void getDefaultBaseNameForTask_ShouldUseArtifactId_IfProjectArtifactIdDefined() {
+	def "getDefaultBaseNameForTask should use artifactId if project artifactId defined"() {
+		when:
 		applyPlugin()
 		Jar jarTask = project.tasks.create('jarTask', Jar)
 		setArtifactId('some-artifact')
 
+		then:
 		ProjectDefaultsPlugin plugin = getPlugin()
-		String baseName = plugin.getDefaultBaseNameForTask(jarTask)
-
-		assert baseName == 'some-artifact'
+		plugin.getDefaultBaseNameForTask(jarTask) == 'some-artifact'
 	}
 
 }

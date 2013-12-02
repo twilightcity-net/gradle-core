@@ -15,17 +15,26 @@
  */
 package com.bancvue.gradle.test
 
-import org.junit.Test
+import org.gradle.api.Task
 
+class ComponentTestPluginSpecification extends AbstractPluginSpecification {
 
-class TestFileTest {
+	String getPluginName() {
+		ComponentTestPlugin.PLUGIN_NAME
+	}
 
-	@Test
-	void getBaseName_ShouldReturnClassNameSansExtension() {
-		TestFile file = new TestFile(new File("dir/SomeFile.java"))
+	void setup() {
+		project.file('src/componentTest').mkdirs()
+	}
 
-		assert file.name == "SomeFile.java"
-		assert file.baseName == "SomeFile"
+	def "apply should add componentTest as check dependency"() {
+		when:
+		applyPlugin()
+
+		then:
+		Task checkTask = project.tasks.getByName('check')
+		Set checkDependencies = checkTask.getDependsOn()
+		checkDependencies.contains(project.tasks.getByName('componentTest'))
 	}
 
 }

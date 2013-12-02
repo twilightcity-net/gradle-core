@@ -26,8 +26,7 @@ class TaskCategory {
 	}
 
 	static void assertMustRunAfter(Task self, Task task) {
-		Set<? extends Task> dependencies = self.getMustRunAfter().getDependencies(self)
-		assert dependencies.contains(task)
+		assert self.getMustRunAfter().getDependencies(self).contains(task)
 	}
 
 	static void assertMustRunBefore(Task self, String taskName) {
@@ -36,8 +35,7 @@ class TaskCategory {
 	}
 
 	static void assertMustRunBefore(Task self, Task task) {
-		Set<? extends Task> dependencies = task.getMustRunAfter().getDependencies(task)
-		assert dependencies.contains(self)
+		assert task.getMustRunAfter().getDependencies(task).contains(self)
 	}
 
 }

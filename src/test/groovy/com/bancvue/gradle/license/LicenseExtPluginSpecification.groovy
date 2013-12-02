@@ -15,59 +15,53 @@
  */
 package com.bancvue.gradle.license
 
-import com.bancvue.gradle.test.AbstractPluginTest
 import com.bancvue.gradle.ResourceResolver
+import com.bancvue.gradle.test.AbstractPluginSpecification
 import com.bancvue.gradle.test.TestFile
 import nl.javadude.gradle.plugins.license.License
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.runners.MockitoJUnitRunner
 
-import static org.mockito.Mockito.when
+class LicenseExtPluginSpecification extends AbstractPluginSpecification {
 
-
-@RunWith(MockitoJUnitRunner)
-class LicenseExtPluginTest extends AbstractPluginTest {
-
-	@Mock
 	private ResourceResolver resourceResolver
 	private LicenseExtPlugin plugin
 	private LicenseExtProperties licenseProperties
 
-	LicenseExtPluginTest() {
-		super(LicenseExtPlugin.PLUGIN_NAME)
+	String getPluginName() {
+		LicenseExtPlugin.PLUGIN_NAME
 	}
 
-	@Before
-	void setUp() {
+	void setup() {
+		resourceResolver = Mock()
 		plugin = new LicenseExtPlugin()
 		plugin.init(project)
 		licenseProperties = plugin.licenseProperties
 		licenseProperties.resourceResolver = resourceResolver
 	}
 
-	@Test
-	void writeDefaultHeaderFile_ShouldOverwriteAnyExistingContent() {
+	def "writeDefaultHeaderFile should overwrite any existing content"() {
+		given:
 		TestFile headerFile = new TestFile(plugin.getHeaderFile())
 		headerFile << "existing content"
-		when(resourceResolver.resolveObjectFromMap(licenseProperties.resourcePath, LicenseModel)).thenReturn(new LicenseModel(header: "new content"))
 
+		when:
 		plugin.writeLicenseHeaderToBuildDir()
 
-		assert headerFile.text =~ /new content/
-		assert !(headerFile.text =~ /existing content/)
+		then:
+		1 * resourceResolver.resolveObjectFromMap(licenseProperties.resourcePath, LicenseModel) >> new LicenseModel(header: "new content")
+		headerFile.text =~ /new content/
+		!(headerFile.text =~ /existing content/)
 	}
 
-	@Test
-	void apply_ShouldExcludeDefinedExtensionsFromFormat() {
+	def "apply should exclude defined extensions from format"() {
+		given:
 		project.ext["licenseExcludedFileExtensions"] = ["properties", "yml"]
-
 		project.apply(plugin: "java")
+
+		when:
 		applyPlugin()
 
-		assert project.tasks.withType(License)
+		then:
+		project.tasks.withType(License)
 		project.tasks.withType(License) { License task ->
 			assert task.excludes == ["**/*.properties", "**/*.yml"] as Set
 		}

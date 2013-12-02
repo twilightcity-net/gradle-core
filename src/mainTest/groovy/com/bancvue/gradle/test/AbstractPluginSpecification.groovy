@@ -21,21 +21,18 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import spock.lang.Specification
 
-abstract class AbstractPluginTest {
+abstract class AbstractPluginSpecification extends Specification {
 
 	@Rule
 	public TemporaryFolder projectDir = new TemporaryFolder()
 	protected Project project
 	protected ProjectFileSystem projectFS
-	protected String pluginName
 
-	AbstractPluginTest(String pluginName) {
-		this.pluginName = pluginName
-	}
+	abstract String getPluginName()
 
-	@Before
-	void setUpProject() {
+	void setup() {
 		project = createProject()
 		projectFS = new ProjectFileSystem(project.rootDir)
 	}
