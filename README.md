@@ -120,6 +120,27 @@ for various example examples usages.
 The [java](http://www.gradle.org/docs/current/userguide/java_plugin.html)
 plugin is applied, adding basic java project support.
 
+This plugin adds support for an optional 'mainTest' configuration.  The idea here is to provide an easy mechanism to
+publish test-related classes, separate from the main artifact.  For example, this project defines classes to support
+gradle plugin testing.  These classes are not appropriate for the main artifact 'gradle-core' since they have
+test-related dependencies (e.g. spock), so it publishes those classes in a different artifact 'gradle-core-test'.
+
+If a project directory named src/mainTest (currently hard-coded) is detected, this plugin does the following
+
+* creates configuration 'mainTest'
+* creates configuration 'mainTestCompile' which extends from configuration 'compile'
+* creates configuration 'mainTestRuntime' which extends from configuration 'runtime'
+* creates sourceSet 'mainTest' which includes main.output
+* creates javadoc task 'javadocMainTest'
+* creates jar task 'jarMainTest'
+* creates jar task 'sourcesJarMainTest'
+* creates jar task 'javadocJarMainTest'
+
+In addition, the compileClasspath and runtimeClasspath of the 'test' sourceSet are overwritten to include mainTest.output
+and the mainTestCompile/mainTestRuntime configurations.  This makes any classes and dependencies defined by mainTest
+available to unit tests.
+
+
 #### Added tasks
 
 * styledTestOutput, adds incremental (and colored) output when running tests, especially useful with longer-running tests to visually track progress
