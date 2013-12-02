@@ -4,8 +4,7 @@ repositories {
 
 dependencies {
     compile gradleApi()
-	compile "org.codehaus.groovy:groovy-all:2.1.2"
-	compile 'nl.javadude.gradle.plugins:license-gradle-plugin:0.5.0'
+	compile 'nl.javadude.gradle.plugins:license-gradle-plugin:0.6.0'
 }
 
 sourceSets {
