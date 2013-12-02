@@ -53,11 +53,11 @@ class ExtendedPublicationNameResolver {
 	}
 
 	String getJarTaskName() {
-		createJarTaskName("jarTask")
+		createJarTaskName("jar")
 	}
 
 	String getSourcesJarTaskName() {
-		createJarTaskName("sourcesJarTask")
+		createJarTaskName("sourcesJar")
 	}
 
 	private String createJarTaskName(String jarBaseName) {
