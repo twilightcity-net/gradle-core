@@ -24,9 +24,14 @@ class LicenseExtProperties extends DefaultProjectPropertyContainer {
 
 	private static final String NAME = "license"
 
-	String name
-	String resourcePath = "licenses/apache_2.0"
-	List<String> excludedFileExtensions = ["properties", "json", "yml", "yaml", "xslt"]
+	private static final class Props {
+		String name
+		String resourcePath = "licenses/apache_2.0"
+		List<String> excludedFileExtensions = ["properties", "json", "yml", "yaml", "xslt"]
+	}
+
+	@Delegate
+	private Props props = new Props()
 
 	LicenseExtProperties(Project project) {
 		super(project, NAME)
@@ -41,7 +46,6 @@ class LicenseExtProperties extends DefaultProjectPropertyContainer {
 	}
 
 	LicenseModel getLicenseModel() {
-		String resourcePath = getProperty("resourcePath")
 		log.info("Resolving license from path=${resourcePath}")
 		resourceResolver.resolveObjectFromMap(resourcePath, LicenseModel)
 	}

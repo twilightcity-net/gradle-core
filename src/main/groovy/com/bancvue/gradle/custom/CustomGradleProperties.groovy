@@ -23,11 +23,16 @@ class CustomGradleProperties extends DefaultProjectPropertyContainer {
 
 	private static final String NAME = "customGradle"
 
-	String groupId
-	String artifactId
-	String version
-	String baseVersion
-	String scriptResourcePath
+	private static final class Props {
+		String groupId
+		String artifactId
+		String version
+		String baseVersion
+		String scriptResourcePath
+	}
+
+	@Delegate
+	private Props props = new Props()
 
 	CustomGradleProperties(Project project) {
 		super(project, NAME)

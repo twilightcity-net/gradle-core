@@ -26,38 +26,42 @@ class MavenRepositoryProperties extends DefaultProjectPropertyContainer {
 		"changeme:set-project-property-repository${propertyName.capitalize()}"
 	}
 
-	String name = "repo"
-	/**
-	 * Dependency repository public url.
-	 */
-	String publicUrl = getDefaultUrlPropertyValue("publicUrl")
-	/**
-	 * Publication repository snapshot url.
-	 */
-	String snapshotUrl = getDefaultUrlPropertyValue("snapshotUrl")
-	/**
-	 * Publication repository release url.
-	 */
-	String releaseUrl = getDefaultUrlPropertyValue("releaseUrl")
-	/**
-	 * Publication repository username.  Only needed if publishing to remote repository; this will generally only
-	 * happen on a CI server and will be passed in by the CI job.
-	 */
-	String username
-	/**
-	 * Publication repository password.  Only needed if publishing to remote repository; this will generally only
-	 * happen on a CI server and will be passed in by the CI job.
-	 */
-	String password
+	private static class Props {
+		String name = "repo"
+		/**
+		 * Dependency repository public url.
+		 */
+		String publicUrl = getDefaultUrlPropertyValue("publicUrl")
+		/**
+		 * Publication repository snapshot url.
+		 */
+		String snapshotUrl = getDefaultUrlPropertyValue("snapshotUrl")
+		/**
+		 * Publication repository release url.
+		 */
+		String releaseUrl = getDefaultUrlPropertyValue("releaseUrl")
+		/**
+		 * Publication repository username.  Only needed if publishing to remote repository; this will generally only
+		 * happen on a CI server and will be passed in by the CI job.
+		 */
+		String username
+		/**
+		 * Publication repository password.  Only needed if publishing to remote repository; this will generally only
+		 * happen on a CI server and will be passed in by the CI job.
+		 */
+		String password
+	}
+
+
+	@Delegate
+	private Props props = new Props()
 
 	MavenRepositoryProperties(Project project) {
 		super(project, NAME)
 	}
 
 	boolean hasCredentialsDefined() {
-		// see http://groovy.329449.n5.nabble.com/How-invoke-getProperty-interceptor-from-this-td5712559.html
-		// for why the getProperty usage is necessary
-		getProperty("username") && getProperty("password")
+		username && password
 	}
 
 }

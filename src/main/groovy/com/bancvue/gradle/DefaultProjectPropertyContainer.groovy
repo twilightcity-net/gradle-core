@@ -19,8 +19,10 @@ import groovy.util.logging.Slf4j
 import org.gradle.api.Project
 
 /**
- * NOTE: due to how groovy routes property access, sub-classes must use getProperty(<property name>) to
- * access their own properties
+ * NOTE: due to how groovy routes property access, sub-classes should encapsulate their properties in an inner class
+ * and declare an instance of this properties class annotated with @Delegate.
+ * Otherwise they would need to use getProperty(<property name>) to access their own properties, which is non-obvious
+ * and error-prone.
  * see http://groovy.329449.n5.nabble.com/How-invoke-getProperty-interceptor-from-this-td5712559.html
  */
 @Slf4j

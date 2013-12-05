@@ -22,17 +22,22 @@ class ProjectDefaultsProperties extends DefaultProjectPropertyContainer {
 
 	private static final String NAME = 'default'
 
-	String javaVersion = '1.7'
+	private static final class Props {
+		String javaVersion = '1.7'
 
-	String compilerEncoding = 'UTF-8'
+		String compilerEncoding = 'UTF-8'
 
-	String minHeapSize = '64m'
-	String maxHeapSize = '256m'
-	String maxPermSize = '64m'
+		String minHeapSize = '64m'
+		String maxHeapSize = '256m'
+		String maxPermSize = '64m'
 
-	String minTestHeapSize = '64m'
-	String maxTestHeapSize = '512m'
-	String maxTestPermSize = '64m'
+		String minTestHeapSize = '64m'
+		String maxTestHeapSize = '512m'
+		String maxTestPermSize = '64m'
+	}
+
+	@Delegate
+	private Props props = new Props()
 
 	ProjectDefaultsProperties(Project project) {
 		super(project, NAME)
