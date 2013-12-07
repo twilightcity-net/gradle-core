@@ -109,7 +109,7 @@ class IdeExtPlugin implements Plugin<Project> {
 	private void applyEclipsePlugin() {
 		project.apply(plugin: 'eclipse')
 		addRefreshEclipseTask()
-		updateEclipseSourcePathAndClassPathPriorToModuleTaskExecution()
+		updateEclipseSourcePathAndClassPathAfterProjectEvaluation()
 	}
 
 	private void addRefreshEclipseTask() {
@@ -123,10 +123,8 @@ class IdeExtPlugin implements Plugin<Project> {
 	}
 
 
-	private void updateEclipseSourcePathAndClassPathPriorToModuleTaskExecution() {
-		Task eclipse = project.tasks.getByName('eclipse')
-
-		eclipse.doFirst {
+	private void updateEclipseSourcePathAndClassPathAfterProjectEvaluation() {
+		project.afterEvaluate {
 			updateEclipseSourcePathAndClassPath()
 		}
 	}
@@ -134,7 +132,7 @@ class IdeExtPlugin implements Plugin<Project> {
 	private void updateEclipseSourcePathAndClassPath() {
 		project.eclipse {
 			classpath {
-				plusConfigurations = getTestRuntimeConfigurations()
+				plusConfigurations += getTestRuntimeConfigurations()
 			}
 		}
 	}

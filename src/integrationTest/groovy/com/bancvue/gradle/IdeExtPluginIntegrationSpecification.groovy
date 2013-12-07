@@ -27,6 +27,14 @@ class IdeExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpec
 apply plugin: 'groovy'
 apply plugin: 'ide-ext'
 apply plugin: 'integration-test'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	integrationTestCompile 'org.apache.commons:commons-collections4:4.0'
+}
         """
 		mkdir("src/main/java")
 		mkdir("src/test/groovy")
@@ -38,6 +46,7 @@ apply plugin: 'integration-test'
 		then:
 		File expectedImlFile = file("${projectFS.name}.iml")
 		expectedImlFile.exists()
+		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/org.apache.commons/commons-collections4/4.0/")
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/main/java", false)
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/test/groovy", true)
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/integrationTest/groovy", true)
@@ -62,12 +71,33 @@ apply plugin: 'integration-test'
 		assert Boolean.parseBoolean(result[0].@isTestSource) == isTestFolder
 	}
 
+	private void assertIdeaModuleFileContainsExpectedDependency(File expectedImlFile, String expectedUrlPath) {
+		def module = new XmlParser().parseText(expectedImlFile.text)
+
+		List result = module.component.orderEntry.library.CLASSES.root.findAll {
+			it.@url =~ expectedUrlPath
+		}
+
+		if (!result) {
+			fail("Expected dependency url=${expectedUrlPath} not found in iml content=${expectedImlFile.text}")
+		}
+	}
+
 	def "eclipse should add standard source directories and additional test configurations if ide plugin declared after test plugin"() {
 		given:
 		buildFile << """
 apply plugin: 'groovy'
-apply plugin: 'component-test'
 apply plugin: 'ide-ext'
+apply plugin: 'component-test'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	componentTestCompile 'org.apache.commons:commons-collections4:4.0'
+}
+
         """
 		mkdir("src/main/java")
 		mkdir("src/test/groovy")
@@ -79,6 +109,7 @@ apply plugin: 'ide-ext'
 		then:
 		File expectedClasspathFile = file(".classpath")
 		assert expectedClasspathFile.exists()
+		assertEclipseModuleFileContainsExpectedDependency(expectedClasspathFile, "/org.apache.commons/commons-collections4/4.0/")
 		assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, "src/main/java")
 		assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, "src/test/groovy")
 		assertEclipseModuleFileContainsExpectedSourceFolder(expectedClasspathFile, "src/componentTest/groovy")
@@ -89,13 +120,21 @@ apply plugin: 'ide-ext'
 	}
 
 	private void assertEclipseModuleFileContainsExpectedSourceFolder(File expectedClasspathFile, String folderName) {
+		assertEclipseModuleFileContainsExpectedPath(expectedClasspathFile, "src", /^${folderName}$/)
+	}
+
+	private void assertEclipseModuleFileContainsExpectedDependency(File expectedClasspathFile, String dependencyPath) {
+		assertEclipseModuleFileContainsExpectedPath(expectedClasspathFile, "lib", dependencyPath)
+	}
+
+	private void assertEclipseModuleFileContainsExpectedPath(File expectedClasspathFile, String kind, String dependencyPath) {
 		def classpath = new XmlParser().parseText(expectedClasspathFile.text)
 		List result = classpath.classpathentry.findAll {
-			it.@kind == "src" && it.@path == folderName
+			it.@kind == kind && it.@path =~ dependencyPath
 		}
 
 		if (!result) {
-			fail("Expected classpathentry path=${folderName} not found in .classpath content=${expectedClasspathFile.text}")
+			fail("Expected ${kind} classpathentry path=${dependencyPath} not found in .classpath content=${expectedClasspathFile.text}")
 		}
 	}
 
