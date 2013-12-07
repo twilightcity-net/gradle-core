@@ -28,6 +28,49 @@ import javax.inject.Inject
 @Slf4j
 class JacocoReportExt extends JacocoReport {
 
+	private static final class ReportDirectoryCollector {
+
+		private JacocoReportExt report
+
+		ReportDirectoryCollector(JacocoReportExt report) {
+			this.report = report
+		}
+
+		private Set<SourceSet> getAllMainSourceSets() {
+			report.project.sourceSets.findAll { SourceSet sourceSet ->
+				sourceSet.name.startsWith("main")
+			}
+		}
+
+		private Set<SourceSet> getSourceSetsOrDefaults() {
+			report.internalSourceSets ? report.internalSourceSets : getAllMainSourceSets()
+		}
+
+		FileCollection collectSourceDirs() {
+			FileCollection sourceDirs = report.sourceDirectories
+			if (sourceDirs == null) {
+				sourceDirs = report.project.files()
+			}
+
+			getSourceSetsOrDefaults().each { SourceSet sourceSet ->
+				sourceDirs = sourceDirs + report.project.files(sourceSet.allJava.srcDirs)
+			}
+			sourceDirs
+		}
+
+		FileCollection collectClassDirs() {
+			FileCollection classDirs = report.classDirectories
+			if (classDirs == null) {
+				classDirs = report.project.files()
+			}
+
+			getSourceSetsOrDefaults().each { SourceSet sourceSet ->
+				classDirs = classDirs + sourceSet.output
+			}
+			classDirs
+		}
+	}
+
 	// NOTE: the more appropriate name for this would be 'sourceSets'; however, in the context of a gradle build script,
 	// this ends up intercepting calls which are meant for the project.  for example, if we declared a sourceSets
 	// variable here, the following would not work as intended when declared in build.gradle...
@@ -42,35 +85,10 @@ class JacocoReportExt extends JacocoReport {
 		super(instantiator)
 
 		group = TestExtPlugin.VERIFICATION_GROUP_NAME
+		ReportDirectoryCollector collector = new ReportDirectoryCollector(this)
 		getProject().afterEvaluate {
-			configureSourceAndClassDirectoriesFromSourceSets()
-		}
-	}
-
-	private Set<SourceSet> getAllMainSourceSets() {
-		project.sourceSets.findAll { SourceSet sourceSet ->
-			sourceSet.name.startsWith("main")
-		}
-	}
-
-	private Set<SourceSet> getSourceSetsOrDefaults() {
-		internalSourceSets ? internalSourceSets : getAllMainSourceSets()
-	}
-
-	private void configureSourceAndClassDirectoriesFromSourceSets() {
-		getSourceSetsOrDefaults().each { SourceSet sourceSet ->
-			log.info("Adding source and output directories from sourceSet ${sourceSet.name}")
-			FileCollection srcDirs = project.files(sourceSet.allJava.srcDirs)
-			if (this.sourceDirectories == null) {
-				this.sourceDirectories = srcDirs
-			} else {
-				this.sourceDirectories = this.sourceDirectories + srcDirs
-			}
-			if (this.classDirectories == null) {
-				this.classDirectories = sourceSet.output
-			} else {
-				this.classDirectories = this.classDirectories + sourceSet.output
-			}
+			sourceDirectories = collector.collectSourceDirs()
+			classDirectories = collector.collectClassDirs()
 		}
 	}
 
