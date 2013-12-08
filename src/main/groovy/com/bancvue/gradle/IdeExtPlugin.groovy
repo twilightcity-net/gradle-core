@@ -41,7 +41,19 @@ class IdeExtPlugin implements Plugin<Project> {
 		project.apply(plugin: 'idea')
 		addRefreshIdeaTask()
 		addRefreshIdeaModuleTask()
+		moveCleanIdeaWorkspaceToIdeGroup()
 		updateIdeaSourcePathAndTestScopePriorToModuleTaskExecution()
+	}
+
+	/**
+	 * no task depends on cleanIdeaWorkspace and it's getting listed in group 'Other', so
+	 * move it to the IDE group
+	 */
+	private void moveCleanIdeaWorkspaceToIdeGroup() {
+		Task cleanIdeaWorkspace = project.tasks.findByName('cleanIdeaWorkspace')
+		if (cleanIdeaWorkspace != null) {
+			cleanIdeaWorkspace.group = IDE_GROUP_NAME
+		}
 	}
 
 	private void addRefreshIdeaTask() {
