@@ -16,18 +16,13 @@
 package com.bancvue.gradle.support
 
 import com.google.common.io.Files
-import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
 
 class ClearArtifactCacheSpecification extends Specification {
 
-	private ClearArtifactCache task
 	private File tempDir
 
 	void setup() {
-		Project project = ProjectBuilder.builder().build()
-		task = project.tasks.create("clearArtifactCache", ClearArtifactCache)
 		tempDir = Files.createTempDir()
 	}
 
@@ -36,7 +31,7 @@ class ClearArtifactCacheSpecification extends Specification {
 		createDirs(tempDir, ["caches/artifacts-24/filestore", "caches/artifacts-26/module-metadata", "caches/filestore"])
 
 		expect:
-		task.collectGradleCacheArtifactDirs(tempDir) == [
+		ClearArtifactCache.collectGradleCacheArtifactDirs(tempDir) == [
 			new File(tempDir, "caches/artifacts-24/filestore"),
 			new File(tempDir, "caches/artifacts-26/module-metadata"),
 		]
@@ -47,7 +42,7 @@ class ClearArtifactCacheSpecification extends Specification {
 		createDirs(tempDir, ["caches/artifacts-24"])
 
 		expect:
-		task.collectGradleCacheArtifactDirs(tempDir) == []
+		ClearArtifactCache.collectGradleCacheArtifactDirs(tempDir) == []
 	}
 
 	def "collectGradleCacheDirsWithName"() {
@@ -56,7 +51,7 @@ class ClearArtifactCacheSpecification extends Specification {
 		createDirs(cacheDir, ["com.bancvue", "nomatch", "com.bancvue.nomatch"])
 
 		expect:
-		task.collectGradleCacheDirsWithName(tempDir, "com.bancvue") == [new File(cacheDir, "com.bancvue")]
+		ClearArtifactCache.collectGradleCacheDirsWithName(tempDir, "com.bancvue") == [new File(cacheDir, "com.bancvue")]
 	}
 
 	private void createDirs(File parent, List<String> dirNames) {
