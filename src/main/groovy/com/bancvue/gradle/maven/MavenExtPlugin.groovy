@@ -24,6 +24,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.maven.MavenPom
+import org.gradle.api.plugins.BasePlugin
 
 @Slf4j
 class MavenExtPlugin implements Plugin<Project> {
@@ -60,16 +61,18 @@ class MavenExtPlugin implements Plugin<Project> {
 
 	private void createPublishRemoteTaskAsAliasForUploadArchives() {
 		Task uploadArchives = project.tasks.findByName('uploadArchives')
-		Task publishRemote = project.tasks.create('publishRemote')
+		Task publishRemote = project.tasks.create('publish')
 		publishRemote.dependsOn { uploadArchives }
+		publishRemote.group = BasePlugin.UPLOAD_GROUP
 		publishRemote.description = uploadArchives.description
 	}
 
 	private void createPublishTaskAsAliasForInstallTask() {
 		Task install = project.tasks.findByName('install')
-		Task publish = project.tasks.create('publish')
-		publish.dependsOn { install }
-		publish.description = install.description
+		Task publishLocal = project.tasks.create('publishLocal')
+		publishLocal.dependsOn { install }
+		publishLocal.group = BasePlugin.UPLOAD_GROUP
+		publishLocal.description = install.description
 	}
 
 	private void addMavenLocalAndOrganizationArtifactRepository() {

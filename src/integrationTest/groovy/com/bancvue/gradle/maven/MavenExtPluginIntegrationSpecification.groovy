@@ -43,7 +43,7 @@ apply plugin: 'maven-ext'
 		"""
 
 		when:
-		run("publishRemote")
+		run("publish")
 
 		then:
 		file("build/libs/artifact-1.0.jar").exists()
@@ -69,7 +69,7 @@ project.uploadArchives {
 """
 
 		when:
-		run("publishRemote")
+		run("publish")
 
 		then:
 		TestFile pomFile = file("build/poms/pom-default.xml")

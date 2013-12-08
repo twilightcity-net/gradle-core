@@ -99,36 +99,4 @@ class MavenPublishExtPluginSpecification extends AbstractPluginSpecification {
 		repo.url.toString() == 'http://release-url'
 	}
 
-	private Task acquireSingleDependencyForTask(String taskName) {
-		List dependencies = getDependenciesForTask(taskName)
-		assert dependencies.size() == 1
-		dependencies[0]
-	}
-
-	private List getDependenciesForTask(String taskName) {
-		Task task = project.tasks.findByName(taskName)
-		task.taskDependencies.getDependencies(task).toList()
-	}
-
-	def "apply should remap publish task to publish remote"() {
-		when:
-		applyPlugin()
-		project.evaluate()
-
-		then:
-		Task publishRemoteDependency = acquireSingleDependencyForTask('publishRemote')
-		publishRemoteDependency instanceof PublishToMavenRepository
-		!(publishRemoteDependency instanceof PublishToMavenLocal)
-	}
-
-	def "apply should remap publish to maven local task to publish"() {
-		when:
-		applyPlugin()
-		project.evaluate()
-
-		then:
-		Task publishRemoteDependency = acquireSingleDependencyForTask('publish')
-		publishRemoteDependency instanceof PublishToMavenLocal
-	}
-
 }

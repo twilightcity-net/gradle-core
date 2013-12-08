@@ -72,7 +72,7 @@ version = '1.0'
 		setupLocalMavenRepoAndApplyPlugin()
 
 		when:
-		run("publishRemote")
+		run("publish")
 
 		then:
 		ZipArchive archive = assertArchiveBuiltAndUploadedToMavenRepo("artifact")
@@ -95,7 +95,7 @@ publishing_ext {
 """
 
 		when:
-		run("publishRemote")
+		run("publish")
 
 		then:
 		!getBuildArtifact("artifact").exists()
@@ -126,7 +126,7 @@ publishing_ext {
 """
 
 		when:
-		run("publishRemote")
+		run("publish")
 
 		then:
 		assertArchiveBuiltAndUploadedToMavenRepo("artifact")
@@ -161,7 +161,7 @@ publishing_ext {
 """
 
 		when:
-		run("publishRemote")
+		run("publish")
 
 		then:
 		assertArchiveBuiltAndUploadedToMavenRepo("artifact-other")
@@ -191,7 +191,7 @@ publishing_ext {
 """
 
 		when:
-		run("publishRemote")
+		run("publish")
 
 		then:
 		String archiveName = getArchiveName("artifact")
@@ -217,7 +217,7 @@ publishing_ext {
 """
 
 		when:
-		run("publishRemote")
+		run("publish")
 
 		then:
 		String archiveName = getArchiveName("artifact")
@@ -244,7 +244,7 @@ dependencies {
 """
 
 		when:
-		run("publishRemote")
+		run("publish")
 
 		then:
 		TestFile pomFile = getPomFile("artifact")

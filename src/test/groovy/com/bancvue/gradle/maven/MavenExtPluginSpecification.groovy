@@ -91,23 +91,23 @@ class MavenExtPluginSpecification extends AbstractPluginSpecification {
 		task.taskDependencies.getDependencies(task).toList()
 	}
 
-	def "apply should alias uploadArchives task to publishRemote"() {
+	def "apply should alias uploadArchives task to publish"() {
 		when:
 		applyPlugin()
 		project.evaluate()
 
 		then:
-		Task publishRemoteDependency = acquireSingleDependencyForTask('publishRemote')
+		Task publishRemoteDependency = acquireSingleDependencyForTask('publish')
 		publishRemoteDependency.name == 'uploadArchives'
 	}
 
-	def "apply should alias install task to publish"() {
+	def "apply should alias install task to publishLocal"() {
 		when:
 		applyPlugin()
 		project.evaluate()
 
 		then:
-		Task publishDependency = acquireSingleDependencyForTask('publish')
+		Task publishDependency = acquireSingleDependencyForTask('publishLocal')
 		publishDependency.name == 'install'
 	}
 

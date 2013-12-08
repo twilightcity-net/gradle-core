@@ -17,20 +17,11 @@ package com.bancvue.gradle.maven.publish
 
 import com.bancvue.gradle.GradlePluginMixin
 import com.bancvue.gradle.JavaExtPlugin
-import com.bancvue.gradle.license.LicenseExtPlugin
-import com.bancvue.gradle.license.LicenseExtProperties
-import com.bancvue.gradle.license.LicenseModel
 import com.bancvue.gradle.maven.MavenRepositoryProperties
-import com.bancvue.gradle.test.TestExtPlugin
 import groovy.util.logging.Slf4j
-import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.publish.Publication
-import org.gradle.api.publish.PublishingExtension
-import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.bundling.Jar
 
 @Slf4j
 @Mixin(GradlePluginMixin)
@@ -55,27 +46,17 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 
 	private void addArtifactDependencyAndPublishingSupport() {
 		project.apply(plugin: 'maven-publish')
-		renamePublishTasks()
+		createPublishLocalAlias()
 		addMavenLocalAndOrganizationArtifactRepository()
 		addOrganizationPublishingRepository()
 	}
 
-	private void renamePublishTasks() {
-		renamePublishTaskToPublishRemote()
-		renamePublishToMavenLocalTaskToPublish()
-	}
-
-	private void renamePublishTaskToPublishRemote() {
-		Task publish = project.tasks.findByName('publish')
-		project.tasks.remove(publish)
-		publish.description = 'Publishes all publications produced by this project.'
-		renameTask(publish, 'publishRemote')
-	}
-
-	private void renamePublishToMavenLocalTaskToPublish() {
+	private void createPublishLocalAlias() {
 		Task publishToMavenLocal = project.tasks.findByName('publishToMavenLocal')
-		publishToMavenLocal.description = 'Publishes all Maven publications produced by this project to the local Maven cache.'
-		renameTask(publishToMavenLocal, 'publish')
+		Task publishLocal = project.tasks.create('publishLocal')
+		publishLocal.dependsOn { publishToMavenLocal }
+		publishLocal.group = publishToMavenLocal.group
+		publishLocal.description = 'Publishes all Maven publications produced by this project to the local Maven cache.'
 	}
 
 	private void addMavenLocalAndOrganizationArtifactRepository() {

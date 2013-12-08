@@ -41,14 +41,6 @@ class GradlePluginMixin {
 		}
 	}
 
-	void renameTask(Task task, String newTaskName) {
-		acquirePluginProject().tasks.remove(task)
-		Map properties = task.properties
-		properties[Task.TASK_OVERWRITE] = true
-		properties[Task.TASK_NAME] = newTaskName
-		acquirePluginProject().tasks.create(properties)
-	}
-
 	ConfigurableFileCollection createJarFileCollection(File dir) {
 		File[] files = dir.listFiles(JAR_FILTER)
 
