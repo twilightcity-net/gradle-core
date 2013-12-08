@@ -29,126 +29,134 @@ class MavenPublishExtExtension {
 
 	static final String NAME = "publishing_ext"
 
-	private Project project
-	private Map<String,ExtendedPublication> publicationMap
+	private Configurator publicationConfigurator
 
 	MavenPublishExtExtension(Project project) {
-		this.project = project
-		this.publicationMap = [:]
+		this.publicationConfigurator = new Configurator(project)
 
+		Configurator configurator = publicationConfigurator
 		project.publishing {
-			publications(createPublicationsClosure())
-		}
-	}
+			publications {
+				configurator.getPublicationsToApply().each { ExtendedPublication extendedPublication ->
+					extendedPublication.deriveUnsetVariables()
 
-	void publication(String id, Closure configure = null) {
-		ExtendedPublication publication = createExtendedPublication(id, configure)
-		publicationMap.put(id, publication)
-	}
-
-	private ExtendedPublication createExtendedPublication(String id, Closure configure) {
-		ExtendedPublication publication = new ExtendedPublication(id, project)
-
-		if (configure != null) {
-			publication.configure(configure)
-		}
-		publication
-	}
-
-	private Closure createPublicationsClosure() {
-		Closure publicationsClosure = {
-			getPublicationsToApply().each { ExtendedPublication extendedPublication ->
-				extendedPublication.deriveUnsetVariables()
-
-				"${extendedPublication.name}"(MavenPublication) { MavenPublication mavenPublication ->
-					configureMavenPublication(extendedPublication, mavenPublication)
-				}
-			}
-		}
-
-		publicationsClosure
-	}
-
-	private List<ExtendedPublication> getPublicationsToApply() {
-		if (!publicationMap.containsKey("main")) {
-			publication("main")
-		}
-
-		publicationMap.values().findAll { ExtendedPublication publication ->
-			publication.enabled
-		}
-	}
-
-	private void configureMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
-		mavenPublication.artifact(extendedPublication.archiveTask)
-		if (extendedPublication.artifactId != null) {
-			mavenPublication.artifactId = extendedPublication.artifactId
-		}
-		addBasicDescriptionToMavenPOM(extendedPublication, mavenPublication)
-		attachLicenseToMavenPOMIfLicenseExtPluginApplied(mavenPublication)
-		attachAdditionalArtifactsToMavenPublication(extendedPublication, mavenPublication)
-		attachDependenciesToMavenPublication(extendedPublication, mavenPublication)
-	}
-
-	private void addBasicDescriptionToMavenPOM(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
-		mavenPublication.pom.withXml {
-			asNode().children().last() + {
-				name extendedPublication.artifactId
-				// TODO: add description
-				// description project.description
-				// TODO: add project url
-				// url projectUrl
-			}
-		}
-	}
-
-	private void attachLicenseToMavenPOMIfLicenseExtPluginApplied(MavenPublication mavenPublication) {
-		if (project.getPlugins().findPlugin(LicenseExtPlugin)) {
-			LicenseExtProperties licenseProperties = new LicenseExtProperties(project)
-			LicenseModel licenseModel = licenseProperties.getLicenseModel()
-
-			if (licenseModel != null) {
-				attachLicenseModelToMavenPOM(mavenPublication, licenseModel)
-			} else {
-				log.warn("license-ext plugin applied but no license model found, bypassing augmentation of maven POM with license info")
-			}
-		} else {
-			log.info("license-ext plugin not applied, bypassing augmentation of maven POM with license info")
-		}
-	}
-
-	private void attachLicenseModelToMavenPOM(MavenPublication publication, LicenseModel licenseModel) {
-		publication.pom.withXml {
-			asNode().children().last() + {
-				licenses {
-					license {
-						name licenseModel.name
-						url licenseModel.url
-						distribution licenseModel.distribution
+					"${extendedPublication.name}"(MavenPublication) { MavenPublication mavenPublication ->
+						configurator.configureMavenPublication(extendedPublication, mavenPublication)
 					}
 				}
 			}
 		}
 	}
 
-	private void attachAdditionalArtifactsToMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
-		if (extendedPublication.publishSources) {
-			mavenPublication.artifact(extendedPublication.sourcesArchiveTask)
-		}
+	void publication(String id, Closure configure = null) {
+		publicationConfigurator.addPublication(id, configure)
 	}
 
-	private void attachDependenciesToMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
-		DependencySet allDependencies = extendedPublication.runtimeConfiguration.allDependencies
 
-		mavenPublication.pom.withXml {
-			asNode().children().last() + {
-				dependencies {
-					allDependencies.each { Dependency aDependency ->
-						dependency {
-							groupId aDependency.group
-							artifactId aDependency.name
-							version aDependency.version
-							scope "runtime"
+	private static class Configurator {
+
+		private Project project
+		private Map<String,ExtendedPublication> publicationMap = [:]
+
+		Configurator(Project project) {
+			this.project = project
+		}
+
+		void addPublication(String id, Closure configure = null) {
+			ExtendedPublication publication = createExtendedPublication(id, configure)
+			publicationMap.put(id, publication)
+		}
+
+		private ExtendedPublication createExtendedPublication(String id, Closure configure) {
+			ExtendedPublication publication = new ExtendedPublication(id, project)
+
+			if (configure != null) {
+				publication.configure(configure)
+			}
+			publication
+		}
+
+		List<ExtendedPublication> getPublicationsToApply() {
+			if (!publicationMap.containsKey("main")) {
+				addPublication("main")
+			}
+
+			publicationMap.values().findAll { ExtendedPublication publication ->
+				publication.enabled
+			}
+		}
+
+		private void configureMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
+			mavenPublication.artifact(extendedPublication.archiveTask)
+			if (extendedPublication.artifactId != null) {
+				mavenPublication.artifactId = extendedPublication.artifactId
+			}
+			addBasicDescriptionToMavenPOM(extendedPublication, mavenPublication)
+			attachLicenseToMavenPOMIfLicenseExtPluginApplied(mavenPublication)
+			attachAdditionalArtifactsToMavenPublication(extendedPublication, mavenPublication)
+			attachDependenciesToMavenPublication(extendedPublication, mavenPublication)
+		}
+
+		private void addBasicDescriptionToMavenPOM(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
+			mavenPublication.pom.withXml {
+				asNode().children().last() + {
+					name extendedPublication.artifactId
+					// TODO: add description
+					// description project.description
+					// TODO: add project url
+					// url projectUrl
+				}
+			}
+		}
+
+		private void attachLicenseToMavenPOMIfLicenseExtPluginApplied(MavenPublication mavenPublication) {
+			if (project.getPlugins().findPlugin(LicenseExtPlugin)) {
+				LicenseExtProperties licenseProperties = new LicenseExtProperties(project)
+				LicenseModel licenseModel = licenseProperties.getLicenseModel()
+
+				if (licenseModel != null) {
+					attachLicenseModelToMavenPOM(mavenPublication, licenseModel)
+				} else {
+					log.warn("license-ext plugin applied but no license model found, bypassing augmentation of maven POM with license info")
+				}
+			} else {
+				log.info("license-ext plugin not applied, bypassing augmentation of maven POM with license info")
+			}
+		}
+
+		private void attachLicenseModelToMavenPOM(MavenPublication publication, LicenseModel licenseModel) {
+			publication.pom.withXml {
+				asNode().children().last() + {
+					licenses {
+						license {
+							name licenseModel.name
+							url licenseModel.url
+							distribution licenseModel.distribution
+						}
+					}
+				}
+			}
+		}
+
+		private void attachAdditionalArtifactsToMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
+			if (extendedPublication.publishSources) {
+				mavenPublication.artifact(extendedPublication.sourcesArchiveTask)
+			}
+		}
+
+		private void attachDependenciesToMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
+			DependencySet allDependencies = extendedPublication.runtimeConfiguration.allDependencies
+
+			mavenPublication.pom.withXml {
+				asNode().children().last() + {
+					dependencies {
+						allDependencies.each { Dependency aDependency ->
+							dependency {
+								groupId aDependency.group
+								artifactId aDependency.name
+								version aDependency.version
+								scope "runtime"
+							}
 						}
 					}
 				}

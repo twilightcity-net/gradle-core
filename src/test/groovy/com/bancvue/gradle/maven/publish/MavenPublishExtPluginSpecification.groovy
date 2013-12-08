@@ -16,11 +16,8 @@
 package com.bancvue.gradle.maven.publish
 
 import com.bancvue.gradle.test.AbstractPluginSpecification
-import org.gradle.api.Task
 import org.gradle.api.artifacts.ArtifactRepositoryContainer
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
-import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 class MavenPublishExtPluginSpecification extends AbstractPluginSpecification {
 
@@ -29,7 +26,7 @@ class MavenPublishExtPluginSpecification extends AbstractPluginSpecification {
 	}
 
 	void setup() {
-		setArtifactId('1.0')
+		setArtifactId('artifact')
 	}
 
 	def "apply should apply maven plugin"() {
