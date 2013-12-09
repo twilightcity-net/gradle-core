@@ -113,13 +113,13 @@ class JacocoReportExt extends JacocoReport {
 			report.conventionMapping.with {
 				enabled = { true }
 				destination = {
-					getReportDestinationClosure(report, reportCategory)
+					getReportDestinationFile(jacocoReportsDir, report, reportCategory)
 				}
 			}
 		}
 	}
 
-	private File getReportDestinationClosure(Report report, String reportDirName) {
+	private static File getReportDestinationFile(File jacocoReportsDir, Report report, String reportDirName) {
 		if (report.outputType == Report.OutputType.DIRECTORY) {
 			new File(jacocoReportsDir, "${reportDirName}/${report.name}")
 		} else {
