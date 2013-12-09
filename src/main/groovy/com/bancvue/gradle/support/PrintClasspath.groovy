@@ -29,12 +29,12 @@ class PrintClasspath extends DefaultTask {
 
 	@TaskAction
 	void printClasspathsForAllSourceSets() {
-		getSourceSets().each { SourceSet sourceSet ->
+		for (SourceSet sourceSet : getSourceSets()) {
 			printClasspathsForSourceSet(sourceSet)
 		}
 	}
 
-	private def getSourceSets() {
+	private Set getSourceSets() {
 		String sourceSetName = project.getProperties().get("sourceSetName")
 		project.sourceSets.findAll { SourceSet sourceSet ->
 			boolean match = true
