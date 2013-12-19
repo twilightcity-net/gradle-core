@@ -145,12 +145,12 @@ class MavenPublishExtExtension {
 		}
 
 		private void attachDependenciesToMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
-			DependencySet allDependencies = extendedPublication.runtimeConfiguration.allDependencies
+			Set runtimeDependencies = getRuntimeDependencies(extendedPublication)
 
 			mavenPublication.pom.withXml {
 				asNode().children().last() + {
 					dependencies {
-						allDependencies.each { Dependency aDependency ->
+						runtimeDependencies.each { Dependency aDependency ->
 							dependency {
 								groupId aDependency.group
 								artifactId aDependency.name
@@ -160,6 +160,14 @@ class MavenPublishExtExtension {
 						}
 					}
 				}
+			}
+		}
+
+		private Set getRuntimeDependencies(ExtendedPublication publication) {
+			DependencySet allDependencies = publication.runtimeConfiguration.allDependencies
+
+			allDependencies.findAll { Dependency aDependency ->
+				aDependency.group && aDependency.name && aDependency.version
 			}
 		}
 	}
