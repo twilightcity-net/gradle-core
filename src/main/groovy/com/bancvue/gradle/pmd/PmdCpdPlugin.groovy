@@ -42,11 +42,11 @@ class PmdCpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 	@Override
 	protected CodeQualityExtension createExtension() {
 		PmdExtension pmdExtension = project.extensions.getByName('pmd')
-		extension = project.extensions.create("cpd", CpdExtension)
-		extension.with {
+		CodeQualityExtension cpdExtension = project.extensions.create("cpd", CpdExtension)
+		cpdExtension.with {
 			toolVersion = pmdExtension.toolVersion
 		}
-		extension
+		cpdExtension
 	}
 
 	@Override
