@@ -35,7 +35,7 @@ class DefaultProjectPropertyContainer {
 	DefaultProjectPropertyContainer(Project project, String containerName) {
 		this.project = project
 		this.containerName = containerName
-		this.resourceResolver = new ResourceResolver.Impl(project)
+		this.resourceResolver = ResourceResolver.create(project)
 	}
 
 	def getProperty(String propertyName) {

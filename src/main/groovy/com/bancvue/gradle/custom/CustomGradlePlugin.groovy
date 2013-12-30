@@ -94,8 +94,8 @@ class CustomGradlePlugin implements Plugin<Project> {
 	}
 
 	private String getGradleInitializationScriptContent() {
-		ResourceResolver resolver = new ResourceResolver.Impl(project)
-		resolver.acquireResourceContent(gradleProperties.scriptResourcePath)
+		ResourceResolver resolver = ResourceResolver.create(project)
+		resolver.getResourceContent(gradleProperties.scriptResourcePath)
 	}
 
 	private void addMavenPublication() {

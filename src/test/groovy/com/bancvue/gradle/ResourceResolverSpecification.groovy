@@ -15,10 +15,10 @@
  */
 package com.bancvue.gradle
 
+import com.bancvue.gradle.resource.ClasspathUrlResolver
+import com.bancvue.gradle.resource.UrlResolver
 import com.bancvue.gradle.test.AbstractPluginSupportSpecification
 import com.bancvue.gradle.test.TestFile
-import org.junit.Before
-import org.junit.Test
 
 class ResourceResolverSpecification extends AbstractPluginSupportSpecification {
 
@@ -27,77 +27,49 @@ class ResourceResolverSpecification extends AbstractPluginSupportSpecification {
 	}
 
 
-	private static final String CLASSPATH_RESOURCE_PATH = "com/bancvue/gradle/ResourceResolverSpecification.class"
+	private UrlResolver urlResolver1 = Mock()
+	private UrlResolver urlResolver2 = Mock()
+	private UrlResolver urlResolver3 = Mock()
 
-	private ResourceResolver.Impl resolver
-
-	void setup() {
-		resolver = new ResourceResolver.Impl(project)
-		project.apply(plugin: "java")
-	}
-
-	def "getNamedResourceAsURLFromProjectResourceDirs should resolve URL"() {
+	def "getResourceURL should return first resolved url in chain"() {
 		given:
-		TestFile resourceFile = projectFS.file("src/main/resources/resource.txt") << "content"
+		ResourceResolver resolver = new ResourceResolver([urlResolver1, urlResolver2])
+		urlResolver2.getResourceAsUrlOrNull(_ as String) >> new URL("file://file1")
+		urlResolver3.getResourceAsUrlOrNull(_ as String) >> new URL("file://file2")
 
 		when:
-		URL resourceUrl = resolver.getNamedResourceAsURLFromProjectResourceDirs("resource.txt")
+		URL resourceUrl = resolver.getResourceURL("some-path")
 
 		then:
-		resourceUrl == resourceFile.toURL()
-	}
-
-	def "getNamedResourceAsURLFromProjectRoot shoudl resolve URL"() {
-		given:
-		TestFile resourceFile = projectFS.file("resource.txt") << "content"
-
-		when:
-		URL resourceUrl = resolver.getNamedResourceAsURLFromProjectRoot("resource.txt")
-
-		then:
-		resourceUrl == resourceFile.toURL()
-	}
-
-	def "getNamedResourceFromClasspath should resolve resource"() {
-		expect:
-		resolver.getNamedResourceFromClasspath(CLASSPATH_RESOURCE_PATH)
-	}
-
-	def "acquireResourceURL should resolve from resource dir before project root"() {
-		given:
-		TestFile resourceDirFile = projectFS.file("src/main/resources/resource.txt") << "content"
-		projectFS.file("resource.txt") << "content"
-
-		when:
-		URL resourceUrl = resolver.acquireResourceURL("resource.txt")
-
-		then:
-		resourceUrl == resourceDirFile.toURL()
-	}
-
-	def "acquireResourceURL should resolve resource from project root before classpath"() {
-		given:
-		assert resolver.getNamedResourceFromClasspath(CLASSPATH_RESOURCE_PATH)
-		TestFile projectRootFile = projectFS.file(CLASSPATH_RESOURCE_PATH) << "content"
-
-		when:
-		URL resourceUrl = resolver.acquireResourceURL(CLASSPATH_RESOURCE_PATH)
-
-		then:
-		resourceUrl == projectRootFile.toURL()
+		resourceUrl.toString() == "file://file1"
 	}
 
 	def "resolveObjectFromMap should create instance of input type and initialize with map from resource file"() {
 		given:
-		projectFS.file("src/main/resources/map_file") << """
+		TestFile mapFile = projectFS.file("map_file")
+		mapFile << """
 key: "value"
 """
+		urlResolver1.getResourceAsUrlOrNull(_ as String) >> mapFile.toURL()
+		ResourceResolver resolver = new ResourceResolver([urlResolver1])
 
 		when:
 		Model model = resolver.resolveObjectFromMap("map_file", Model)
 
 		then:
 		model.key == "value"
+	}
+
+	/**
+	 * Having the classpath resolver last enables a default version of a resource to be
+	 * embedded in the plugin jar but overridden at the project level if desired.
+	 */
+	def "create should construct resolver which resolves from classpath last"() {
+		given:
+		ResourceResolver resolver = ResourceResolver.create(project)
+
+		expect:
+		resolver.resolverChain.last() instanceof ClasspathUrlResolver
 	}
 
 }

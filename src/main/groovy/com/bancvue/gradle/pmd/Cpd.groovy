@@ -62,7 +62,7 @@ class Cpd extends SourceTask implements VerificationTask, Reporting<CpdReports> 
 	Cpd(Instantiator instantiator, IsolatedAntBuilder antBuilder) {
 		reports = instantiator.newInstance(CpdReportsImpl, this)
 		this.antBuilder = antBuilder
-		this.resourceResolver = new ResourceResolver.Impl(project)
+		this.resourceResolver = ResourceResolver.create(project)
 	}
 
 	@Override
@@ -134,7 +134,7 @@ class Cpd extends SourceTask implements VerificationTask, Reporting<CpdReports> 
 	}
 
 	private File acquireCpdXsltFile() {
-		URL cpdXsltURL = resourceResolver.acquireResourceURL(getCpdXsltPath())
+		URL cpdXsltURL = resourceResolver.getResourceURL(getCpdXsltPath())
 		File cpdXsltFile = new File(project.buildDir, "pmd/cpdhtml.xslt")
 
 		cpdXsltFile.parentFile.mkdirs()
