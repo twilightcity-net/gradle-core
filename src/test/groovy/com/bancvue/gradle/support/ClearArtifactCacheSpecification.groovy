@@ -31,7 +31,7 @@ class ClearArtifactCacheSpecification extends Specification {
 		createDirs(tempDir, ["caches/artifacts-24/filestore", "caches/artifacts-26/module-metadata", "caches/filestore"])
 
 		expect:
-		ClearArtifactCache.collectGradleCacheArtifactDirs(tempDir) == [
+		ClearArtifactCache.collectGradleCacheArtifactDirs(tempDir).sort() == [
 			new File(tempDir, "caches/artifacts-24/filestore"),
 			new File(tempDir, "caches/artifacts-26/module-metadata"),
 		]
