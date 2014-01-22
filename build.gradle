@@ -5,7 +5,6 @@ import org.gradle.api.publication.maven.internal.PomFilter
 
 apply plugin: "bancvue-oss"
 apply plugin: "integration-test"
-apply plugin: "signing"
 
 repositories {
 	mavenCentral()
@@ -45,13 +44,8 @@ artifacts {
 	archives sourcesJarMainTest
 }
 
-signing {
-    sign configurations.archives
-}
-
 uploadArchives {
 	repositories.mavenDeployer {
-		beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
 		pom.project {
 			packaging "jar"
