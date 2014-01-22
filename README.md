@@ -1,7 +1,8 @@
 # GradlePluginsCore
 
-A collection of gradle plugins meant to codify and streamline project development within an organization.  
+A collection of gradle plugins meant to codify and streamline project development within an organization.
 
+[![Build Status](https://travis-ci.org/BancVue/GradlePluginsCore.png?branch=master)](https://travis-ci.org/BancVue/GradlePluginsCore)
 
 ## ProjectDefaultsPlugin (project-defaults)
 
