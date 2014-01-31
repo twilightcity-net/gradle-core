@@ -15,12 +15,10 @@
  */
 package com.bancvue.gradle.maven.publish
 
-import com.bancvue.exception.ExceptionSupport
 import com.bancvue.gradle.test.AbstractPluginIntegrationSpecification
 import com.bancvue.gradle.test.TestFile
 import com.bancvue.zip.ZipArchive
 
-@Mixin(ExceptionSupport)
 class MavenPublishExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
 	private TestFile mavenRepo

@@ -16,33 +16,14 @@
 package com.bancvue.gradle.test
 
 import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
-import spock.lang.Specification
 
-abstract class AbstractPluginSpecification extends Specification {
+abstract class AbstractPluginSpecification extends AbstractProjectSpecification {
 
-	@Rule
-	public TemporaryFolder projectDir = new TemporaryFolder()
-	protected Project project
-	protected ProjectFileSystem projectFS
-
-	abstract String getPluginName()
-
-	void setup() {
-		project = createProject()
-		projectFS = new ProjectFileSystem(project.rootDir)
+	String getProjectName() {
+		pluginName
 	}
 
-	protected Project createProject() {
-		ProjectBuilder.builder()
-			.withName("${pluginName}-project")
-			.withProjectDir(projectDir.root)
-			.build()
-	}
+	abstract String getPluginName();
 
 	protected void applyPlugin() {
 		project.apply(plugin: pluginName)
@@ -59,9 +40,4 @@ abstract class AbstractPluginSpecification extends Specification {
 	protected void assertNamedPluginApplied(String pluginName) {
 		assert getNamedPlugin(pluginName) != null
 	}
-
-	protected void setArtifactId(String artifactId) {
-		project.ext['artifactId'] = artifactId
-	}
-
 }

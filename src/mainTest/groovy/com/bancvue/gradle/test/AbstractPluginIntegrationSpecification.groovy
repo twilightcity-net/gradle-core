@@ -18,7 +18,6 @@ package com.bancvue.gradle.test
 import org.gradle.testkit.functional.ExecutionResult
 import org.gradle.testkit.functional.GradleRunner
 import org.gradle.testkit.functional.GradleRunnerFactory
-import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
@@ -29,12 +28,13 @@ class AbstractPluginIntegrationSpecification extends Specification {
 	public TemporaryFolder projectDir = new TemporaryFolder()
 	protected ProjectFileSystem projectFS
 	protected GradleRunner runner
+	protected TestFile buildDir
 
 	void setup() {
 		runner = GradleRunnerFactory.create()
 		runner.directory = projectDir.root
 		projectFS = new ProjectFileSystem(projectDir.root)
-		projectFS.initBuildDir()
+		buildDir = projectFS.initBuildDir()
 	}
 
 	protected ExecutionResult run(String... args) {
