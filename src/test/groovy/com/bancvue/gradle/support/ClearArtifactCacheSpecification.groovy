@@ -15,15 +15,36 @@
  */
 package com.bancvue.gradle.support
 
+import com.bancvue.exception.ExceptionSupport
+import com.bancvue.gradle.test.AbstractProjectSpecification
 import com.google.common.io.Files
-import spock.lang.Specification
+import org.gradle.api.GradleException
+import org.gradle.api.tasks.TaskExecutionException
 
-class ClearArtifactCacheSpecification extends Specification {
+@Mixin(ExceptionSupport)
+class ClearArtifactCacheSpecification extends AbstractProjectSpecification {
 
 	private File tempDir
+	private ClearArtifactCache clearArtifactCacheTask
+
+	@Override
+	String getProjectName() {
+		return 'clearArtifactCache'
+	}
 
 	void setup() {
 		tempDir = Files.createTempDir()
+		clearArtifactCacheTask = project.tasks.create("clearArtifactCacheTask", ClearArtifactCache)
+	}
+
+	def "clearArtifactCache should not try to clear cache if group name is not provided"() {
+		when:
+		clearArtifactCacheTask.execute()
+
+		then:
+		TaskExecutionException exception = thrown()
+		GradleException cause = getRootCause(exception)
+		cause.getMessage() == "Required property 'groupName' not set"
 	}
 
 	def "collectGradleCacheArtifactDirs"() {

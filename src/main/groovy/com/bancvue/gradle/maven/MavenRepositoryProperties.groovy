@@ -20,7 +20,7 @@ import org.gradle.api.Project
 
 class MavenRepositoryProperties extends DefaultProjectPropertyContainer {
 
-	public static final String NAME = "repository";
+	public static final String NAME = "repository"
 
 	private static final String getDefaultUrlPropertyValue(String propertyName) {
 		"changeme:set-project-property-repository${propertyName.capitalize()}"
@@ -51,7 +51,6 @@ class MavenRepositoryProperties extends DefaultProjectPropertyContainer {
 		 */
 		String password
 	}
-
 
 	@Delegate
 	private Props props = new Props()

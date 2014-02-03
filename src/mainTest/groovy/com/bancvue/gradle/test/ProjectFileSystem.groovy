@@ -17,7 +17,6 @@ package com.bancvue.gradle.test
 
 import org.apache.commons.io.FilenameUtils
 
-
 class ProjectFileSystem extends TestFile {
 
 	ProjectFileSystem(File baseDir) {
@@ -25,7 +24,11 @@ class ProjectFileSystem extends TestFile {
 	}
 
 	void initBuildDir() {
-		mkdir('build')
+		buildDir.mkdirs()
+	}
+
+	TestFile getBuildDir() {
+		file("build")
 	}
 
 	TestFile getBuildFile() {

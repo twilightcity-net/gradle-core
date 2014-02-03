@@ -18,7 +18,6 @@ package com.bancvue.gradle.test
 import org.gradle.testkit.functional.ExecutionResult
 import org.gradle.testkit.functional.GradleRunner
 import org.gradle.testkit.functional.GradleRunnerFactory
-import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification

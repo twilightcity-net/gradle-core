@@ -58,13 +58,4 @@ class MavenRepositoryPropertiesSpecification extends Specification {
 		then:
 		properties.hasCredentialsDefined()
 	}
-
-	def "hasCredentialsDefined should return true if username and password dDefined on project"() {
-		when:
-		project.ext["repositoryUsername"] = 'username'
-		project.ext["repositoryPassword"] = 'password'
-
-		then:
-		properties.hasCredentialsDefined()
-	}
 }
