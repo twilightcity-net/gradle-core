@@ -28,13 +28,12 @@ class AbstractPluginIntegrationSpecification extends Specification {
 	public TemporaryFolder projectDir = new TemporaryFolder()
 	protected ProjectFileSystem projectFS
 	protected GradleRunner runner
-	protected TestFile buildDir
 
 	void setup() {
 		runner = GradleRunnerFactory.create()
 		runner.directory = projectDir.root
 		projectFS = new ProjectFileSystem(projectDir.root)
-		buildDir = projectFS.initBuildDir()
+		projectFS.initBuildDir()
 	}
 
 	protected ExecutionResult run(String... args) {

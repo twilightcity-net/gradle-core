@@ -23,9 +23,13 @@ class ProjectFileSystem extends TestFile {
 		super(baseDir)
 	}
 
-	TestFile initBuildDir() {
-		mkdir('build')
+	void initBuildDir() {
+        buildDir.mkdirs()
 	}
+
+    TestFile getBuildDir() {
+        file("build")
+    }
 
 	TestFile getBuildFile() {
 		file("build.gradle")
