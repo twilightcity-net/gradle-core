@@ -1,6 +1,5 @@
 import com.bancvue.gradle.maven.DefaultPublishFilter
 import org.apache.ivy.core.module.descriptor.Artifact
-import org.gradle.api.artifacts.maven.MavenDeployment
 import org.gradle.api.publication.maven.internal.PomFilter
 
 apply plugin: "bancvue-oss"
@@ -13,7 +12,7 @@ repositories {
 dependencies {
 	compile localGroovy()
 	compile gradleApi()
-	compile "nl.javadude.gradle.plugins:license-gradle-plugin:0.6.0"
+	compile "nl.javadude.gradle.plugins:license-gradle-plugin:0.7.0"
 
 	mainTestCompile('org.spockframework:spock-core:0.7-groovy-1.8') {
 		exclude group: 'org.codehaus.groovy'
@@ -26,6 +25,7 @@ check.dependsOn integrationTest
 
 license {
 	ext.name = "BancVue, LTD"
+	skipExistingHeaders true
 }
 
 [licenseMain, licenseFormatMain]*.exclude "licenses/*"

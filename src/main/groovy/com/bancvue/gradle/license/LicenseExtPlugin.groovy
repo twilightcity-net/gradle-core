@@ -32,9 +32,8 @@ class LicenseExtPlugin implements Plugin<Project> {
 	void apply(Project project) {
 		init(project)
 		applyLicensePlugin()
-		configureApache2LicenseHeader()
+		configureLicenseHeader()
 		excludedConfiguredFileExtensions()
-		addFormatAllLicenseTask()
 		addCheckAllLicenseTask()
 	}
 
@@ -47,7 +46,7 @@ class LicenseExtPlugin implements Plugin<Project> {
 		project.apply(plugin: 'license')
 	}
 
-	private void configureApache2LicenseHeader() {
+	private void configureLicenseHeader() {
 		writeConfiguredLicenseHeaderToBuildDirPriorToLicenseExecution()
 		project.license {
 			header = getHeaderFile()
@@ -100,42 +99,18 @@ class LicenseExtPlugin implements Plugin<Project> {
 		expressions
 	}
 
-	private void addFormatAllLicenseTask() {
-		Task licenseFormat = project.tasks.create('licenseFormat')
-		licenseFormat.group = GROUP_NAME
-		licenseFormat.description = 'Apply license on files from all available source sets'
-
-		applyToFormatLicenseTasks { License task ->
-			licenseFormat.dependsOn(task)
-		}
-	}
-
 	private void addCheckAllLicenseTask() {
 		Task licenseCheck = project.tasks.create('licenseCheck')
 		licenseCheck.group = GROUP_NAME
 		licenseCheck.description = 'Check license on files from all available source sets'
 
-		applyToCheckLicenseTasks { License task ->
-			licenseCheck.dependsOn(task)
-		}
-	}
-
-	private void applyToCheckLicenseTasks(Closure closure) {
-		applyToLicenseTasksWithGivenValueForCheck(true, closure)
-	}
-
-	private void applyToFormatLicenseTasks(Closure closure) {
-		applyToLicenseTasksWithGivenValueForCheck(false, closure)
-	}
-
-	private void applyToLicenseTasksWithGivenValueForCheck(boolean check, Closure closure) {
 		// this must be done after evaluation, otherwise - if a License task is added after this plugin
 		// is applied - the closure will be called when the task is added to the container, which will probably
 		// be before the check value is set
 		project.afterEvaluate {
 			project.tasks.withType(License) { License task ->
-				if (task.check == check) {
-					closure.call(task)
+				if (task.check) {
+					licenseCheck.dependsOn(task)
 				}
 			}
 		}
