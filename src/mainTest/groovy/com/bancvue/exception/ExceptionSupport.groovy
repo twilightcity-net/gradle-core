@@ -25,4 +25,18 @@ class ExceptionSupport {
 		}
 		result
 	}
+
+	/*
+	why this is here...
+
+	In one of our internal integration tests, we are getting a PlaceholderException as the root cause of a BuildException
+	when we throw a custom RuntimeException in the build, but we get a ClassCastException when trying to cast it to
+	PlaceholderException. In order to verify that our correct internal exception is thrown, we have to inspect the
+	exceptionClassName on the PlaceholderException.
+	 */
+	static Throwable getRootCauseAndVerifyPlaceholderExceptionClassName(Throwable exception, Class exceptionClass) {
+		Throwable cause = getRootCause(exception)
+		assert cause.getExceptionClassName() == exceptionClass.name
+		cause
+	}
 }
