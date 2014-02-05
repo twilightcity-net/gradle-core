@@ -15,9 +15,11 @@
  */
 package com.bancvue.gradle.license
 
+import com.bancvue.exception.ExceptionSupport
 import com.bancvue.gradle.test.AbstractPluginIntegrationSpecification
 import org.gradle.testkit.functional.ExecutionResult
 
+@Mixin(ExceptionSupport)
 class LicenseExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
 	/**************************************************************************************************************
@@ -100,6 +102,10 @@ apply plugin: 'license-ext'
 		buildFile << """
 apply plugin: 'java'
 apply plugin: 'license-ext'
+
+license {
+	ignoreFailures true
+}
         """
 
 		when:
@@ -116,6 +122,10 @@ apply plugin: 'license-ext'
 apply plugin: 'java'
 apply plugin: 'license-ext'
 apply plugin: 'test-ext'
+
+license {
+	ignoreFailures true
+}
         """
 
 		when:
