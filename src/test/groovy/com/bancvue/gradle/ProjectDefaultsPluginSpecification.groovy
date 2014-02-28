@@ -105,6 +105,40 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		}
 	}
 
+	def "apply should set java tmp dir"() {
+		given:
+		String originalTmpDir = System.getProperty("java.io.tmpdir")
+		System.setProperty("java.io.tmpdir", "new_tmpdir_value")
+
+		when:
+		project.apply(plugin: 'groovy')
+		applyPlugin()
+
+		then:
+		TaskCollection testTasks = project.tasks.withType(org.gradle.api.tasks.testing.Test)
+		testTasks.size() > 0
+		testTasks.each { org.gradle.api.tasks.testing.Test test ->
+			assert test.systemProperties["java.io.tmpdir"] == "new_tmpdir_value"
+		}
+
+		and:
+		TaskCollection javaTasks = project.tasks.withType(JavaCompile)
+		javaTasks.size() > 0
+		javaTasks.each { JavaCompile compile ->
+			assert compile.options.forkOptions.jvmArgs.contains("-Djava.io.tmpdir=new_tmpdir_value")
+		}
+
+		and:
+		TaskCollection groovyTasks = project.tasks.withType(GroovyCompile)
+		groovyTasks.size() > 0
+		groovyTasks.each { GroovyCompile compile ->
+			assert compile.groovyOptions.forkOptions.jvmArgs.contains("-Djava.io.tmpdir=new_tmpdir_value")
+		}
+
+		cleanup:
+		System.setProperty("java.io.tmpdir", originalTmpDir)
+	}
+
 	def "apply should add Built-Date and Build-Jdk to jar manifest"() {
 		given:
 		String expectedJavaVersion = System.getProperty('java.version')
