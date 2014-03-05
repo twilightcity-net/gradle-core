@@ -16,6 +16,10 @@ apply plugin: 'release'
 apply plugin: "bancvue-oss"
 apply plugin: "integration-test"
 
+repositories {
+	mavenCentral()
+}
+
 dependencies {
 	compile localGroovy()
 	compile gradleApi()
