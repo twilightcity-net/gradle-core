@@ -49,12 +49,14 @@ class ClearArtifactCacheSpecification extends AbstractProjectSpecification {
 
 	def "collectGradleCacheArtifactDirs"() {
 		given:
-		createDirs(tempDir, ["caches/artifacts-24/filestore", "caches/artifacts-26/module-metadata", "caches/filestore"])
+		createDirs(tempDir, ["caches/artifacts-24/filestore", "caches/artifacts-26/module-metadata", "caches/filestore", "caches/modules-2/files-2.1", "caches/modules-2/metadata-2.2/descriptors"])
 
 		expect:
 		ClearArtifactCache.collectGradleCacheArtifactDirs(tempDir).sort() == [
 			new File(tempDir, "caches/artifacts-24/filestore"),
 			new File(tempDir, "caches/artifacts-26/module-metadata"),
+			new File(tempDir, "caches/modules-2/files-2.1"),
+			new File(tempDir, "caches/modules-2/metadata-2.2/descriptors")
 		]
 	}
 

@@ -77,6 +77,10 @@ class ClearArtifactCache extends DefaultTask {
 				appendToListIfDirExists(dirs, new File(dir, "filestore"))
 				appendToListIfDirExists(dirs, new File(dir, "module-metadata"))
 			}
+			if (dir.name =~ /^modules-.*/) {
+				appendToListIfDirExists(dirs, new File(dir, "files-2.1"))
+				appendToListIfDirExists(dirs, new File(dir, "metadata-2.2/descriptors"))
+			}
 		}
 		dirs
 	}
