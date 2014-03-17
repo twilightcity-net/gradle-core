@@ -72,19 +72,13 @@ class ClearArtifactCache extends DefaultTask {
 	private static List<File> collectGradleCacheArtifactDirs(File gradleUserHomeDir) {
 		List<File> dirs = []
 
-		new File(gradleUserHomeDir, "caches").eachDir { File dir ->
-			if (dir.name =~ /^artifacts-.*/) {
-				appendToListIfDirExists(dirs, new File(dir, "filestore"))
-				appendToListIfDirExists(dirs, new File(dir, "module-metadata"))
-			}
+		new File(gradleUserHomeDir, "caches").eachDirMatch(~/^artifacts-.*|^modules-.*/) { File dir ->
+				dir.eachDirRecurse { File cache ->
+					if (cache.name =~ /filestore|module-metadata|files-.*|descriptors/) {
+						dirs << cache
+					}
+				}
 		}
 		dirs
 	}
-
-	private static void appendToListIfDirExists(List<File> fileList, File dir) {
-		if (dir.exists()) {
-			fileList << dir
-		}
-	}
-
 }
