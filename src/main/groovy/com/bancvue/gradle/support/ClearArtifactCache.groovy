@@ -98,7 +98,7 @@ class ClearArtifactCache extends DefaultTask {
 	private static void appendCacheDirsFromModulesDir(File dir, List<File> dirs) {
 		if (dir.name =~ /^modules-.*/) {
 			dir.eachDirMatch(~/^files-.*/) { File filesDir ->
-				appendToListIfDirExists(dirs, filesDir)
+				dirs << filesDir
 			}
 			dir.eachDirMatch(~/^metadata-.*/) { File metadataDir ->
 				appendToListIfDirExists(dirs, new File(metadataDir, "descriptors"))

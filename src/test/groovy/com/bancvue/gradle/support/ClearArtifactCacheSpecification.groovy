@@ -47,7 +47,7 @@ class ClearArtifactCacheSpecification extends AbstractProjectSpecification {
 		cause.getMessage() == "Required property 'groupName' not set"
 	}
 
-	def "collectGradleCacheArtifactDirs from artifacts dir"() {
+	def "collectGradleCacheArtifactDirs should return filestore and module-metadata when using gradle version <= 1.8"() {
 		given:
 		createDirs(tempDir, ["caches/artifacts-24/filestore", "caches/artifacts-26/module-metadata", "caches/filestore"])
 
@@ -58,7 +58,7 @@ class ClearArtifactCacheSpecification extends AbstractProjectSpecification {
 		]
 	}
 
-	def "collectGradleCacheArtifactDirs from modules dir"() {
+	def "collectGradleCacheArtifactDirs should return files and metadata dirs when using gradle version >= 1.9"() {
 		given:
 		createDirs(tempDir, ["caches/modules-2/files-2.1", "caches/modules-2/metadata-2.2/descriptors"])
 
