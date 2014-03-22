@@ -19,7 +19,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
-
 class ClearArtifactCache extends DefaultTask {
 
 	String groupName
@@ -69,16 +68,42 @@ class ClearArtifactCache extends DefaultTask {
 		dirs
 	}
 
+	/*
+	NOTE: we aren't using eachDirRecurse here because the larger the cache, the longer it takes to clear it when we 
+	recurse through all the subdirectories
+	*/
 	private static List<File> collectGradleCacheArtifactDirs(File gradleUserHomeDir) {
 		List<File> dirs = []
 
-		new File(gradleUserHomeDir, "caches").eachDirMatch(~/^artifacts-.*|^modules-.*/) { File dir ->
-				dir.eachDirRecurse { File cache ->
-					if (cache.name =~ /filestore|module-metadata|files-.*|descriptors/) {
-						dirs << cache
-					}
-				}
+		new File(gradleUserHomeDir, "caches").eachDir { File dir ->
+			appendCacheDirsFromArtifactsDir(dir, dirs)
+			appendCacheDirsFromModulesDir(dir, dirs)
 		}
 		dirs
 	}
+
+	private static void appendCacheDirsFromArtifactsDir(File dir, List<File> dirs) {
+		if (dir.name =~ /^artifacts-.*/) {
+			appendToListIfDirExists(dirs, new File(dir, "filestore"))
+			appendToListIfDirExists(dirs, new File(dir, "module-metadata"))
+		}
+	}
+
+	private static void appendToListIfDirExists(List<File> fileList, File dir) {
+		if (dir.exists()) {
+			fileList << dir
+		}
+	}
+
+	private static void appendCacheDirsFromModulesDir(File dir, List<File> dirs) {
+		if (dir.name =~ /^modules-.*/) {
+			dir.eachDirMatch(~/^files-.*/) { File filesDir ->
+				dirs << filesDir
+			}
+			dir.eachDirMatch(~/^metadata-.*/) { File metadataDir ->
+				appendToListIfDirExists(dirs, new File(metadataDir, "descriptors"))
+			}
+		}
+	}
+
 }
