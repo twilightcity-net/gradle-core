@@ -56,7 +56,11 @@ dependencies {
 		} catch (Throwable ex) {}
 	}
 
-	private void assertIdeaModuleFileContainsExpectedSourceFolder(File expectedImlFile, String folderName, boolean isTestFolder) {
+	private void assertIdeaModuleFileContainsExpectedResourceFolder(File expectedImlFile, String folderName, boolean isTestFolder) {
+		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, folderName, isTestFolder, true)
+	}
+
+	private void assertIdeaModuleFileContainsExpectedSourceFolder(File expectedImlFile, String folderName, boolean isTestFolder, boolean isResourceFolder = false) {
 		String expectedUrl = "file://\$MODULE_DIR\$/${folderName}"
 		def module = new XmlParser().parseText(expectedImlFile.text)
 
@@ -69,6 +73,11 @@ dependencies {
 		}
 		assert result.size() == 1
 		assert Boolean.parseBoolean(result[0].@isTestSource) == isTestFolder
+		if (isResourceFolder) {
+			assert result[0].@type == (isTestFolder ? "java-test-resource" : "java-resource")
+		} else {
+			assert result[0].@type == null
+		}
 	}
 
 	private void assertIdeaModuleFileContainsExpectedDependency(File expectedImlFile, String expectedUrlPath) {
@@ -136,6 +145,28 @@ dependencies {
 		if (!result) {
 			fail("Expected ${kind} classpathentry path=${dependencyPath} not found in .classpath content=${expectedClasspathFile.text}")
 		}
+	}
+
+	def "idea should augment resource directories with type"() {
+		given:
+		buildFile << """
+apply plugin: 'groovy'
+apply plugin: 'ide-ext'
+apply plugin: 'integration-test'
+        """
+		mkdir("src/main/resources")
+		mkdir("src/test/resources")
+		mkdir("src/integrationTest/resources")
+
+		when:
+		run("idea")
+
+		then:
+		File expectedImlFile = file("${projectFS.name}.iml")
+		expectedImlFile.exists()
+		assertIdeaModuleFileContainsExpectedResourceFolder(expectedImlFile, "src/main/resources", false)
+		assertIdeaModuleFileContainsExpectedResourceFolder(expectedImlFile, "src/test/resources", true)
+		assertIdeaModuleFileContainsExpectedResourceFolder(expectedImlFile, "src/integrationTest/resources", true)
 	}
 
 }

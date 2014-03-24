@@ -21,7 +21,6 @@ import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.SourceSet
 
-
 class IdeExtPlugin implements Plugin<Project> {
 
 	static final String PLUGIN_NAME = 'ide-ext'
@@ -87,6 +86,7 @@ class IdeExtPlugin implements Plugin<Project> {
 	private void updateIdeaSourcePathAndTestScope() {
 		resetIdeaModuleTestPaths()
 		addTestConfigurationsToIdeaTestScope()
+		augmentResourceSourceFoldersWithType()
 	}
 
 	private void resetIdeaModuleTestPaths() {
@@ -97,7 +97,7 @@ class IdeExtPlugin implements Plugin<Project> {
 
 	private Set<File> getTestSourceDirs() {
 		project.sourceSets.findAll { SourceSet sourceSet ->
-			sourceSet.name =~ /(?i)test/
+			isTestSourceSet(sourceSet)
 		}.collect { SourceSet sourceSet ->
 			sourceSet.allSource.srcDirs
 		}.flatten()
@@ -113,9 +113,36 @@ class IdeExtPlugin implements Plugin<Project> {
 
 	private Set<Configuration> getTestRuntimeConfigurations() {
 		Set runtimeConfigurations = project.configurations.findAll { Configuration config ->
-			config.name =~ /(?i)testruntime$/
+			isTestConfiguration(config)
 		} as Set
 		runtimeConfigurations
+	}
+
+	private void augmentResourceSourceFoldersWithType() {
+		project.idea.module.iml {
+			withXml { provider ->
+				def resourceFolderNodes = provider.node.component.content.sourceFolder.findAll { it.@url =~ /resources$/ }
+				resourceFolderNodes.each { Node sourceFolder ->
+					String typeString = isTestIdeaSourceFolder(sourceFolder) ? "java-test-resource" : "java-resource"
+					sourceFolder.@type = typeString
+				}
+			}
+		}
+	}
+
+	private boolean isTestSourceSet(SourceSet sourceSet) {
+		sourceSet.name =~ /(?i)test$/
+	}
+
+	private boolean isTestConfiguration(Configuration config) {
+		config.name =~ /(?i)testruntime$/
+	}
+
+	private boolean isTestIdeaSourceFolder(Node sourceFolder) {
+		String partialSrcFolderUrl = sourceFolder.@url - "file://\$MODULE_DIR\$"
+		getTestSourceDirs().find { File testSourceDir ->
+			testSourceDir.absolutePath.endsWith(partialSrcFolderUrl)
+		}
 	}
 
 	private void applyEclipsePlugin() {
