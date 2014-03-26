@@ -92,7 +92,9 @@ class JacocoExtPlugin implements Plugin<Project> {
 		coverage.configure {
 			group = TestExtPlugin.VERIFICATION_GROUP_NAME
 			description = "Execute all tests and generate coverage reports"
-			dependsOn { project.tasks.getByName("check") }
+			Task check = project.tasks.getByName("check")
+			dependsOn { check }
+			mustRunAfter { check }
 		}
 		project.tasks.withType(JacocoReport) { JacocoReport report ->
 			coverage.dependsOn(report)
