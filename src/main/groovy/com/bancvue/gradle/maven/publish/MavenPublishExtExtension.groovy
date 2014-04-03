@@ -22,6 +22,8 @@ import groovy.util.logging.Slf4j
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencySet
+import org.gradle.api.artifacts.ExcludeRule
+import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.publish.maven.MavenPublication
 
 @Slf4j
@@ -151,16 +153,42 @@ class MavenPublishExtExtension {
 				asNode().children().last() + {
 					dependencies {
 						runtimeDependencies.each { Dependency aDependency ->
+							List<ExcludeRule> excludeRules = getExcludeRules(aDependency)
+
 							dependency {
 								groupId aDependency.group
 								artifactId aDependency.name
 								version aDependency.version
 								scope "runtime"
+
+								if (excludeRules) {
+									exclusions {
+										excludeRules.each { ExcludeRule excludeRule ->
+											exclusion {
+												if (excludeRule.group) {
+													groupId excludeRule.group
+												}
+												if (excludeRule.module) {
+													artifactId excludeRule.module
+												}
+											}
+										}
+									}
+								}
 							}
 						}
 					}
 				}
 			}
+		}
+
+		private List<ExcludeRule> getExcludeRules(Dependency dependency) {
+			List<ExcludeRule> excludeRules = []
+
+			if (dependency instanceof ModuleDependency) {
+				excludeRules = ((ModuleDependency) dependency).excludeRules as List
+			}
+			excludeRules
 		}
 
 		private Set getRuntimeDependencies(ExtendedPublication publication) {

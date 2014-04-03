@@ -254,4 +254,54 @@ dependencies {
 		pom.dependencies.dependency.find { it.artifactId.text() == "log4j-over-slf4j" }
 	}
 
+	def "should exclude dependencies from pom which have been excluded in gradle build - fix for http://issues.gradle.org//browse/GRADLE-2945"() {
+		given:
+		emptyClassFile("src/main/java/MainClass.java")
+		emptyClassFile("src/mainTest/java/MainTestClass.java")
+		setupLocalMavenRepoAndApplyPlugin()
+		buildFile << """
+apply plugin: 'test-ext'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+    compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
+        exclude module: 'commons-lang'
+    }
+	mainTestCompile('org.spockframework:spock-core:0.7-groovy-1.8') {
+		exclude group: 'org.codehaus.groovy'
+		exclude group: 'org.hamcrest'
+	}
+}
+
+publishing_ext {
+	publication('mainTest')
+}
+"""
+
+		when:
+		run("publish")
+
+		then:
+		TestFile pomFile = getPomFile("artifact")
+		assertExclusion(pomFile, "http-builder", null, "commons-lang")
+		TestFile testPomFile = getPomFile("artifact-test")
+		assertExclusion(testPomFile, "http-builder", null, "commons-lang")
+		assertExclusion(testPomFile, "spock-core", "org.codehaus.groovy", null)
+		assertExclusion(testPomFile, "spock-core", "org.hamcrest", null)
+	}
+
+	private void assertExclusion(TestFile pomFile, String dependencyArtifactId, String exclusionGroupId, String exclusionArtifactId) {
+		def pom = new XmlParser().parse(pomFile)
+		Node dependency = pom.dependencies.dependency.find { it.artifactId.text() == dependencyArtifactId }
+		Node exclusion = dependency.exclusions.exclusion.find {
+			boolean groupIdMatch = (exclusionGroupId ? (it.groupId.text() == exclusionGroupId) : true)
+			boolean artifactIdMatch = (exclusionArtifactId ? (it.artifactId.text() == exclusionArtifactId) : true)
+			groupIdMatch && artifactIdMatch
+		}
+		assert exclusion: "Exclusion for dependency=${dependencyArtifactId} not found, exclusion=${exclusionGroupId}:${exclusionArtifactId}"
+	}
+
 }
