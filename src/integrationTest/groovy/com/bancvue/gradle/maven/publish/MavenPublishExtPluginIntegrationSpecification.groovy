@@ -272,6 +272,7 @@ dependencies {
     }
 	mainTestCompile('org.spockframework:spock-core:0.7-groovy-1.8') {
 		exclude group: 'org.codehaus.groovy'
+		exclude group: 'org.hamcrest'
 	}
 }
 
@@ -289,6 +290,7 @@ publishing_ext {
 		TestFile testPomFile = getPomFile("artifact-test")
 		assertExclusion(testPomFile, "http-builder", null, "commons-lang")
 		assertExclusion(testPomFile, "spock-core", "org.codehaus.groovy", null)
+		assertExclusion(testPomFile, "spock-core", "org.hamcrest", null)
 	}
 
 	private void assertExclusion(TestFile pomFile, String dependencyArtifactId, String exclusionGroupId, String exclusionArtifactId) {

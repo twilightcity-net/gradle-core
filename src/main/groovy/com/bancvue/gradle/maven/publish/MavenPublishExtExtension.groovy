@@ -163,13 +163,13 @@ class MavenPublishExtExtension {
 
 								if (excludeRules) {
 									exclusions {
-										exclusion {
-											excludeRules.each { ExcludeRule exclusion ->
-												if (exclusion.group) {
-													groupId exclusion.group
+										excludeRules.each { ExcludeRule excludeRule ->
+											exclusion {
+												if (excludeRule.group) {
+													groupId excludeRule.group
 												}
-												if (exclusion.module) {
-													artifactId exclusion.module
+												if (excludeRule.module) {
+													artifactId excludeRule.module
 												}
 											}
 										}
