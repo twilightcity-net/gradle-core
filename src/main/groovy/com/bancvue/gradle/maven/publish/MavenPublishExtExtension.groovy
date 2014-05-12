@@ -20,6 +20,7 @@ import com.bancvue.gradle.license.LicenseExtProperties
 import com.bancvue.gradle.license.LicenseModel
 import groovy.util.logging.Slf4j
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.ExcludeRule
@@ -58,10 +59,12 @@ class MavenPublishExtExtension {
 	private static class Configurator {
 
 		private Project project
+		private DependencyResolver dependencyResolver
 		private Map<String,ExtendedPublication> publicationMap = [:]
 
 		Configurator(Project project) {
 			this.project = project
+			this.dependencyResolver = new DependencyResolver(project)
 		}
 
 		void addPublication(String id, Closure configure = null) {
@@ -147,13 +150,13 @@ class MavenPublishExtExtension {
 		}
 
 		private void attachDependenciesToMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
-			Set runtimeDependencies = getRuntimeDependencies(extendedPublication)
+			Set runtimeDependencies = dependencyResolver.getRuntimeDependencies(extendedPublication)
 
 			mavenPublication.pom.withXml {
 				asNode().children().last() + {
 					dependencies {
 						runtimeDependencies.each { Dependency aDependency ->
-							List<ExcludeRule> excludeRules = getExcludeRules(aDependency)
+							List<Exclusion> exclusionList = dependencyResolver.getDependencyExclusions(aDependency)
 
 							dependency {
 								groupId aDependency.group
@@ -161,14 +164,12 @@ class MavenPublishExtExtension {
 								version aDependency.version
 								scope "runtime"
 
-								if (excludeRules) {
+								if (exclusionList) {
 									exclusions {
-										excludeRules.findAll { ExcludeRule excludeRule ->
-											excludeRule.group || excludeRule.module
-										}.each { ExcludeRule excludeRule ->
+										exclusionList.each { Exclusion item ->
 											exclusion {
-												groupId (excludeRule.group ? excludeRule.group : "*")
-												artifactId (excludeRule.module ? excludeRule.module : "*")
+												groupId item.groupId
+												artifactId item.artifactId
 											}
 										}
 									}
@@ -180,21 +181,72 @@ class MavenPublishExtExtension {
 			}
 		}
 
-		private List<ExcludeRule> getExcludeRules(Dependency dependency) {
-			List<ExcludeRule> excludeRules = []
+	}
 
-			if (dependency instanceof ModuleDependency) {
-				excludeRules = ((ModuleDependency) dependency).excludeRules as List
-			}
-			excludeRules
+	private static class DependencyResolver {
+		private Project project
+
+		DependencyResolver(Project project1) {
+			this.project = project1
 		}
 
-		private Set getRuntimeDependencies(ExtendedPublication publication) {
+
+		List<Exclusion> getDependencyExclusions(Dependency dependency) {
+			List<ExcludeRule> excludeRules = getDependencyExcludeRules(dependency)
+
+			excludeRules.findAll { ExcludeRule excludeRule ->
+				excludeRule.group || excludeRule.module
+			}.collectAll { ExcludeRule excludeRule ->
+				new Exclusion(excludeRule)
+			}
+		}
+
+		List<ExcludeRule> getDependencyExcludeRules(Dependency dependency) {
+			Set<ExcludeRule> excludeRules = []
+
+			if (dependency instanceof ModuleDependency) {
+				excludeRules.addAll(((ModuleDependency) dependency).excludeRules)
+
+				Configuration configuration = getConfigurationContainingDependency(dependency)
+				if (configuration != null) {
+					excludeRules.addAll(configuration.excludeRules)
+				}
+			}
+			excludeRules as List
+		}
+
+		private Configuration getConfigurationContainingDependency(Dependency dependency) {
+			project.configurations.find { Configuration config ->
+				config.dependencies.find {
+					dependency.is(it)
+				}
+			}
+		}
+
+		Set getRuntimeDependencies(ExtendedPublication publication) {
 			DependencySet allDependencies = publication.runtimeConfiguration.allDependencies
 
 			allDependencies.findAll { Dependency aDependency ->
 				aDependency.group && aDependency.name && aDependency.version
 			}
+		}
+	}
+
+	private static class Exclusion {
+		private String groupId
+		private String artifactId
+
+		public Exclusion(ExcludeRule excludeRule) {
+			groupId = excludeRule.group
+			artifactId = excludeRule.module
+		}
+
+		String getGroupId() {
+			groupId ?: "*"
+		}
+
+		String getArtifactId() {
+			artifactId ?: "*"
 		}
 	}
 
