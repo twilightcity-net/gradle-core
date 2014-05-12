@@ -163,14 +163,12 @@ class MavenPublishExtExtension {
 
 								if (excludeRules) {
 									exclusions {
-										excludeRules.each { ExcludeRule excludeRule ->
+										excludeRules.findAll { ExcludeRule excludeRule ->
+											excludeRule.group || excludeRule.module
+										}.each { ExcludeRule excludeRule ->
 											exclusion {
-												if (excludeRule.group) {
-													groupId excludeRule.group
-												}
-												if (excludeRule.module) {
-													artifactId excludeRule.module
-												}
+												groupId (excludeRule.group ? excludeRule.group : "*")
+												artifactId (excludeRule.module ? excludeRule.module : "*")
 											}
 										}
 									}

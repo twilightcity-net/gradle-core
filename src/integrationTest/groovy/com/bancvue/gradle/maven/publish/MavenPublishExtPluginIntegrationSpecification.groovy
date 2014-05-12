@@ -284,11 +284,11 @@ publishing_ext {
 
 		then:
 		PomFile pomFile = getPomFile("artifact")
-		pomFile.assertExclusion("http-builder", null, "commons-lang")
+		pomFile.assertExclusion("http-builder", "*", "commons-lang")
 		PomFile testPomFile = getPomFile("artifact-test")
-		testPomFile.assertExclusion("http-builder", null, "commons-lang")
-		testPomFile.assertExclusion("spock-core", "org.codehaus.groovy", null)
-		testPomFile.assertExclusion("spock-core", "org.hamcrest", null)
+		testPomFile.assertExclusion("http-builder", "*", "commons-lang")
+		testPomFile.assertExclusion("spock-core", "org.codehaus.groovy", "*")
+		testPomFile.assertExclusion("spock-core", "org.hamcrest", "*")
 	}
 
 }
