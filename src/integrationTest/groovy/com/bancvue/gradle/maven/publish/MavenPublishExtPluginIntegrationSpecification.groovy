@@ -16,6 +16,7 @@
 package com.bancvue.gradle.maven.publish
 
 import com.bancvue.gradle.test.AbstractPluginIntegrationSpecification
+import com.bancvue.gradle.test.PomFile
 import com.bancvue.gradle.test.TestFile
 import com.bancvue.zip.ZipArchive
 
@@ -54,8 +55,8 @@ version = '1.0'
 		mavenRepo.file("group/${artifactId}/1.0/${jarName}.jar")
 	}
 
-	private TestFile getPomFile(String artifactId) {
-		mavenRepo.file("group/${artifactId}/1.0/${artifactId}-1.0.pom")
+	private PomFile getPomFile(String artifactId) {
+		new PomFile(mavenRepo.file("group/${artifactId}/1.0/${artifactId}-1.0.pom"))
 	}
 
 	private ZipArchive assertArchiveBuiltAndUploadedToMavenRepo(String artifactId, String classifier = null) {
@@ -245,13 +246,10 @@ dependencies {
 		run("publish")
 
 		then:
-		TestFile pomFile = getPomFile("artifact")
+		PomFile pomFile = getPomFile("artifact")
 		pomFile.exists()
-		// TODO: create abstraction for pom file
-		def pom = new XmlParser().parse(pomFile)
-		pom.dependencies.dependency.size() == 2
-		pom.dependencies.dependency.find { it.artifactId.text() == "logback" }
-		pom.dependencies.dependency.find { it.artifactId.text() == "log4j-over-slf4j" }
+		pomFile.assertDependency("logback")
+		pomFile.assertDependency("log4j-over-slf4j")
 	}
 
 	def "should exclude dependencies from pom which have been excluded in gradle build - fix for http://issues.gradle.org//browse/GRADLE-2945"() {
@@ -285,23 +283,12 @@ publishing_ext {
 		run("publish")
 
 		then:
-		TestFile pomFile = getPomFile("artifact")
-		assertExclusion(pomFile, "http-builder", null, "commons-lang")
-		TestFile testPomFile = getPomFile("artifact-test")
-		assertExclusion(testPomFile, "http-builder", null, "commons-lang")
-		assertExclusion(testPomFile, "spock-core", "org.codehaus.groovy", null)
-		assertExclusion(testPomFile, "spock-core", "org.hamcrest", null)
-	}
-
-	private void assertExclusion(TestFile pomFile, String dependencyArtifactId, String exclusionGroupId, String exclusionArtifactId) {
-		def pom = new XmlParser().parse(pomFile)
-		Node dependency = pom.dependencies.dependency.find { it.artifactId.text() == dependencyArtifactId }
-		Node exclusion = dependency.exclusions.exclusion.find {
-			boolean groupIdMatch = (exclusionGroupId ? (it.groupId.text() == exclusionGroupId) : true)
-			boolean artifactIdMatch = (exclusionArtifactId ? (it.artifactId.text() == exclusionArtifactId) : true)
-			groupIdMatch && artifactIdMatch
-		}
-		assert exclusion: "Exclusion for dependency=${dependencyArtifactId} not found, exclusion=${exclusionGroupId}:${exclusionArtifactId}"
+		PomFile pomFile = getPomFile("artifact")
+		pomFile.assertExclusion("http-builder", null, "commons-lang")
+		PomFile testPomFile = getPomFile("artifact-test")
+		testPomFile.assertExclusion("http-builder", null, "commons-lang")
+		testPomFile.assertExclusion("spock-core", "org.codehaus.groovy", null)
+		testPomFile.assertExclusion("spock-core", "org.hamcrest", null)
 	}
 
 }
