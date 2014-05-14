@@ -139,18 +139,6 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		System.setProperty("java.io.tmpdir", originalTmpDir)
 	}
 
-	def "apply should add Built-Date and Build-Jdk to jar manifest"() {
-		given:
-		String expectedJavaVersion = System.getProperty('java.version')
-
-		when:
-		applyPlugin()
-
-		then:
-		project.jar.manifest.attributes['Built-Date'] != null
-		project.jar.manifest.attributes['Build-Jdk'] == expectedJavaVersion
-	}
-
 	def "apply should set default jar baseName and allow override"() {
 		given:
 		Jar jarTask = project.tasks.create('jarTask', Jar)
