@@ -274,6 +274,9 @@ dependencies {
 	}
 }
 
+configurations.mainTestCompile { exclude module: 'commons-logging' }
+configurations.all { exclude group: 'xml-resolver', module: 'xml-resolver' }
+
 publishing_ext {
 	publication('mainTest')
 }
@@ -285,10 +288,12 @@ publishing_ext {
 		then:
 		PomFile pomFile = getPomFile("artifact")
 		pomFile.assertExclusion("http-builder", "*", "commons-lang")
+		pomFile.assertExclusion("http-builder", "xml-resolver", "xml-resolver")
 		PomFile testPomFile = getPomFile("artifact-test")
-		testPomFile.assertExclusion("http-builder", "*", "commons-lang")
 		testPomFile.assertExclusion("spock-core", "org.codehaus.groovy", "*")
 		testPomFile.assertExclusion("spock-core", "org.hamcrest", "*")
+		testPomFile.assertExclusion("spock-core", "*", "commons-logging")
+		testPomFile.assertExclusion("spock-core", "xml-resolver", "xml-resolver")
 	}
 
 }
