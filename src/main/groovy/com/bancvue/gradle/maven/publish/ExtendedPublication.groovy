@@ -19,6 +19,7 @@ import com.bancvue.gradle.categories.ProjectCategory
 import groovy.util.logging.Slf4j
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.bundling.Jar
@@ -68,6 +69,12 @@ class ExtendedPublication {
 		setJarTaskIfNotSet()
 		if (publishSources) {
 			setSourceJarTaskIfNotSet()
+		}
+	}
+
+	boolean isArchiveAttachedToRuntimeConfiguration() {
+		runtimeConfiguration.artifacts.find { PublishArtifact artifact ->
+			artifact.file == archiveTask.archivePath
 		}
 	}
 
@@ -160,7 +167,8 @@ class ExtendedPublication {
 			try {
 				property.setProperty(this, argArray[0])
 				return
-			} catch (Exception ex) {}
+			} catch (Exception ex) {
+			}
 		}
 		throw new MissingMethodException(methodName, this.class, args)
 	}

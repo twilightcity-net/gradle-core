@@ -18,13 +18,10 @@ package com.bancvue.gradle.maven.publish
 import com.bancvue.gradle.license.LicenseExtPlugin
 import com.bancvue.gradle.license.LicenseExtProperties
 import com.bancvue.gradle.license.LicenseModel
+import com.bancvue.gradle.multiproject.PostEvaluationNotifier
 import groovy.util.logging.Slf4j
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.DependencySet
-import org.gradle.api.artifacts.ExcludeRule
-import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.publish.maven.MavenPublication
 
 @Slf4j
@@ -34,7 +31,16 @@ class MavenPublishExtExtension {
 
 	private Configurator publicationConfigurator
 
+	private static final PostEvaluationNotifier POST_EVAL_NOTIFIER = new PostEvaluationNotifier(
+			{ Project project ->
+				MavenPublishExtExtension publishExtExtension = project.extensions.findByName(NAME)
+				publishExtExtension?.attachDependenciesToMavenPublications()
+			})
+
+
 	MavenPublishExtExtension(Project project) {
+		POST_EVAL_NOTIFIER.addProject(project)
+
 		this.publicationConfigurator = new Configurator(project)
 
 		Configurator configurator = publicationConfigurator
@@ -51,6 +57,31 @@ class MavenPublishExtExtension {
 		}
 	}
 
+	/**
+	 * NOTE: this hack is here b/c I couldn't figure out any other way to resolve module dependencies of a
+	 * multi-module build as external dependencies.
+	 * For example, if one module (moduleA) depends on another (moduleB), and both modules are published, moduleB
+	 * needs to be recognized as a transitive dependency of moduleA.  Specifically, the artifact published
+	 * from moduleB needs to be recognized as a transitive dependency in the pom file of moduleA.
+	 * For single builds, this is not a problem.  For multi-module builds, the publication of the
+	 * dependant build may not yet be set up and so it's not possible to derive the maven publication
+	 * from the project configuration.  To work around, dependencies are attached to the pom after
+	 * all sub-modules have been evaluated.
+	 *
+	 * See MavenPublishExtPluginMultiModuleIntegrationSpecification for test cases
+	 */
+	void attachDependenciesToMavenPublications() {
+		Configurator configurator = publicationConfigurator
+
+		configurator.project.publishing.publications {
+			configurator.getPublicationsToApply().each { ExtendedPublication extendedPublication ->
+				"${extendedPublication.name}"(MavenPublication) { MavenPublication mavenPublication ->
+					configurator.attachDependenciesToMavenPublication(extendedPublication, mavenPublication)
+				}
+			}
+		}
+	}
+
 	void publication(String id, Closure configure = null) {
 		publicationConfigurator.addPublication(id, configure)
 	}
@@ -60,7 +91,7 @@ class MavenPublishExtExtension {
 
 		private Project project
 		private DependencyResolver dependencyResolver
-		private Map<String,ExtendedPublication> publicationMap = [:]
+		private Map<String, ExtendedPublication> publicationMap = [:]
 
 		Configurator(Project project) {
 			this.project = project
@@ -96,10 +127,17 @@ class MavenPublishExtExtension {
 			if (extendedPublication.artifactId != null) {
 				mavenPublication.artifactId = extendedPublication.artifactId
 			}
+
+			addArtifactToRuntimeConfigurationIfNotAlreadyAdded(extendedPublication)
 			addBasicDescriptionToMavenPOM(extendedPublication, mavenPublication)
 			attachLicenseToMavenPOMIfLicenseExtPluginApplied(mavenPublication)
 			attachAdditionalArtifactsToMavenPublication(extendedPublication, mavenPublication)
-			attachDependenciesToMavenPublication(extendedPublication, mavenPublication)
+		}
+
+		private void addArtifactToRuntimeConfigurationIfNotAlreadyAdded(ExtendedPublication extendedPublication) {
+			if (!extendedPublication.isArchiveAttachedToRuntimeConfiguration()) {
+				project.artifacts.add(extendedPublication.runtimeConfiguration.name, extendedPublication.archiveTask)
+			}
 		}
 
 		private void addBasicDescriptionToMavenPOM(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
@@ -179,74 +217,6 @@ class MavenPublishExtExtension {
 					}
 				}
 			}
-		}
-
-	}
-
-	private static class DependencyResolver {
-		private Project project
-
-		DependencyResolver(Project project1) {
-			this.project = project1
-		}
-
-
-		List<Exclusion> getDependencyExclusions(Dependency dependency) {
-			List<ExcludeRule> excludeRules = getDependencyExcludeRules(dependency)
-
-			excludeRules.findAll { ExcludeRule excludeRule ->
-				excludeRule.group || excludeRule.module
-			}.collectAll { ExcludeRule excludeRule ->
-				new Exclusion(excludeRule)
-			}
-		}
-
-		List<ExcludeRule> getDependencyExcludeRules(Dependency dependency) {
-			Set<ExcludeRule> excludeRules = []
-
-			if (dependency instanceof ModuleDependency) {
-				excludeRules.addAll(((ModuleDependency) dependency).excludeRules)
-
-				Configuration configuration = getConfigurationContainingDependency(dependency)
-				if (configuration != null) {
-					excludeRules.addAll(configuration.excludeRules)
-				}
-			}
-			excludeRules as List
-		}
-
-		private Configuration getConfigurationContainingDependency(Dependency dependency) {
-			project.configurations.find { Configuration config ->
-				config.dependencies.find {
-					dependency.is(it)
-				}
-			}
-		}
-
-		Set getRuntimeDependencies(ExtendedPublication publication) {
-			DependencySet allDependencies = publication.runtimeConfiguration.allDependencies
-
-			allDependencies.findAll { Dependency aDependency ->
-				aDependency.group && aDependency.name && aDependency.version
-			}
-		}
-	}
-
-	private static class Exclusion {
-		private String groupId
-		private String artifactId
-
-		public Exclusion(ExcludeRule excludeRule) {
-			groupId = excludeRule.group
-			artifactId = excludeRule.module
-		}
-
-		String getGroupId() {
-			groupId ?: "*"
-		}
-
-		String getArtifactId() {
-			artifactId ?: "*"
 		}
 	}
 
