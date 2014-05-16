@@ -18,7 +18,7 @@ package com.bancvue.gradle.pmd
 import com.bancvue.gradle.test.AbstractPluginIntegrationSpecification
 import org.gradle.tooling.BuildException
 
-class PmdCpdPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
+class CpdPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
 	def "should detect cpd violation and write xml and html report"() {
 		given:

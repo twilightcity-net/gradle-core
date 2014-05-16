@@ -20,7 +20,7 @@ import org.gradle.api.plugins.quality.PmdExtension
 import org.gradle.api.plugins.quality.internal.AbstractCodeQualityPlugin
 import org.gradle.api.tasks.SourceSet
 
-class PmdCpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
+class CpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 
 	static final String PLUGIN_NAME = 'pmdcpd'
 
