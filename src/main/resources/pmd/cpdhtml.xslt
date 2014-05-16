@@ -63,7 +63,7 @@
         	<td>
         		<table>
         			<xsl:for-each select="file">
-        				<tr><td><a><xsl:attribute name="href">../src/<xsl:value-of select="@path"/>.html#<xsl:value-of select="@line"/></xsl:attribute><xsl:value-of select="@path"/></a></td><td> line <xsl:value-of select="@line"/></td></tr>
+        				<tr><td><a><xsl:attribute name="href"><xsl:value-of select="@path"/>#<xsl:value-of select="@line"/></xsl:attribute><xsl:value-of select="@path"/></a></td><td> line <xsl:value-of select="@line"/></td></tr>
         			</xsl:for-each>
         		</table>
         	</td>
