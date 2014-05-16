@@ -116,6 +116,7 @@ See the [integration test](https://github.com/BancVue/GradlePluginsCore/blob/mas
 for various example examples usages.
 
 
+
 ## TestExtPlugin (test-ext)
 
 The [java](http://www.gradle.org/docs/current/userguide/java_plugin.html)
@@ -156,6 +157,33 @@ from all exception stack traces.
 Skipped events are output to the console in addition to test faiures.
 
 
+
+## CpdPlugin
+
+This plugin wraps the CPD ant task, part of the [PMD](http://pmd.sourceforge.net/) source code analyzer project.
+
+The plugin extends the gradle AbstractCodeQualityPlugin which results in a CPD task for each SourceSet of each
+project in the build.  For multi-project builds, this is problematic since the underlying CPD implementation is
+not thread safe and CPD will fail when the build is parallelized.
+
+Therefore, the default mode of this plugin is to disable the individual CPD tasks and create a single unified
+CPD task (cpdAll) at the project root level which runs CPD across all SourceSets of all projects in the build.
+This has the added advantage of catching copy-paste errors across SourceSets.
+
+If for some reason you need to disable this behavior, just disable the unified report like so...
+
+    cpd {
+        createUnifiedReport = false
+    }
+
+
+#### Added tasks
+
+* cpd<SourceSet name>, executes CPD for the given source set
+* cpdAll (if unifed report enabled), executes CPD across all source sets in the build
+
+
+
 ## NamedTestConfigurationPlugin (component-test, integration-test)
 
 This plugin is not directly applied but is meant for extension by other plugins.
@@ -166,12 +194,13 @@ TODO: shouldn't <named test configuration> dependencies come before test depende
 
 ## ComponentTestPlugin (component-test)
 
-Adds a test configuration named 'component-test'
+Adds a test configuration named 'component-test'.
 
 
 ## IntegrationTestPlugin (integration-test)
 
 Adds a test configuration named 'integration-test'.
+
 
 
 ## IdeExtPlugin (ide-ext)

@@ -15,18 +15,60 @@
  */
 package com.bancvue.gradle.pmd
 
+import com.bancvue.gradle.multiproject.PostEvaluationNotifier
+import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.DependencySet
+import org.gradle.api.file.FileTree
+import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.quality.CodeQualityExtension
-import org.gradle.api.plugins.quality.PmdExtension
 import org.gradle.api.plugins.quality.internal.AbstractCodeQualityPlugin
 import org.gradle.api.tasks.SourceSet
 
 class CpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 
-	static final String PLUGIN_NAME = 'pmdcpd'
+	static final String PLUGIN_NAME = 'cpd'
+
+	static final String UNIFIED_REPORT_TASK_NAME = "cpdAll"
+
+	private static final PostEvaluationNotifier POST_EVAL_NOTIFIER = new PostEvaluationNotifier(
+			{ List<Project> projects ->
+				Project rootProject = projects[0].rootProject
+				CpdPlugin cpdPlugin = rootProject.plugins.findPlugin(PLUGIN_NAME)
+				if (cpdPlugin) {
+					cpdPlugin.conditionallyCreateUnifiedReport(projects)
+				}
+			})
+
+
+
+	private void conditionallyCreateUnifiedReport(List<Project> projects) {
+		if (shouldCreateUnifiedReport()) {
+			List<FileTree> cpdSourceFiles = getAllCpdSourceFiles(projects)
+
+			Cpd task = project.tasks.create(name: UNIFIED_REPORT_TASK_NAME, type: Cpd,
+					description: 'Run CPD analysis for all sources', overwrite: true)
+			task.source(cpdSourceFiles)
+			project.plugins.withType(JavaBasePlugin) {
+				project.tasks.findByName('check').dependsOn(task)
+			}
+		}
+	}
+
+	private List<FileTree> getAllCpdSourceFiles(List<Project> projects) {
+		List<FileTree> sourceFiles = []
+		projects.each { Project project ->
+			project.tasks.withType(Cpd).each { Cpd cpd ->
+				sourceFiles.add(cpd.source)
+			}
+		}
+		sourceFiles
+	}
+
 
 	@Override
 	protected void beforeApply() {
-		project.apply(plugin: 'pmd')
+		POST_EVAL_NOTIFIER.addProject(project)
 	}
 
 	@Override
@@ -41,20 +83,33 @@ class CpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 
 	@Override
 	protected CodeQualityExtension createExtension() {
-		PmdExtension pmdExtension = project.extensions.getByName('pmd')
 		CodeQualityExtension cpdExtension = project.extensions.create("cpd", CpdExtension)
-		cpdExtension.with {
-			toolVersion = pmdExtension.toolVersion
-		}
+		cpdExtension.toolVersion = "5.1.1"
 		cpdExtension
+	}
+
+	protected void createConfigurations() {
+		super.createConfigurations()
+
+		Configuration cpdConfiguration = project.configurations.getByName(configurationName)
+		cpdConfiguration.incoming.beforeResolve {
+			DependencySet dependencies = cpdConfiguration.dependencies
+			if (dependencies.isEmpty()) {
+				dependencies.add(project.dependencies.create(getPmdDependencyGav()))
+			}
+		}
+	}
+
+	private String getPmdDependencyGav() {
+		int toolMajorVersion = extension.toolVersion.replaceFirst(/\..*/, "") as int
+		String pmdGroupId = (toolMajorVersion < 5) ? "pmd" : "net.sourceforge.pmd"
+		"${pmdGroupId}:pmd:${extension.toolVersion}"
 	}
 
 	@Override
 	protected void configureTaskDefaults(Cpd task, String baseName) {
 		task.conventionMapping.with {
-			cpdClasspath = {
-				project.configurations['pmd']
-			}
+			cpdClasspath = { project.configurations['cpd'] }
 			cpdXsltPath = { extension.cpdXsltPath }
 			minimumTokenCount = { extension.minimumTokenCount }
 			ignoreLiterals = { extension.ignoreLiterals }
@@ -74,8 +129,16 @@ class CpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 	protected void configureForSourceSet(SourceSet sourceSet, Cpd task) {
 		task.with {
 			description = "Run CPD analysis for ${sourceSet.name} classes"
+			setSource(sourceSet.allJava)
+			onlyIf {
+				shouldCreateUnifiedReport() == false
+			}
 		}
-		task.setSource(sourceSet.allJava)
+	}
+
+	private boolean shouldCreateUnifiedReport() {
+		CpdExtension extension = project.rootProject.extensions.getByName(CpdExtension.NAME)
+		extension.createUnifiedReport
 	}
 
 }

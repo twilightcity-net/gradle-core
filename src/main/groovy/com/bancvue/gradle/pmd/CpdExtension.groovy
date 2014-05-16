@@ -19,6 +19,8 @@ import org.gradle.api.plugins.quality.CodeQualityExtension
 
 class CpdExtension extends CodeQualityExtension {
 
+	static final String NAME = 'cpd'
+
 	int minimumTokenCount = 50
 
 	boolean ignoreLiterals = false
@@ -26,5 +28,14 @@ class CpdExtension extends CodeQualityExtension {
 	boolean ignoreIdentifiers = false
 
 	String cpdXsltPath = "pmd/cpdhtml.xslt"
+
+	/**
+	 * If true (the default), a task named 'cpdAll' will be created at the root project level and all
+	 * other CPD tasks will be disabled.  This task will operate on all java sources across any project
+	 * which applies the 'cpd' plugin.
+	 * NOTE: though the CPD plugin can be defined on any project within a multi-project build, this
+	 * particular setting will only be recognized whne defined on the root project.
+	 */
+	boolean createUnifiedReport = true
 
 }
