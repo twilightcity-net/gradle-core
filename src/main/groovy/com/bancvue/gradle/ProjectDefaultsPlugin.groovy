@@ -99,7 +99,6 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	private void addBuildDateAndJdkToJarManifest() {
 		project.tasks.withType(Jar) { Jar jar ->
 			manifest {
-				attributes 'Built-Date': new Date()
 				attributes 'Build-Jdk': System.getProperty('java.version')
 			}
 		}
