@@ -26,6 +26,7 @@ abstract class AbstractPluginIntegrationSpecification extends Specification {
 
 	@Rule
 	public TemporaryFolder projectDir = new TemporaryFolder()
+	protected boolean runWithStacktrace = true
 	protected ProjectFileSystem projectFS
 	protected GradleRunner runner
 
@@ -38,6 +39,9 @@ abstract class AbstractPluginIntegrationSpecification extends Specification {
 
 	protected ExecutionResult run(String... args) {
 		runner.arguments.addAll(args)
+		if (runWithStacktrace) {
+			runner.arguments.add("--stacktrace")
+		}
 
 		runner.run()
 	}
