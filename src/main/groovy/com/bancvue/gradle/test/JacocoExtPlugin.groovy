@@ -15,6 +15,7 @@
  */
 package com.bancvue.gradle.test
 
+import com.bancvue.gradle.multiproject.PostEvaluationNotifier
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -30,13 +31,33 @@ class JacocoExtPlugin implements Plugin<Project> {
 
 	private Project project
 
+	private static final PostEvaluationNotifier POST_EVAL_NOTIFIER = new PostEvaluationNotifier({ Project aProject ->
+		Task mergeAll = aProject.tasks.findByName("jacocoAllMerge")
+		if (mergeAll) {
+			aProject.subprojects.each { Project subProject ->
+				mergeAll.dependsOn(subProject.tasks.withType(JacocoMerge))
+			}
+		}
+	})
+
 	@Override
 	void apply(Project project) {
 		this.project = project
 		project.apply(plugin: "jacoco")
+		addPluginExtension()
 		addJacocoTestReportsForAllTestTasks()
 		addConsolidatedJacocoReportTask()
 		addCoverageTask()
+
+		POST_EVAL_NOTIFIER.addProject(project)
+	}
+
+	private void addPluginExtension() {
+		project.extensions.create(JacocoExtExtension.NAME, JacocoExtExtension)
+	}
+
+	private JacocoExtExtension getPluginExtension() {
+		project.extensions.getByName(JacocoExtExtension.NAME) as JacocoExtExtension
 	}
 
 	private void addJacocoTestReportsForAllTestTasks() {
@@ -53,10 +74,10 @@ class JacocoExtPlugin implements Plugin<Project> {
 		reportTask.executionData(testTask)
 	}
 
-	private FileCollection getAllJacocoReportExecutionDataAsFileCollection(JacocoReport excludedReport) {
+	private FileCollection getExecutionDataForMergeAllTaskAsFileCollection(JacocoReportExt excludedReport) {
 		Set files = []
-		project.tasks.withType(JacocoReport) { JacocoReport report ->
-			if (!report.is(excludedReport)) {
+		getProjectsToIncludeForMergeAllTask().each { Project aProject ->
+			getAllReportsExcept(aProject, excludedReport).each { JacocoReport report ->
 				files.addAll(report.executionData.findAll {
 					it.exists()
 				})
@@ -65,11 +86,28 @@ class JacocoExtPlugin implements Plugin<Project> {
 		project.files(files)
 	}
 
-	private JacocoMerge createJacocoMergeAllTask(JacocoReport excludeReport) {
+	private Set<Project> getProjectsToIncludeForMergeAllTask() {
+		shouldIncludeSubProjectsInAllReport() ? project.allprojects : [project]
+	}
+
+	private boolean shouldIncludeSubProjectsInAllReport() {
+		getPluginExtension().includeSubProjectsInAllReport
+	}
+
+	private Set<JacocoReport> getAllReportsExcept(Project project, JacocoReport excludeReport) {
+		project.tasks.withType(JacocoReport).findAll { JacocoReport report ->
+			!report.is(excludeReport)
+		}
+	}
+
+	private JacocoMerge createJacocoMergeAllTask(JacocoReportExt excludeReport) {
 		JacocoMerge mergeAll = project.tasks.create("jacocoAllMerge", JacocoMerge)
-		mergeAll.ext.visible = false
-		mergeAll.conventionMapping.map("executionData") {
-			getAllJacocoReportExecutionDataAsFileCollection(excludeReport)
+		mergeAll.configure {
+			ext.visible = false
+			mustRunAfter(getAllReportsExcept(project, excludeReport))
+		}
+		mergeAll.conventionMapping.with {
+			executionData = { getExecutionDataForMergeAllTaskAsFileCollection(excludeReport) }
 		}
 		mergeAll
 	}
@@ -78,12 +116,15 @@ class JacocoExtPlugin implements Plugin<Project> {
 		JacocoReportExt reportAll = project.tasks.create("jacocoAllReport", JacocoReportExt)
 		JacocoMerge mergeAll = createJacocoMergeAllTask(reportAll)
 
-		reportAll.dependsOn(mergeAll)
-		reportAll.description = "Generates a consolidated coverage report for the entire project"
-		reportAll.reportCategory = "all"
-		reportAll.conventionMapping.map("executionData", {
-			mergeAll.executionData
-		})
+		reportAll.configure {
+			description = "Generates a consolidated coverage report for the entire project (including any sub-projects)"
+			reportCategory = "all"
+			dependsOn(mergeAll)
+		}
+		reportAll.conventionMapping.with {
+			includeSubProjects = { shouldIncludeSubProjectsInAllReport() }
+			executionData = { project.files(mergeAll.destinationFile) }
+		}
 	}
 
 	private void addCoverageTask() {
@@ -93,8 +134,8 @@ class JacocoExtPlugin implements Plugin<Project> {
 			group = TestExtPlugin.VERIFICATION_GROUP_NAME
 			description = "Execute all tests and generate coverage reports"
 			Task check = project.tasks.getByName("check")
-			dependsOn { check }
-			mustRunAfter { check }
+			dependsOn(check)
+			mustRunAfter(check)
 		}
 		project.tasks.withType(JacocoReport) { JacocoReport report ->
 			coverage.dependsOn(report)

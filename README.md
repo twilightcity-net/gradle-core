@@ -116,6 +116,22 @@ See the [integration test](https://github.com/BancVue/GradlePluginsCore/blob/mas
 for various example examples usages.
 
 
+## JacocoExtPlugin (jacoco-ext)
+
+The [jacoco](http://www.gradle.org/docs/current/userguide/jacoco_plugin.html)
+plugin is applied, adding basic code coverage support.
+
+This plugin enhances the standard jacoco plugin.  A jacoco report task is automatically created for all tasks of
+type Test.  By default, any sourceSet whose name starts with 'main' is automatically associated to the jacoco report
+task, though this may be overridden by applying sourceSets to the report task.
+
+In addition, an 'all' report task is created which produces a merged report for the project.  By default, all
+sub-projects are also included in the 'all' report, though this may be disabled via the jacoco-ext extension.
+
+    jacoco_ext {
+        includeSubProjectsInAllReport = false
+    }
+
 
 ## TestExtPlugin (test-ext)
 

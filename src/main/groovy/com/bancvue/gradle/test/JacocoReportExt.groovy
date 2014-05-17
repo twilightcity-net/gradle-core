@@ -16,6 +16,7 @@
 package com.bancvue.gradle.test
 
 import groovy.util.logging.Slf4j
+import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.reporting.Report
 import org.gradle.api.tasks.SourceSet
@@ -37,9 +38,15 @@ class JacocoReportExt extends JacocoReport {
 		}
 
 		private Set<SourceSet> getAllMainSourceSets() {
-			report.project.sourceSets.findAll { SourceSet sourceSet ->
-				sourceSet.name.startsWith("main")
-			}
+			projects.collect { Project project ->
+				project.sourceSets.findAll { SourceSet sourceSet ->
+					sourceSet.name.startsWith("main")
+				}
+			}.flatten() as Set<SourceSet>
+		}
+
+		private Set<Project> getProjects() {
+			report.includeSubProjects ? report.project.allprojects : [report.project]
 		}
 
 		private Set<SourceSet> getSourceSetsOrDefaults() {
@@ -53,7 +60,7 @@ class JacocoReportExt extends JacocoReport {
 			}
 
 			getSourceSetsOrDefaults().each { SourceSet sourceSet ->
-				sourceDirs = sourceDirs + report.project.files(sourceSet.allJava.srcDirs)
+				sourceDirs += report.project.files(sourceSet.allJava.srcDirs)
 			}
 			sourceDirs
 		}
@@ -65,7 +72,7 @@ class JacocoReportExt extends JacocoReport {
 			}
 
 			getSourceSetsOrDefaults().each { SourceSet sourceSet ->
-				classDirs = classDirs + sourceSet.output
+				classDirs += sourceSet.output
 			}
 			classDirs
 		}
@@ -79,14 +86,15 @@ class JacocoReportExt extends JacocoReport {
 	// }
 	//
 	Set<SourceSet> internalSourceSets = []
+	boolean includeSubProjects = false
 
 	@Inject
 	JacocoReportExt(Instantiator instantiator) {
 		super(instantiator)
 
 		group = TestExtPlugin.VERIFICATION_GROUP_NAME
-		ReportDirectoryCollector collector = new ReportDirectoryCollector(this)
 		getProject().afterEvaluate {
+			ReportDirectoryCollector collector = new ReportDirectoryCollector(this)
 			sourceDirectories = collector.collectSourceDirs()
 			classDirectories = collector.collectClassDirs()
 		}
@@ -110,8 +118,8 @@ class JacocoReportExt extends JacocoReport {
 		}
 
 		reports.all { Report report ->
+			report.enabled = true
 			report.conventionMapping.with {
-				enabled = { true }
 				destination = {
 					getReportDestinationFile(jacocoReportsDir, report, reportCategory)
 				}
