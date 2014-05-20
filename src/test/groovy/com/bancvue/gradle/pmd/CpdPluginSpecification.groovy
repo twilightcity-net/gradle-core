@@ -17,10 +17,10 @@ package com.bancvue.gradle.pmd
 
 import com.bancvue.gradle.test.AbstractPluginSpecification
 
-class PmdCpdPluginSpecification extends AbstractPluginSpecification {
+class CpdPluginSpecification extends AbstractPluginSpecification {
 
 	String getPluginName() {
-		PmdCpdPlugin.PLUGIN_NAME
+		CpdPlugin.PLUGIN_NAME
 	}
 
 	void setup() {

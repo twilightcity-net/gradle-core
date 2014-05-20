@@ -42,7 +42,17 @@ abstract class AbstractProjectSpecification extends Specification {
                 .build()
     }
 
-    protected void setArtifactId(String artifactId) {
+	protected Project createSubProject(String subProjectName) {
+		File subProjectDir = projectFS.file(subProjectName)
+
+		ProjectBuilder.builder()
+				.withName(subProjectName)
+				.withProjectDir(subProjectDir)
+				.withParent(project)
+				.build()
+	}
+
+	protected void setArtifactId(String artifactId) {
         project.ext['artifactId'] = artifactId
     }
 }
