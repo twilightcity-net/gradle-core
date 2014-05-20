@@ -37,6 +37,11 @@ class PomFile extends File {
 		assert dependency: "Dependency for artifactId=${artifactId} not found"
 	}
 
+	void assertNoDependency(String artifactId) {
+		Node dependency = findDependencyNode(artifactId)
+		assert !dependency: "Dependency unexpectedly found for artifactId=${artifactId}"
+	}
+
 	Node findExclusionNode(String dependencyArtifactId, String exclusionGroupId, String exclusionArtifactId) {
 		Node dependency = pom.dependencies.dependency.find { it.artifactId.text() == dependencyArtifactId }
 		dependency.exclusions.exclusion.find {
