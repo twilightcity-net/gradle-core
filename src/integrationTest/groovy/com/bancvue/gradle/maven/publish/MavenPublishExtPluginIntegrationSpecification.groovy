@@ -298,4 +298,35 @@ publishing_ext {
 		testPomFile.assertExclusion("spock-core", "xml-resolver", "xml-resolver")
 	}
 
+	def "should publish dependency pom without project archives if no source set is defined"() {
+		given:
+		setupLocalMavenRepoAndApplyPlugin()
+		buildFile << """
+repositories {
+	mavenCentral()
+}
+
+configurations {
+	clientCompile
+	clientRuntime.extendsFrom(clientCompile)
+}
+
+dependencies {
+	clientCompile "org.slf4j:log4j-over-slf4j:1.7.5"
+}
+
+publishing_ext {
+	publication('client')
+}
+"""
+
+		when:
+		run("publish")
+
+		then:
+		PomFile pomFile = getPomFile("artifact-client")
+		pomFile.assertDependency("log4j-over-slf4j")
+		!getUploadedArtifact("artifact-client").exists()
+	}
+
 }
