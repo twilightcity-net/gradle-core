@@ -123,19 +123,28 @@ class MavenPublishExtExtension {
 		}
 
 		private void configureMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
-			mavenPublication.artifact(extendedPublication.archiveTask)
 			if (extendedPublication.artifactId != null) {
 				mavenPublication.artifactId = extendedPublication.artifactId
 			}
 
+			attachArtifactsToMavenPublication(extendedPublication, mavenPublication)
 			addArtifactToRuntimeConfigurationIfNotAlreadyAdded(extendedPublication)
 			addBasicDescriptionToMavenPOM(extendedPublication, mavenPublication)
 			attachLicenseToMavenPOMIfLicenseExtPluginApplied(mavenPublication)
-			attachAdditionalArtifactsToMavenPublication(extendedPublication, mavenPublication)
+		}
+
+		private void attachArtifactsToMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
+			if (extendedPublication.archiveTask) {
+				mavenPublication.artifact(extendedPublication.archiveTask)
+			}
+
+			if (extendedPublication.sourcesArchiveTask && extendedPublication.publishSources) {
+				mavenPublication.artifact(extendedPublication.sourcesArchiveTask)
+			}
 		}
 
 		private void addArtifactToRuntimeConfigurationIfNotAlreadyAdded(ExtendedPublication extendedPublication) {
-			if (!extendedPublication.isArchiveAttachedToRuntimeConfiguration()) {
+			if (extendedPublication.archiveTask && !extendedPublication.isArchiveAttachedToRuntimeConfiguration()) {
 				project.artifacts.add(extendedPublication.runtimeConfiguration.name, extendedPublication.archiveTask)
 			}
 		}
@@ -178,12 +187,6 @@ class MavenPublishExtExtension {
 						}
 					}
 				}
-			}
-		}
-
-		private void attachAdditionalArtifactsToMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
-			if (extendedPublication.publishSources) {
-				mavenPublication.artifact(extendedPublication.sourcesArchiveTask)
 			}
 		}
 

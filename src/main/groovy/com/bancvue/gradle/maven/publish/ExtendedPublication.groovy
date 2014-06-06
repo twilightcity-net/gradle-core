@@ -62,10 +62,10 @@ class ExtendedPublication {
 	 */
 	void deriveUnsetVariables() {
 		setArtifactIdIfNotSet()
+		setRuntimeConfigurationIfNotSet()
 		// NOTE: order is important!  sourceSet must be defined prior to the jar tasks since they may require
 		// the sourceSet if the tasks need to be dynamically constructed
 		setSourceSetIfNotSet()
-		setRuntimeConfigurationIfNotSet()
 		setJarTaskIfNotSet()
 		if (publishSources) {
 			setSourceJarTaskIfNotSet()
@@ -74,7 +74,7 @@ class ExtendedPublication {
 
 	boolean isArchiveAttachedToRuntimeConfiguration() {
 		runtimeConfiguration.artifacts.find { PublishArtifact artifact ->
-			artifact.file == archiveTask.archivePath
+			archiveTask && (artifact.file == archiveTask.archivePath)
 		}
 	}
 
@@ -98,7 +98,9 @@ class ExtendedPublication {
 
 	private void setSourceSetIfNotSet() {
 		if (sourceSet == null) {
-			sourceSet = project.sourceSets.getByName(resolver.sourceSetName)
+			// findByName is used b/c SourceSet is optional; if not set and no archive tasks are available,
+			// then no archives will be attached to the maven publication
+			sourceSet = project.sourceSets.findByName(resolver.sourceSetName)
 		}
 	}
 
@@ -121,7 +123,17 @@ class ExtendedPublication {
 		Jar jarTask = project.tasks.findByName(jarTaskName)
 
 		if (jarTask == null) {
+			jarTask = createJarTaskIfSourceSetAvailable(jarTaskName, isSourceJar)
+		}
+		jarTask
+	}
+
+	private Jar createJarTaskIfSourceSetAvailable(String jarTaskName, boolean isSourceJar) {
+		Jar jarTask = null
+		if (sourceSet != null) {
 			jarTask = createJarTask(jarTaskName, isSourceJar)
+		} else {
+			log.warn("Failed to resolve archive task=${jarTaskName} and unable to create task due to undefined SourceSet")
 		}
 		jarTask
 	}
