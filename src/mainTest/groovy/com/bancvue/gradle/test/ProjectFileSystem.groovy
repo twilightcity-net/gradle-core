@@ -35,10 +35,13 @@ class ProjectFileSystem extends TestFile {
 		file("build.gradle")
 	}
 
-	TestFile emptyClassFile(String filePath) {
+	TestFile emptyClassFile(String filePath, String content = "") {
 		TestFile classFile = file(filePath)
 		String className = FilenameUtils.getBaseName(classFile.name)
-		classFile << "class ${className} {}"
+		classFile << """class ${className} {
+${content}
+}
+"""
 		classFile
 	}
 }

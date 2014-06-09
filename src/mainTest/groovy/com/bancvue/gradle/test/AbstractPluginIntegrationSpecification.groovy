@@ -58,8 +58,8 @@ abstract class AbstractPluginIntegrationSpecification extends Specification {
 		projectFS.file(relativePath)
 	}
 
-	protected TestFile emptyClassFile(String filePath) {
-		projectFS.emptyClassFile(filePath)
+	protected TestFile emptyClassFile(String filePath, String content = "") {
+		projectFS.emptyClassFile(filePath, content)
 	}
 
 }

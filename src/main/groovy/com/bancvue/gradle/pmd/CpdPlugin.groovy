@@ -19,7 +19,7 @@ import com.bancvue.gradle.multiproject.PostEvaluationNotifier
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.DependencySet
-import org.gradle.api.file.FileTree
+import org.gradle.api.internal.file.UnionFileTree
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.quality.CodeQualityExtension
 import org.gradle.api.plugins.quality.internal.AbstractCodeQualityPlugin
@@ -44,8 +44,7 @@ class CpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 
 	private void conditionallyCreateUnifiedReport(List<Project> projects) {
 		if (shouldCreateUnifiedReport()) {
-			List<FileTree> cpdSourceFiles = getAllCpdSourceFiles(projects)
-
+			Set<File> cpdSourceFiles = getAllCpdSourceFiles(projects)
 			Cpd task = project.tasks.create(name: UNIFIED_REPORT_TASK_NAME, type: Cpd,
 					description: 'Run CPD analysis for all sources', overwrite: true)
 			task.source(cpdSourceFiles)
@@ -55,14 +54,14 @@ class CpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 		}
 	}
 
-	private List<FileTree> getAllCpdSourceFiles(List<Project> projects) {
-		List<FileTree> sourceFiles = []
+	private Set<File> getAllCpdSourceFiles(List<Project> projects) {
+		UnionFileTree allCpdSource = new UnionFileTree()
 		projects.each { Project project ->
 			project.tasks.withType(Cpd).each { Cpd cpd ->
-				sourceFiles.add(cpd.source)
+				allCpdSource.add(cpd.source)
 			}
 		}
-		sourceFiles
+		allCpdSource.files
 	}
 
 
