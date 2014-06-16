@@ -108,6 +108,38 @@ apply plugin: 'test-ext'
 		file("build/reports/cpd/all.xml").text =~ /duplication/
 	}
 
+	def "should not fail if same file appears in multiple source sets"() {
+		String classFileContent = ""
+		for (int i = 0; i < 5; i++) {
+			classFileContent += "	public void method${i}() {}"
+		}
+		emptyClassFile("src/main/java/bv/SomeClass.java", classFileContent)
+		buildFile << """
+sourceSets {
+	client {
+		java {
+			srcDir "src/main/java"
+		}
+	}
+}
+"""
+
+		when:
+		run("check")
+
+		then:
+		notThrown(BuildException)
+
+		// verify the content of the file would actually generate a cpd failure
+		when:
+		emptyClassFile("src/main/java/bv/OtherClass.java", classFileContent)
+		run("check")
+
+		then:
+		thrown(BuildException)
+		file("build/reports/cpd/all.xml").text =~ /duplication/
+	}
+
 	def "should work with pmd versions < 5"() {
 		given:
 		classFileWithDuplicateTokens("src/main/java/Class.java", minTokenCount)
