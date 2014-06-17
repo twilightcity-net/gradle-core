@@ -22,6 +22,7 @@ import groovy.util.logging.Slf4j
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 @Slf4j
 @Mixin(GradlePluginMixin)
@@ -38,6 +39,10 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		project.apply(plugin: JavaExtPlugin.PLUGIN_NAME)
 		addArtifactDependencyAndPublishingSupport()
 		addPublishingExtExtension()
+		project.tasks.withType(PublishToMavenRepository) {
+			it.dependsOn('assemble')
+			it.mustRunAfter('assemble')
+		}
 	}
 
 	private void addPublishingExtExtension() {

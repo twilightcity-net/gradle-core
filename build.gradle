@@ -23,7 +23,9 @@ repositories {
 dependencies {
 	compile localGroovy()
 	compile gradleApi()
-	compile "nl.javadude.gradle.plugins:license-gradle-plugin:0.7.0"
+	compile ("nl.javadude.gradle.plugins:license-gradle-plugin:0.7.0") {
+		exclude group: 'com.google.guava'
+	}
 
 	mainTestCompile('org.spockframework:spock-core:0.7-groovy-1.8') {
 		exclude group: 'org.codehaus.groovy'

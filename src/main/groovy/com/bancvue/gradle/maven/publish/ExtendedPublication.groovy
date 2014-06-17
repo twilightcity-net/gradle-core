@@ -20,6 +20,7 @@ import groovy.util.logging.Slf4j
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.PublishArtifact
+import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.bundling.Jar
@@ -87,12 +88,14 @@ class ExtendedPublication {
 	private void setJarTaskIfNotSet() {
 		if (archiveTask == null) {
 			archiveTask = findOrCreateJarTask()
+			project.getTasks().getByName(BasePlugin.ASSEMBLE_TASK_NAME).dependsOn(archiveTask);
 		}
 	}
 
 	private void setSourceJarTaskIfNotSet() {
 		if (sourcesArchiveTask == null) {
 			sourcesArchiveTask = findOrCreateSourcesJarTask()
+			project.getTasks().getByName(BasePlugin.ASSEMBLE_TASK_NAME).dependsOn(sourcesArchiveTask);
 		}
 	}
 
