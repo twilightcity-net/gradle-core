@@ -39,10 +39,6 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		project.apply(plugin: JavaExtPlugin.PLUGIN_NAME)
 		addArtifactDependencyAndPublishingSupport()
 		addPublishingExtExtension()
-		project.tasks.withType(PublishToMavenRepository) {
-			it.dependsOn('assemble')
-			it.mustRunAfter('assemble')
-		}
 	}
 
 	private void addPublishingExtExtension() {
