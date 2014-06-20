@@ -88,20 +88,12 @@ class ExtendedPublication {
 	private void setJarTaskIfNotSet() {
 		if (archiveTask == null) {
 			archiveTask = findOrCreateJarTask()
-			assembleDependsOnArchiveTaskIfNotNull(archiveTask)
-		}
-	}
-
-	private void assembleDependsOnArchiveTaskIfNotNull(Jar archiveTask) {
-		if (archiveTask != null) {
-			project.getTasks().getByName(BasePlugin.ASSEMBLE_TASK_NAME).dependsOn(archiveTask);
 		}
 	}
 
 	private void setSourceJarTaskIfNotSet() {
 		if (sourcesArchiveTask == null) {
 			sourcesArchiveTask = findOrCreateSourcesJarTask()
-			assembleDependsOnArchiveTaskIfNotNull(sourcesArchiveTask)
 		}
 	}
 
@@ -158,6 +150,7 @@ class ExtendedPublication {
 			}
 			from isSourceJar ? getSourceSet().allSource : getSourceSet().output
 		}
+		project.getTasks().getByName(BasePlugin.ASSEMBLE_TASK_NAME).dependsOn(jarTask)
 		jarTask
 	}
 
