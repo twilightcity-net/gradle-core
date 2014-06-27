@@ -20,6 +20,7 @@ import com.bancvue.gradle.test.AbstractProjectSpecification
 import com.google.common.io.Files
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskExecutionException
+import spock.lang.Unroll
 
 @Mixin(ExceptionSupport)
 class ClearArtifactCacheSpecification extends AbstractProjectSpecification {
@@ -84,6 +85,27 @@ class ClearArtifactCacheSpecification extends AbstractProjectSpecification {
 
 		expect:
 		ClearArtifactCache.collectGradleCacheDirsWithName(tempDir, "com.bancvue") == [new File(cacheDir, "com.bancvue")]
+	}
+	
+	@Unroll("clearArtifactCache should clear #cacheDirParentPath")
+	def "clearArtifactCache should clear all caches"() {
+		given:
+		clearArtifactCacheTask.userHome = tempDir
+		clearArtifactCacheTask.groupName = 'com.bancvue'
+		File cacheDir = new File(tempDir, cacheDirParentPath)
+		createDirs(cacheDir, caches)
+
+		when:
+		clearArtifactCacheTask.clearArtifactCache()
+		
+		then:
+		!new File(tempDir, cachePath).exists()
+		
+		where:
+		cacheDirParentPath                                 | caches                                     | cachePath
+		".groovy/grapes"                                   | ["com.bancvue"]                            | ".groovy/grapes/com.bancvue"
+		".m2/repository"                                   | ["com/bancvue"]                            | ".m2/repository/com/bancvue"
+		project.gradle.gradleUserHomeDir.absolutePath      | ["caches/modules-2/files-2.1/com.bancvue"] | ".gradle/caches/modules-2/files-2.1/com.bancvue"
 	}
 
 	private void createDirs(File parent, List<String> dirNames) {

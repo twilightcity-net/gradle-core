@@ -22,6 +22,7 @@ import org.gradle.api.tasks.TaskAction
 class ClearArtifactCache extends DefaultTask {
 
 	String groupName
+	File userHome = getDefaultUserHome()
 
 	void setGroupName(String groupName) {
 		this.groupName = groupName
@@ -33,6 +34,7 @@ class ClearArtifactCache extends DefaultTask {
 		assertGroupNameSet()
 		clearMavenCache()
 		clearGradleCache()
+		clearGroovyGrapeCache()
 	}
 
 	private void assertGroupNameSet() {
@@ -43,10 +45,10 @@ class ClearArtifactCache extends DefaultTask {
 
 	private void clearMavenCache() {
 		String cachePath = groupName.replaceAll(/\./, '/')
-		project.delete new File(getUserHome(), ".m2/repository/${cachePath}")
+		project.delete new File(userHome, ".m2/repository/${cachePath}")
 	}
 
-	private static File getUserHome() {
+	private static File getDefaultUserHome() {
 		String userHome = System.getProperty("user.home")
 		new File(userHome)
 	}
@@ -106,4 +108,7 @@ class ClearArtifactCache extends DefaultTask {
 		}
 	}
 
+	private void clearGroovyGrapeCache() {
+		project.delete new File(userHome, ".groovy/grapes/${groupName}")
+	}
 }

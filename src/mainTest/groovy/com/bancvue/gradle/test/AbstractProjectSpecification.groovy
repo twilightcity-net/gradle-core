@@ -19,12 +19,14 @@ import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import spock.lang.Shared
 import spock.lang.Specification
 
 abstract class AbstractProjectSpecification extends Specification {
 
     @Rule
     public TemporaryFolder projectDir = new TemporaryFolder()
+	@Shared
     protected Project project
     protected ProjectFileSystem projectFS
 
