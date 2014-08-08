@@ -16,6 +16,7 @@
 package com.bancvue.gradle.test
 
 import org.gradle.api.Plugin
+import org.gradle.api.Project
 
 abstract class AbstractPluginSpecification extends AbstractProjectSpecification {
 
@@ -24,6 +25,10 @@ abstract class AbstractPluginSpecification extends AbstractProjectSpecification 
 	}
 
 	abstract String getPluginName();
+
+	protected Project getProject() {
+		super.project
+	}
 
 	protected void applyPlugin() {
 		project.apply(plugin: pluginName)
