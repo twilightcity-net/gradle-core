@@ -37,6 +37,10 @@ abstract class AbstractProjectSpecification extends Specification {
         projectFS = new ProjectFileSystem(project.rootDir)
     }
 
+	protected void evaluateProject() {
+		project.evaluate()
+	}
+
     protected Project createProject() {
         ProjectBuilder.builder()
                 .withName("${projectName}-project")
