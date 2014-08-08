@@ -16,16 +16,14 @@
 package com.bancvue.gradle
 
 import com.bancvue.gradle.license.LicenseExtPlugin
-import com.bancvue.gradle.maven.MavenExtPlugin
 import com.bancvue.gradle.support.ProjectSupportPlugin
 import com.bancvue.gradle.test.ComponentTestPlugin
 import com.bancvue.gradle.test.JacocoExtPlugin
 import com.bancvue.gradle.test.TestExtPlugin
-import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-class BancvueOssPlugin implements Plugin<Project> {
+class CoreOssPlugin implements Plugin<Project> {
 
 	static final String PLUGIN_NAME = 'com.bancvue.core-oss'
 
@@ -33,12 +31,10 @@ class BancvueOssPlugin implements Plugin<Project> {
 
 	public void apply(Project project) {
 		this.project = project
-		project.group = 'com.bancvue'
 		applyJavaExtPlugin()
 		applyGroovyPlugin()
 		applyProjectDefaultsPlugin()
 		applyLicenseExtPlugin()
-		applyMavenExtPlugin()
 		applyTestExtPlugin()
 		applyComponentTestPlugin()
 		applyJacocoExtPlugin()
@@ -60,10 +56,6 @@ class BancvueOssPlugin implements Plugin<Project> {
 
 	private void applyLicenseExtPlugin() {
 		project.apply(plugin: LicenseExtPlugin.PLUGIN_NAME)
-	}
-
-	private void applyMavenExtPlugin() {
-		project.apply(plugin: MavenExtPlugin.PLUGIN_NAME)
 	}
 
 	private void applyTestExtPlugin() {

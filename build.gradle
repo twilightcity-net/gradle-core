@@ -14,7 +14,11 @@ buildscript {
 
 apply plugin: "com.bancvue.core-oss"
 apply plugin: "com.bancvue.integration-test"
+<<<<<<< HEAD
 apply plugin: 'release'
+=======
+apply plugin: "com.bancvue.maven-publish-ext"
+>>>>>>> 2f3e38b... renamed BancvueOssPlugin > CoreOssPlugin; removed publishing plugin from CoreOssPlugin
 
 repositories {
 	mavenCentral()
