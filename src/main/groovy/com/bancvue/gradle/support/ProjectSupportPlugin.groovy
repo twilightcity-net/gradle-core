@@ -21,7 +21,7 @@ import org.gradle.api.Task
 
 class ProjectSupportPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = 'project-support'
+	static final String PLUGIN_NAME = 'com.bancvue.project-support'
 
 	private static final String TASK_GROUP_NAME = 'Utilities'
 

@@ -40,14 +40,14 @@ allprojects {
 		emptyClassFile("src/main/java/bv/SomeClass.java")
 		classFileWithDuplicateTokens("module/src/main/java/bv/ModuleClass.java", minTokenCount)
 		buildFile << """
-apply plugin: 'cpd'
+apply plugin: 'com.bancvue.cpd'
 
 cpd {
     minimumTokenCount ${minTokenCount}
 }
 
 allprojects {
-	apply plugin: 'cpd'
+	apply plugin: 'com.bancvue.cpd'
 }
 """
 
@@ -62,7 +62,7 @@ allprojects {
 	def "should not fail if a project contains cpd violation but cpd plugin is not applied"() {
 		given:
 		buildFile << """
-apply plugin: 'cpd'
+apply plugin: 'com.bancvue.cpd'
 
 cpd {
     minimumTokenCount ${minTokenCount}
@@ -84,14 +84,14 @@ cpd {
 		given:
 		int halfMinTokenCount = (minTokenCount / 2) as int
 		buildFile << """
-apply plugin: 'cpd'
+apply plugin: 'com.bancvue.cpd'
 
 cpd {
     minimumTokenCount ${minTokenCount}
 }
 
 allprojects {
-	apply plugin: 'cpd'
+	apply plugin: 'com.bancvue.cpd'
 }
 """
 
@@ -117,15 +117,15 @@ allprojects {
 		given:
 		classFileWithDuplicateTokens("module/src/mainTest/java/bv/ModuleClass.java", minTokenCount)
 		buildFile << """
-apply plugin: 'cpd'
+apply plugin: 'com.bancvue.cpd'
 
 cpd {
     minimumTokenCount ${minTokenCount}
 }
 
 subprojects {
-	apply plugin: 'cpd'
-	apply plugin: 'test-ext' // creates the 'mainTest' source set
+	apply plugin: 'com.bancvue.cpd'
+	apply plugin: 'com.bancvue.test-ext' // creates the 'mainTest' source set
 }
 """
 

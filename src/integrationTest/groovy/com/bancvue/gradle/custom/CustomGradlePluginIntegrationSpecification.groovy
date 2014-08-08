@@ -45,7 +45,7 @@ ext {
 	repositoryReleaseUrl='${mavenRepo.toURI()}'
 }
 
-apply plugin: 'custom-gradle'
+apply plugin: 'com.bancvue.custom-gradle'
 
 // fake out the download and replace it with an empty zip
 task createDownloadArchive(type: Zip) {

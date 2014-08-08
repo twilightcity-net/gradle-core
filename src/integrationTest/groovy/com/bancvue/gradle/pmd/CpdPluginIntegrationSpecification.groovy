@@ -25,7 +25,7 @@ class CpdPluginIntegrationSpecification extends AbstractCpdPluginIntegrationSpec
 	def setup() {
 		buildFile << """
 apply plugin: 'java'
-apply plugin: 'cpd'
+apply plugin: 'com.bancvue.cpd'
 
 repositories {
 	mavenCentral()
@@ -54,7 +54,7 @@ cpd {
 		emptyClassFile("src/main/java/bv/SomeClass.java")
 		classFileWithDuplicateTokens("src/mainTest/java/bv/MainTestClass.java", minTokenCount)
 		buildFile << """
-apply plugin: 'test-ext'
+apply plugin: 'com.bancvue.test-ext'
 
 cpd {
 	createUnifiedReport false
@@ -90,7 +90,7 @@ cpd {
 		int halfMinTokenCount = (minTokenCount / 2) as int
 		classFileWithDuplicateTokens("src/main/java/bv/SomeClass.java", halfMinTokenCount)
 		buildFile << """
-apply plugin: 'test-ext'
+apply plugin: 'com.bancvue.test-ext'
 """
 
 		when:

@@ -27,7 +27,7 @@ import org.gradle.api.Project
 
 class BancvueOssPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = 'bancvue-oss'
+	static final String PLUGIN_NAME = 'com.bancvue.core-oss'
 
 	private Project project
 

@@ -35,7 +35,7 @@ class SomeTest {
 """
 		buildFile << """
 apply plugin: 'groovy'
-apply plugin: 'component-test'
+apply plugin: 'com.bancvue.component-test'
 
 repositories {
 	mavenCentral()

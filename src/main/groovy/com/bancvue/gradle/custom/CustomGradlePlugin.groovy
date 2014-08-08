@@ -27,7 +27,7 @@ import org.gradle.api.tasks.wrapper.Wrapper
 
 class CustomGradlePlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = 'custom-gradle'
+	static final String PLUGIN_NAME = 'com.bancvue.custom-gradle'
 
 	private Project project
 	private CustomGradleProperties gradleProperties

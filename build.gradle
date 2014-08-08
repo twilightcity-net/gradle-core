@@ -12,9 +12,9 @@ buildscript {
 	}
 }
 
+apply plugin: "com.bancvue.core-oss"
+apply plugin: "com.bancvue.integration-test"
 apply plugin: 'release'
-apply plugin: "bancvue-oss"
-apply plugin: "integration-test"
 
 repositories {
 	mavenCentral()
@@ -51,32 +51,32 @@ license {
 /**********************************************************************************************************************/
 // Everything below is POC
 
-artifacts {
-	archives jarMainTest
-	archives sourcesJarMainTest
-}
-
-uploadArchives {
-	repositories.mavenDeployer {
-
-		pom.project {
-			packaging "jar"
-			url "https://github.com/BancVue/GradlePluginsCore"
-			developers {
-				developer {
-					id "bancvue_oss"
-					name "BancVue Open Source Development"
-					email "opensource@bancvue.com"
-				}
-			}
-			scm {
-				url "https://github.com/BancVue/GradlePluginsCore.git"
-				connection "scm:git:git@github.com:BancVue/GradlePluginsCore.git"
-				developerConnection "scm:git:git@github.com:BancVue/GradlePluginsCore.git"
-			}
-		}
-	}
-}
+//artifacts {
+//	archives jarMainTest
+//	archives sourcesJarMainTest
+//}
+//
+//uploadArchives {
+//	repositories.mavenDeployer {
+//
+//		pom.project {
+//			packaging "jar"
+//			url "https://github.com/BancVue/GradlePluginsCore"
+//			developers {
+//				developer {
+//					id "bancvue_oss"
+//					name "BancVue Open Source Development"
+//					email "opensource@bancvue.com"
+//				}
+//			}
+//			scm {
+//				url "https://github.com/BancVue/GradlePluginsCore.git"
+//				connection "scm:git:git@github.com:BancVue/GradlePluginsCore.git"
+//				developerConnection "scm:git:git@github.com:BancVue/GradlePluginsCore.git"
+//			}
+//		}
+//	}
+//}
 
 //uploadArchives {
 //	repositories.mavenDeployer {

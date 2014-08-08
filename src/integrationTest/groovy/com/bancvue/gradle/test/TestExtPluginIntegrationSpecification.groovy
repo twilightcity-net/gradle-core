@@ -25,7 +25,7 @@ class TestExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpe
 		emptyClassFile("src/mainTest/java/Class.java")
 		buildFile << """
 apply plugin: 'java'
-apply plugin: 'test-ext'
+apply plugin: 'com.bancvue.test-ext'
 
 jarMainTest.archiveName='mainTest.jar'
         """
@@ -50,7 +50,7 @@ public class Class {}
 """
 		buildFile << """
 apply plugin: 'java'
-apply plugin: 'test-ext'
+apply plugin: 'com.bancvue.test-ext'
 
 javadocJarMainTest.archiveName='mainTestJavadoc.jar'
         """

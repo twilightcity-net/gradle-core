@@ -25,8 +25,8 @@ class IdeExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpec
 		given:
 		buildFile << """
 apply plugin: 'groovy'
-apply plugin: 'ide-ext'
-apply plugin: 'integration-test'
+apply plugin: 'com.bancvue.ide-ext'
+apply plugin: 'com.bancvue.integration-test'
 
 repositories {
 	mavenCentral()
@@ -96,8 +96,8 @@ dependencies {
 		given:
 		buildFile << """
 apply plugin: 'groovy'
-apply plugin: 'ide-ext'
-apply plugin: 'component-test'
+apply plugin: 'com.bancvue.ide-ext'
+apply plugin: 'com.bancvue.component-test'
 
 repositories {
 	mavenCentral()
@@ -151,8 +151,8 @@ dependencies {
 		given:
 		buildFile << """
 apply plugin: 'groovy'
-apply plugin: 'ide-ext'
-apply plugin: 'integration-test'
+apply plugin: 'com.bancvue.ide-ext'
+apply plugin: 'com.bancvue.integration-test'
         """
 		mkdir("src/main/resources")
 		mkdir("src/test/resources")
