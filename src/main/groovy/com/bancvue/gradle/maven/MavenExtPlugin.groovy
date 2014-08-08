@@ -77,6 +77,7 @@ class MavenExtPlugin implements Plugin<Project> {
 
 	private void addMavenLocalAndOrganizationArtifactRepository() {
 		project.repositories.mavenLocal()
+
 		project.repositories {
 			maven {
 				name repositoryProperties.name

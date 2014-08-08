@@ -1,6 +1,6 @@
-import com.bancvue.gradle.maven.DefaultPublishFilter
-import org.apache.ivy.core.module.descriptor.Artifact
-import org.gradle.api.publication.maven.internal.PomFilter
+//import com.bancvue.gradle.maven.DefaultPublishFilter
+//import org.apache.ivy.core.module.descriptor.Artifact
+//import org.gradle.api.publication.maven.internal.PomFilter
 
 buildscript {
 	repositories {
@@ -27,7 +27,7 @@ dependencies {
 		exclude group: 'com.google.guava'
 	}
 
-	mainTestCompile('org.spockframework:spock-core:0.7-groovy-1.8') {
+	mainTestCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
 		exclude group: 'org.codehaus.groovy'
 	}
 	mainTestCompile 'cglib:cglib-nodep:2.2.2'
@@ -78,24 +78,24 @@ uploadArchives {
 	}
 }
 
-uploadArchives {
-	repositories.mavenDeployer {
-		addFilter("test") { Artifact artifact, file ->
-			(artifact.name =~ /.*-test$/).matches()
-		}
-		addFilter("default", new DefaultPublishFilter(it))
-
-		getActivePomFilters().each { PomFilter pomFilter ->
-			pomFilter.setPomTemplate(pom.effectivePom)
-		}
-	}
-}
-
-install {
-	repositories.mavenInstaller {
-		addFilter("test") { Artifact artifact, file ->
-			(artifact.name =~ /.*-test$/).matches()
-		}
-		addFilter("default", new DefaultPublishFilter(it))
-	}
-}
+//uploadArchives {
+//	repositories.mavenDeployer {
+//		addFilter("test") { Artifact artifact, file ->
+//			(artifact.name =~ /.*-test$/).matches()
+//		}
+//		addFilter("default", new DefaultPublishFilter(it))
+//
+//		getActivePomFilters().each { PomFilter pomFilter ->
+//			pomFilter.setPomTemplate(pom.effectivePom)
+//		}
+//	}
+//}
+//
+//install {
+//	repositories.mavenInstaller {
+//		addFilter("test") { Artifact artifact, file ->
+//			(artifact.name =~ /.*-test$/).matches()
+//		}
+//		addFilter("default", new DefaultPublishFilter(it))
+//	}
+//}

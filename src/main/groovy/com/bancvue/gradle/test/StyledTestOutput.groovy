@@ -45,14 +45,14 @@ class StyledTestOutput extends DefaultTask {
 			}
 
 			test.afterTest { TestDescriptor descriptor, TestResult result ->
-				StyledTextOutput.Style style = getStyleForResult(result)
+				Style style = StyledTestOutput.getStyleForResult(result)
 				out.withStyle(style).println("  ${descriptor.name}")
 			}
 		}
 	}
 
-	private StyledTextOutput.Style getStyleForResult(TestResult result) {
-		StyledTextOutput.Style style = Style.Identifier
+	private static Style getStyleForResult(TestResult result) {
+		Style style = Style.Identifier
 
 		if (result.failedTestCount > 0) {
 			style = Style.Failure

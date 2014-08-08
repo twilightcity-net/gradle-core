@@ -23,7 +23,7 @@ class MavenRepositoryProperties extends DefaultProjectPropertyContainer {
 	public static final String NAME = "repository"
 
 	private static final String getDefaultUrlPropertyValue(String propertyName) {
-		"changeme:set-project-property-repository${propertyName.capitalize()}"
+		"http://set_project_property/repository${propertyName.capitalize()}"
 	}
 
 	private static class Props {
