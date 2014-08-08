@@ -35,6 +35,7 @@ class LicenseExtPlugin implements Plugin<Project> {
 		configureLicenseHeader()
 		excludedConfiguredFileExtensions()
 		addCheckAllLicenseTask()
+		setGroupOnLicenseTasks()
 	}
 
 	private void init(Project project) {
@@ -97,6 +98,11 @@ class LicenseExtPlugin implements Plugin<Project> {
 			}
 		}
 		expressions
+	}
+
+	private void setGroupOnLicenseTasks() {
+		project.tasks.findByName("licenseFormat")?.group = GROUP_NAME
+		project.tasks.findByName("downloadLicenses")?.group = GROUP_NAME
 	}
 
 	private void addCheckAllLicenseTask() {
