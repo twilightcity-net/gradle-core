@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Source: https://github.com/pmd/pmd/blob/master/pmd/etc/xslt/cpdhtml.xslt -->
 <!-- Stylesheet to turn the XML output of CPD into a nice-looking HTML page -->
 <!-- $Id$ -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
