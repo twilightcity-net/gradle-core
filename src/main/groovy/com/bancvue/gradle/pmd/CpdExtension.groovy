@@ -34,8 +34,8 @@ class CpdExtension extends CodeQualityExtension {
 	 * other CPD tasks will be disabled.  This task will operate on all java sources across any project
 	 * which applies the 'cpd' plugin.
 	 * NOTE: though the CPD plugin can be defined on any project within a multi-project build, this
-	 * particular setting will only be recognized whne defined on the root project.
+	 * particular setting will only be recognized when defined on the root project.
 	 */
-	boolean createUnifiedReport = true
+	boolean createAllReport = true
 
 }
