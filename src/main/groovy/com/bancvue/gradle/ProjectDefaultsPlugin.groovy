@@ -16,6 +16,8 @@
 package com.bancvue.gradle
 
 import com.bancvue.gradle.categories.ProjectCategory
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Jar
@@ -99,9 +101,14 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	private void addBuildDateAndJdkToJarManifest() {
 		project.tasks.withType(Jar) { Jar jar ->
 			manifest {
+				attributes 'Build-Date': getDateAsString()
 				attributes 'Build-Jdk': System.getProperty('java.version')
 			}
 		}
+	}
+
+	private String getDateAsString() {
+		return DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date())
 	}
 
 	private void setDefaultBaseNameForJarTasks() {
