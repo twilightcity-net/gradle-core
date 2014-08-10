@@ -22,7 +22,7 @@ import org.gradle.api.Task
 
 class LicenseExtPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = 'license-ext'
+	static final String PLUGIN_NAME = 'com.bancvue.license-ext'
 	private static final String GROUP_NAME = 'License'
 
 	private Project project

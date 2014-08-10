@@ -33,8 +33,8 @@ class MavenPublishExtPluginIntegrationSpecification extends AbstractPluginIntegr
 ext.repositoryReleaseUrl='${mavenRepo.toURI()}'
 ext.artifactId='artifact'
 
-apply plugin: 'maven-publish-ext'
-apply plugin: 'project-defaults' // set jar baseName to artifactId
+apply plugin: 'com.bancvue.maven-publish-ext'
+apply plugin: 'com.bancvue.project-defaults' // set jar baseName to artifactId
 
 group = 'group'
 version = '1.0'
@@ -84,7 +84,7 @@ version = '1.0'
 		given:
 		emptyClassFile("src/other/java/MainClass.java")
 		buildFile << """
-apply plugin: 'maven-publish-ext'
+apply plugin: 'com.bancvue.maven-publish-ext'
 
 publishing_ext {
 	publication("main") {
@@ -258,7 +258,7 @@ dependencies {
 		emptyClassFile("src/mainTest/java/MainTestClass.java")
 		setupLocalMavenRepoAndApplyPlugin()
 		buildFile << """
-apply plugin: 'test-ext'
+apply plugin: 'com.bancvue.test-ext'
 
 repositories {
 	mavenCentral()

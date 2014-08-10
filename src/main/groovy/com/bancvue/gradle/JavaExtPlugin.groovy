@@ -22,7 +22,7 @@ import org.gradle.api.tasks.javadoc.Javadoc
 
 public class JavaExtPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = 'java-ext'
+	static final String PLUGIN_NAME = 'com.bancvue.java-ext'
 
 	private Project project
 

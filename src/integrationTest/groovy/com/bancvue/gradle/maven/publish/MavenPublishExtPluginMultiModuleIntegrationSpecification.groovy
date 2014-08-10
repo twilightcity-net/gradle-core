@@ -33,7 +33,7 @@ class MavenPublishExtPluginMultiModuleIntegrationSpecification extends AbstractP
 
 	private TestFile initMultiModuleBuildFile() {
 		buildFile << """
-apply plugin: 'maven-publish-ext'
+apply plugin: 'com.bancvue.maven-publish-ext'
 
 ext.artifactId='artifact'
 
@@ -42,7 +42,7 @@ repositories {
 }
 
 allprojects {
-	apply plugin: 'project-defaults' // set jar baseName to artifactId
+	apply plugin: 'com.bancvue.project-defaults' // set jar baseName to artifactId
 
 	ext.repositoryReleaseUrl='${mavenRepo.toURI()}'
 	group = 'group'
@@ -69,7 +69,7 @@ dependencies {
 }
 """
 		file("publishedDependency/build.gradle") << """
-apply plugin: 'maven-publish-ext'
+apply plugin: 'com.bancvue.maven-publish-ext'
 """
 
 		when:
@@ -89,7 +89,7 @@ apply plugin: 'maven-publish-ext'
 		file("settings.gradle") << "include 'subModule', 'subModulePublishedDependency', 'subModuleLocalDependency'"
 		initMultiModuleBuildFile()
 		file("subModule/build.gradle") << """
-apply plugin: 'maven-publish-ext'
+apply plugin: 'com.bancvue.maven-publish-ext'
 
 dependencies {
 	compile project(":subModulePublishedDependency")
@@ -97,7 +97,7 @@ dependencies {
 }
 """
 		file("subModulePublishedDependency/build.gradle") << """
-apply plugin: 'maven-publish-ext'
+apply plugin: 'com.bancvue.maven-publish-ext'
 """
 
 		when:
@@ -122,8 +122,8 @@ dependencies {
 }
 """
 		file("publishedDependency/build.gradle") << """
-apply plugin: 'test-ext'
-apply plugin: 'maven-publish-ext'
+apply plugin: 'com.bancvue.test-ext'
+apply plugin: 'com.bancvue.maven-publish-ext'
 
 publishing_ext {
 	publication("mainTest")

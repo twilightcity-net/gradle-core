@@ -19,7 +19,7 @@ import org.gradle.api.Task
 
 class ComponentTestPlugin extends NamedTestConfigurationPlugin {
 
-	static final String PLUGIN_NAME = 'component-test'
+	static final String PLUGIN_NAME = 'com.bancvue.component-test'
 
 	public ComponentTestPlugin() {
 		super('componentTest')

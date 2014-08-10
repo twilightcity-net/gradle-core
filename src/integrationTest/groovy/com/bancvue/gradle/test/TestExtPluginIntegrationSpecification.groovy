@@ -16,7 +16,7 @@
 package com.bancvue.gradle.test
 
 import com.bancvue.zip.ZipArchive
-import org.junit.Test
+import org.gradle.testkit.functional.ExecutionResult
 
 class TestExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
@@ -25,7 +25,7 @@ class TestExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpe
 		emptyClassFile("src/mainTest/java/Class.java")
 		buildFile << """
 apply plugin: 'java'
-apply plugin: 'test-ext'
+apply plugin: 'com.bancvue.test-ext'
 
 jarMainTest.archiveName='mainTest.jar'
         """
@@ -50,7 +50,7 @@ public class Class {}
 """
 		buildFile << """
 apply plugin: 'java'
-apply plugin: 'test-ext'
+apply plugin: 'com.bancvue.test-ext'
 
 javadocJarMainTest.archiveName='mainTestJavadoc.jar'
         """
@@ -63,6 +63,36 @@ javadocJarMainTest.archiveName='mainTestJavadoc.jar'
 		ZipArchive mainTestJavadocJar = projectFS.archive("build/libs/mainTestJavadoc.jar")
 		mainTestJavadocJar.exists()
 		mainTestJavadocJar.acquireContentForEntryWithNameLike("Class.html")
+	}
+
+	def "styledTestOutput should print test progress"() {
+		given:
+		buildFile << """
+apply plugin: 'groovy'
+apply plugin: 'com.bancvue.test-ext'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+}
+"""
+ 		file("src/test/groovy/SomeTest.groovy") << """
+class SomeTest extends spock.lang.Specification {
+
+	def "styled test output test"() {
+		expect:
+			true
+	}
+}
+"""
+		when:
+		ExecutionResult result = run("test", "styledTestOutput")
+
+		then:
+		result.standardOutput =~ /styled test output test/
 	}
 
 }

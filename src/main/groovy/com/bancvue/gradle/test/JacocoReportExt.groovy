@@ -20,11 +20,8 @@ import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.reporting.Report
 import org.gradle.api.tasks.SourceSet
-import org.gradle.internal.reflect.Instantiator
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
-
-import javax.inject.Inject
 
 @Slf4j
 class JacocoReportExt extends JacocoReport {
@@ -88,10 +85,7 @@ class JacocoReportExt extends JacocoReport {
 	Set<SourceSet> internalSourceSets = []
 	boolean includeSubProjects = false
 
-	@Inject
-	JacocoReportExt(Instantiator instantiator) {
-		super(instantiator)
-
+	JacocoReportExt() {
 		group = TestExtPlugin.VERIFICATION_GROUP_NAME
 		getProject().afterEvaluate {
 			ReportDirectoryCollector collector = new ReportDirectoryCollector(this)
@@ -121,7 +115,7 @@ class JacocoReportExt extends JacocoReport {
 			report.enabled = true
 			report.conventionMapping.with {
 				destination = {
-					getReportDestinationFile(jacocoReportsDir, report, reportCategory)
+					JacocoReportExt.getReportDestinationFile(jacocoReportsDir, report, reportCategory)
 				}
 			}
 		}

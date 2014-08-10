@@ -77,9 +77,12 @@ class ClearArtifactCache extends DefaultTask {
 	private static List<File> collectGradleCacheArtifactDirs(File gradleUserHomeDir) {
 		List<File> dirs = []
 
-		new File(gradleUserHomeDir, "caches").eachDir { File dir ->
-			appendCacheDirsFromArtifactsDir(dir, dirs)
-			appendCacheDirsFromModulesDir(dir, dirs)
+		File cachesDir = new File(gradleUserHomeDir, "caches")
+		if (cachesDir.exists()) {
+			cachesDir.eachDir { File dir ->
+				appendCacheDirsFromArtifactsDir(dir, dirs)
+				appendCacheDirsFromModulesDir(dir, dirs)
+			}
 		}
 		dirs
 	}

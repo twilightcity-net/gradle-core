@@ -29,7 +29,7 @@ import org.gradle.api.plugins.BasePlugin
 @Slf4j
 class MavenExtPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = 'maven-ext'
+	static final String PLUGIN_NAME = 'com.bancvue.maven-ext'
 
 	private Project project
 	private MavenRepositoryProperties repositoryProperties
@@ -77,6 +77,7 @@ class MavenExtPlugin implements Plugin<Project> {
 
 	private void addMavenLocalAndOrganizationArtifactRepository() {
 		project.repositories.mavenLocal()
+
 		project.repositories {
 			maven {
 				name repositoryProperties.name

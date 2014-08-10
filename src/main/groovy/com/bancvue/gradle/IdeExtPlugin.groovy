@@ -23,7 +23,7 @@ import org.gradle.api.tasks.SourceSet
 
 class IdeExtPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = 'ide-ext'
+	static final String PLUGIN_NAME = 'com.bancvue.ide-ext'
 
 	private static final String IDE_GROUP_NAME = 'IDE'
 

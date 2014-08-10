@@ -27,7 +27,7 @@ import org.gradle.api.tasks.SourceSet
 
 class CpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 
-	static final String PLUGIN_NAME = 'cpd'
+	static final String PLUGIN_NAME = 'com.bancvue.cpd'
 
 	static final String UNIFIED_REPORT_TASK_NAME = "cpdAll"
 
@@ -87,6 +87,10 @@ class CpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 		cpdExtension
 	}
 
+	private CpdExtension getCpdExtension() {
+		extension as CpdExtension
+	}
+
 	protected void createConfigurations() {
 		super.createConfigurations()
 
@@ -109,11 +113,11 @@ class CpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 	protected void configureTaskDefaults(Cpd task, String baseName) {
 		task.conventionMapping.with {
 			cpdClasspath = { project.configurations['cpd'] }
-			cpdXsltPath = { extension.cpdXsltPath }
-			minimumTokenCount = { extension.minimumTokenCount }
-			ignoreLiterals = { extension.ignoreLiterals }
-			ignoreIdentifiers = { extension.ignoreIdentifiers }
-			ignoreFailures = { extension.ignoreFailures }
+			cpdXsltPath = { cpdExtension.cpdXsltPath }
+			minimumTokenCount = { cpdExtension.minimumTokenCount }
+			ignoreLiterals = { cpdExtension.ignoreLiterals }
+			ignoreIdentifiers = { cpdExtension.ignoreIdentifiers }
+			ignoreFailures = { cpdExtension.ignoreFailures }
 		}
 
 		task.reports.all { report ->
@@ -137,7 +141,7 @@ class CpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 
 	private boolean shouldCreateUnifiedReport() {
 		CpdExtension extension = project.rootProject.extensions.getByName(CpdExtension.NAME)
-		extension.createUnifiedReport
+		extension.createAllReport
 	}
 
 }

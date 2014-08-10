@@ -1,23 +1,22 @@
-import com.bancvue.gradle.maven.DefaultPublishFilter
-import org.apache.ivy.core.module.descriptor.Artifact
-import org.gradle.api.publication.maven.internal.PomFilter
-
 buildscript {
 	repositories {
-		mavenCentral()
-		maven { url "https://oss.sonatype.org/content/groups/public"}
+		jcenter()
 	}
 	dependencies {
 		classpath 'com.github.townsfolk:gradle-release:1.2'
+		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
 	}
 }
 
+
 apply plugin: 'release'
-apply plugin: "bancvue-oss"
-apply plugin: "integration-test"
+apply plugin: "com.bancvue.core-oss"
+apply plugin: "com.bancvue.integration-test"
+apply plugin: "com.bancvue.maven-publish-ext"
+apply plugin: 'com.jfrog.bintray'
 
 repositories {
-	mavenCentral()
+	jcenter()
 }
 
 dependencies {
@@ -27,7 +26,7 @@ dependencies {
 		exclude group: 'com.google.guava'
 	}
 
-	mainTestCompile('org.spockframework:spock-core:0.7-groovy-1.8') {
+	mainTestCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
 		exclude group: 'org.codehaus.groovy'
 	}
 	mainTestCompile 'cglib:cglib-nodep:2.2.2'
@@ -47,55 +46,31 @@ license {
 [licenseMainTest, licenseFormatMainTest]*.exclude "org/gradle/testkit/**"
 
 
-
-/**********************************************************************************************************************/
-// Everything below is POC
-
-artifacts {
-	archives jarMainTest
-	archives sourcesJarMainTest
+publishing_ext {
+	publication("mainTest")
 }
 
-uploadArchives {
-	repositories.mavenDeployer {
+bintray {
+	user = 'bancvue'
+	key = '--changeme--'
 
-		pom.project {
-			packaging "jar"
-			url "https://github.com/BancVue/GradlePluginsCore"
-			developers {
-				developer {
-					id "bancvue_oss"
-					name "BancVue Open Source Development"
-					email "opensource@bancvue.com"
-				}
-			}
-			scm {
-				url "https://github.com/BancVue/GradlePluginsCore.git"
-				connection "scm:git:git@github.com:BancVue/GradlePluginsCore.git"
-				developerConnection "scm:git:git@github.com:BancVue/GradlePluginsCore.git"
-			}
+	publications = ['gradleCore', 'gradleCoreTest']
+	dryRun = false
+	publish = false
+	pkg {
+		repo = 'maven'
+		userOrg = 'bancvue'
+		name = project.ext['artifactId']
+		desc = project.description
+		websiteUrl = 'https://github.com/BancVue/gradle-core'
+		issueTrackerUrl = 'https://github.com/BancVue/gradle-core/issues'
+		vcsUrl = 'https://github.com/BancVue/gradle-core.git'
+		licenses = ['Apache-2.0']
+		labels = ['gradle']
+		publicDownloadNumbers = true
+		version {
+			vcsTag = project.version
+			attributes = ['gradle-plugin': 'com.bancvue.core-oss:com.bancvue:gradle-core']
 		}
-	}
-}
-
-uploadArchives {
-	repositories.mavenDeployer {
-		addFilter("test") { Artifact artifact, file ->
-			(artifact.name =~ /.*-test$/).matches()
-		}
-		addFilter("default", new DefaultPublishFilter(it))
-
-		getActivePomFilters().each { PomFilter pomFilter ->
-			pomFilter.setPomTemplate(pom.effectivePom)
-		}
-	}
-}
-
-install {
-	repositories.mavenInstaller {
-		addFilter("test") { Artifact artifact, file ->
-			(artifact.name =~ /.*-test$/).matches()
-		}
-		addFilter("default", new DefaultPublishFilter(it))
 	}
 }

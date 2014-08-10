@@ -17,7 +17,7 @@ package com.bancvue.gradle.test
 
 class IntegrationTestPlugin extends NamedTestConfigurationPlugin {
 
-	static final String PLUGIN_NAME = 'integration-test'
+	static final String PLUGIN_NAME = 'com.bancvue.integration-test'
 
 	IntegrationTestPlugin() {
 		super('integrationTest')
