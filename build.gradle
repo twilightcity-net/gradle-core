@@ -1,8 +1,6 @@
 buildscript {
 	repositories {
 		jcenter()
-		mavenCentral()
-		maven { url "https://oss.sonatype.org/content/groups/public"}
 	}
 	dependencies {
 		classpath 'com.github.townsfolk:gradle-release:1.2'
@@ -18,7 +16,7 @@ apply plugin: "com.bancvue.maven-publish-ext"
 apply plugin: 'com.jfrog.bintray'
 
 repositories {
-	mavenCentral()
+	jcenter()
 }
 
 dependencies {
