@@ -34,6 +34,11 @@ class IdeExtPlugin implements Plugin<Project> {
 		project.apply(plugin: 'java')
 		applyIdeaPlugin()
 		applyEclipsePlugin()
+		project.ext['updateIdePaths'] = true
+	}
+
+	private boolean shouldUpdateIdePaths() {
+		project.ext['updateIdePaths'] == true
 	}
 
 	private void applyIdeaPlugin() {
@@ -79,70 +84,42 @@ class IdeExtPlugin implements Plugin<Project> {
 		Task ideaModule = project.tasks.getByName('ideaModule')
 
 		ideaModule.doFirst {
-			updateIdeaSourcePathAndTestScope()
-		}
-	}
-
-	private void updateIdeaSourcePathAndTestScope() {
-		resetIdeaModuleTestPaths()
-		addTestConfigurationsToIdeaTestScope()
-		augmentResourceSourceFoldersWithType()
-	}
-
-	private void resetIdeaModuleTestPaths() {
-		project.idea {
-			module.conventionMapping.testSourceDirs = { getTestSourceDirs() }
-		}
-	}
-
-	private Set<File> getTestSourceDirs() {
-		project.sourceSets.findAll { SourceSet sourceSet ->
-			isTestSourceSet(sourceSet)
-		}.collect { SourceSet sourceSet ->
-			sourceSet.allSource.srcDirs
-		}.flatten()
-	}
-
-	private void addTestConfigurationsToIdeaTestScope() {
-		project.idea {
-			module {
-				scopes.TEST.plus = getTestRuntimeConfigurations()
+			if (shouldUpdateIdePaths()) {
+				updateIdeaSourcePathsAndScopes()
 			}
 		}
 	}
 
-	private Set<Configuration> getTestRuntimeConfigurations() {
-		Set runtimeConfigurations = project.configurations.findAll { Configuration config ->
-			isTestConfiguration(config)
-		} as Set
-		runtimeConfigurations
-	}
+	private void updateIdeaSourcePathsAndScopes() {
+		ProjectInfo info = new ProjectInfo(project)
 
-	private void augmentResourceSourceFoldersWithType() {
-		project.idea.module.iml {
-			withXml { provider ->
-				def resourceFolderNodes = provider.node.component.content.sourceFolder.findAll { it.@url =~ /resources$/ }
-				resourceFolderNodes.each { Node sourceFolder ->
-					String typeString = isTestIdeaSourceFolder(sourceFolder) ? "java-test-resource" : "java-resource"
-					sourceFolder.@type = typeString
+		project.idea {
+			module {
+				sourceDirs += info.sourceDirs
+				testSourceDirs += info.testSourceDirs
+				scopes.COMPILE.plus += info.compileConfigurations
+				scopes.RUNTIME.plus += info.runtimeConfigurations - info.compileConfigurations
+				scopes.TEST.plus += info.testRuntimeConfigurations - info.runtimeConfigurations
+
+				iml {
+					withXml { provider ->
+						provider.node.component.content.sourceFolder.each { Node sourceFolder ->
+							if (sourceFolder.@url =~ /resources$/) {
+								sourceFolder.@type = getSourceFolderTypeString(info, sourceFolder.@url)
+							}
+						}
+					}
 				}
 			}
 		}
 	}
 
-	private boolean isTestSourceSet(SourceSet sourceSet) {
-		sourceSet.name =~ /(?i)test$/
-	}
-
-	private boolean isTestConfiguration(Configuration config) {
-		config.name =~ /(?i)testruntime$/
-	}
-
-	private boolean isTestIdeaSourceFolder(Node sourceFolder) {
-		String partialSrcFolderUrl = sourceFolder.@url - "file://\$MODULE_DIR\$"
-		getTestSourceDirs().find { File testSourceDir ->
+	private String getSourceFolderTypeString(ProjectInfo info, String sourceFolderUrl) {
+		String partialSrcFolderUrl = sourceFolderUrl - "file://\$MODULE_DIR\$"
+		boolean isTestSourceFolder = info.testSourceDirs.find { File testSourceDir ->
 			testSourceDir.absolutePath.endsWith(partialSrcFolderUrl)
 		}
+		isTestSourceFolder ? "java-test-resource" : "java-resource"
 	}
 
 	private void applyEclipsePlugin() {
@@ -164,16 +141,56 @@ class IdeExtPlugin implements Plugin<Project> {
 
 	private void updateEclipseSourcePathAndClassPathAfterProjectEvaluation() {
 		project.afterEvaluate {
-			updateEclipseSourcePathAndClassPath()
+			if (shouldUpdateIdePaths()) {
+				updateEclipseSourcePathAndClassPath()
+			}
 		}
 	}
 
 	private void updateEclipseSourcePathAndClassPath() {
+		ProjectInfo info = new ProjectInfo(project)
+
 		project.eclipse {
 			classpath {
-				plusConfigurations += getTestRuntimeConfigurations()
+				plusConfigurations += info.getRuntimeConfigurations() + info.getTestRuntimeConfigurations()
 			}
 		}
 	}
+
+
+	private static class ProjectInfo {
+
+		Set<File> sourceDirs
+		Set<File> testSourceDirs
+		Set<Configuration> compileConfigurations
+		Set<Configuration> runtimeConfigurations
+		Set<Configuration> testRuntimeConfigurations
+
+		ProjectInfo(Project project) {
+			sourceDirs = []
+			testSourceDirs = []
+			project.sourceSets.each { SourceSet sourceSet ->
+				Set<File> sourceSetSrcDirs = sourceSet.allSource.srcDirs
+
+				if (sourceSet.name =~ /(?i).*test$/) {
+					testSourceDirs.addAll(sourceSetSrcDirs)
+				} else {
+					sourceDirs.addAll(sourceSetSrcDirs)
+				}
+			}
+
+			compileConfigurations = findConfigurationsMatching(project, /(?i).*(?<!test)compile$/)
+			runtimeConfigurations = findConfigurationsMatching(project, /(?i).*(?<!test)runtime$/)
+			testRuntimeConfigurations = findConfigurationsMatching(project, /(?i).*testruntime$/)
+		}
+
+		private Set<Configuration> findConfigurationsMatching(Project project, String regex) {
+			project.configurations.findAll { Configuration config ->
+				config.name =~ regex
+			} as Set
+		}
+
+	}
+
 
 }

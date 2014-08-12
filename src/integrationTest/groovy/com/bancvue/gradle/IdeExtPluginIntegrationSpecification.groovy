@@ -35,8 +35,13 @@ repositories {
 dependencies {
 	integrationTestCompile 'org.apache.commons:commons-collections4:4.0'
 }
+
+sourceSets {
+	other
+}
         """
 		mkdir("src/main/java")
+		mkdir("src/other/java")
 		mkdir("src/test/groovy")
 		mkdir("src/integrationTest/groovy")
 
@@ -48,6 +53,7 @@ dependencies {
 		expectedImlFile.exists()
 		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/org.apache.commons/commons-collections4/4.0/")
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/main/java", false)
+		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/other/java", false)
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/test/groovy", true)
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/integrationTest/groovy", true)
 		try {
