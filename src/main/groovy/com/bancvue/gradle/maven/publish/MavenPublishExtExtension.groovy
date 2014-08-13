@@ -23,6 +23,7 @@ import groovy.util.logging.Slf4j
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.util.ConfigureUtil
 
 @Slf4j
 class MavenPublishExtExtension {
@@ -86,12 +87,22 @@ class MavenPublishExtExtension {
 		publicationConfigurator.addPublication(id, configure)
 	}
 
+	void config(Closure closure) {
+		publicationConfigurator.config = closure
+	}
+
+	void pom(Closure closure) {
+		publicationConfigurator.pom = closure
+	}
+
 
 	private static class Configurator {
 
 		private Project project
 		private DependencyResolver dependencyResolver
 		private Map<String, ExtendedPublication> publicationMap = [:]
+		private Closure config
+		private Closure pom
 
 		Configurator(Project project) {
 			this.project = project
@@ -131,6 +142,7 @@ class MavenPublishExtExtension {
 			addArtifactToRuntimeConfigurationIfNotAlreadyAdded(extendedPublication)
 			addBasicDescriptionToMavenPOM(extendedPublication, mavenPublication)
 			attachLicenseToMavenPOMIfLicenseExtPluginApplied(mavenPublication)
+			applyConfigurationClosuresToMavenPublication(extendedPublication, mavenPublication)
 		}
 
 		private void attachArtifactsToMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
@@ -186,6 +198,29 @@ class MavenPublishExtExtension {
 							distribution licenseModel.distribution
 						}
 					}
+				}
+			}
+		}
+
+		private void applyConfigurationClosuresToMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
+			applyConfigurePomClosureToMavenPublication(mavenPublication, pom)
+			applyConfigurePomClosureToMavenPublication(mavenPublication, extendedPublication.pom)
+			applyConfigureClosureToMavenPublication(mavenPublication, config)
+			applyConfigureClosureToMavenPublication(mavenPublication, extendedPublication.config)
+		}
+
+		private void applyConfigureClosureToMavenPublication(MavenPublication mavenPublication, Closure config) {
+			if (config != null) {
+				ConfigureUtil.configure(config, mavenPublication)
+			}
+		}
+
+		private void applyConfigurePomClosureToMavenPublication(MavenPublication mavenPublication, Closure configurePom) {
+			if (configurePom != null) {
+				configurePom.resolveStrategy = Closure.DELEGATE_FIRST
+
+				mavenPublication.pom.withXml {
+					asNode().children().last() + configurePom
 				}
 			}
 		}

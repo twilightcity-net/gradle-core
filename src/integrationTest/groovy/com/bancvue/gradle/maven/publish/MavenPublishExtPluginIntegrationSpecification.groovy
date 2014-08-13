@@ -329,4 +329,66 @@ publishing_ext {
 		!getUploadedArtifact("artifact-client").exists()
 	}
 
+	def "should augment pom with content of pom closure, both globally and per-publication"() {
+		given:
+		setupLocalMavenRepoAndApplyPlugin()
+		buildFile << """
+publishing_ext {
+	pom {
+		packaging "custom"
+	}
+
+	publication('main') {
+		pom {
+			url "http://publication-url"
+		}
+	}
+}
+"""
+
+		when:
+		run("publish")
+
+		then:
+		PomFile pomFile = getPomFile("artifact")
+		pomFile.text =~ "<packaging>custom</packaging>"
+		pomFile.text =~ "<url>http://publication-url</url>"
+	}
+
+	def "should apply config closure to maven publication, both globally and per-publication"() {
+		given:
+		setupLocalMavenRepoAndApplyPlugin()
+		buildFile << """
+publishing_ext {
+	config {
+		pom.withXml {
+	        asNode().children().last() + {
+	            resolveStrategy = Closure.DELEGATE_FIRST
+	            packaging "custom"
+            }
+        }
+	}
+
+	publication('main') {
+		config {
+			pom.withXml {
+				asNode().children().last() + {
+					resolveStrategy = Closure.DELEGATE_FIRST
+					url "http://publication-url"
+				}
+			}
+		}
+	}
+}
+"""
+
+		when:
+		run("publish")
+
+		then:
+		PomFile pomFile = getPomFile("artifact")
+		pomFile.text =~ "<packaging>custom</packaging>"
+		pomFile.text =~ "<url>http://publication-url</url>"
+	}
+
 }
