@@ -15,9 +15,12 @@
  */
 package com.bancvue.gradle.support
 
+import com.bancvue.gradle.categories.ProjectCategory
 import org.gradle.api.Project
+import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.javadoc.Javadoc
 
 class CommonTaskFactory {
 
@@ -59,6 +62,35 @@ class CommonTaskFactory {
 			from sourcePath
 		}
 		jarTask
+	}
+
+	Jar createJavadocJarTask() {
+		Javadoc javadocTask = project.tasks.findByName(namer.javadocTaskName)
+		if (javadocTask == null) {
+			javadocTask = createJavadocTask()
+		}
+		Jar javadocJarTask = createAndConfigureJarTask(namer.javadocJarTaskName, javadocTask.destinationDir, "javadoc")
+		javadocJarTask.dependsOn { javadocTask }
+		javadocJarTask
+	}
+
+	Javadoc createJavadocTask() {
+		File javadocsDir = getJavadocsDir()
+		Javadoc javadocTask = project.tasks.create(namer.javadocTaskName, Javadoc)
+		javadocTask.configure {
+			source = sourceSet.allJava
+			classpath = sourceSet.output + sourceSet.compileClasspath
+			group = JavaBasePlugin.DOCUMENTATION_GROUP
+			description = "Generates Javadoc API documentation for the ${sourceSet.name} source code."
+			destinationDir = javadocsDir
+		}
+		javadocTask
+	}
+
+	private File getJavadocsDir() {
+		use(ProjectCategory) {
+			new File(project.getJavaConvention().docsDir, "${sourceSet.name}Docs")
+		}
 	}
 
 }

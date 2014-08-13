@@ -64,6 +64,14 @@ class TaskAndConfigurationNamer {
 		createTaskName("sourcesJar")
 	}
 
+	String getJavadocTaskName() {
+		createTaskName("javadoc")
+	}
+
+	String getJavadocJarTaskName() {
+		createTaskName("javadocJar")
+	}
+
 	private String createTaskName(String jarBaseName) {
 		String jarTaskNamePostfix = sourceSetName
 		if (jarTaskNamePostfix == "main") {
