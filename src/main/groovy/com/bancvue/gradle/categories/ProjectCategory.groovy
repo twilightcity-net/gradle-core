@@ -18,7 +18,6 @@ package com.bancvue.gradle.categories
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.api.tasks.bundling.Jar
 
 
 class ProjectCategory {
@@ -34,7 +33,7 @@ class ProjectCategory {
 		if (artifactId == null) {
 			throw new ArtifactIdNotDefinedException()
 		}
-		self.hasProperty('artifactId') ? self.ext.artifactId : null
+		artifactId
 	}
 
 	static String getArtifactIdOrNull(Project self) {
@@ -43,19 +42,6 @@ class ProjectCategory {
 
 	static JavaPluginConvention getJavaConvention(Project self) {
 		self.getConvention().getPlugins().get("java") as JavaPluginConvention
-	}
-
-	static Jar createJarTask(Project self, String taskName, String sourceSetName, String classifierString = null) {
-		String jarContent = classifierString || "classes"
-		Jar jarTask = self.tasks.create(taskName, Jar)
-		jarTask.configure {
-			group = "Build"
-			description = "Assembles a jar archive containing the ${sourceSetName} ${jarContent}."
-			if (classifierString) {
-				classifier = classifierString
-			}
-		}
-		jarTask
 	}
 
 }

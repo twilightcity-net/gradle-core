@@ -15,10 +15,10 @@
  */
 package com.bancvue.gradle
 
-import com.bancvue.gradle.categories.ProjectCategory
+import com.bancvue.gradle.support.CommonTaskFactory
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.javadoc.Javadoc
+import org.gradle.api.tasks.SourceSet
 
 public class JavaExtPlugin implements Plugin<Project> {
 
@@ -29,26 +29,10 @@ public class JavaExtPlugin implements Plugin<Project> {
 	public void apply(Project project) {
 		this.project = project
 		project.apply(plugin: 'java')
-		addSourcesJarTask()
-		addJavadocJarTask()
-	}
 
-	private void addSourcesJarTask() {
-		use(ProjectCategory) {
-			project.createJarTask("sourcesJar", "main", "sources").configure {
-				from project.sourceSets.main.allSource
-			}
-		}
-	}
-
-	private void addJavadocJarTask() {
-		Javadoc javadocTask = project.tasks.getByName('javadoc')
-		use(ProjectCategory) {
-			project.createJarTask("javadocJar", "main", "javadoc").configure {
-				dependsOn { javadocTask }
-				from javadocTask.destinationDir
-			}
-		}
+		CommonTaskFactory factory = new CommonTaskFactory(project, project.sourceSets.main as SourceSet)
+		factory.createSourcesJarTask()
+		factory.createJavadocJarTask()
 	}
 
 }
