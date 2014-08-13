@@ -153,6 +153,10 @@ class MavenPublishExtExtension {
 			if (extendedPublication.sourcesArchiveTask && extendedPublication.publishSources) {
 				mavenPublication.artifact(extendedPublication.sourcesArchiveTask)
 			}
+
+			if (extendedPublication.javadocArchiveTask && extendedPublication.publishJavadoc) {
+				mavenPublication.artifact(extendedPublication.javadocArchiveTask)
+			}
 		}
 
 		private void addArtifactToRuntimeConfigurationIfNotAlreadyAdded(ExtendedPublication extendedPublication) {

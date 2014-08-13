@@ -34,10 +34,12 @@ class ExtendedPublication {
 	Project project
 	AbstractArchiveTask archiveTask
 	AbstractArchiveTask sourcesArchiveTask
+	AbstractArchiveTask javadocArchiveTask
 	SourceSet sourceSet
 	Configuration runtimeConfiguration
 	boolean enabled
-	Boolean publishSources
+	boolean publishSources
+	boolean publishJavadoc
 	Closure config
 	Closure pom
 
@@ -47,6 +49,7 @@ class ExtendedPublication {
 		this.project = project
 		this.enabled = true
 		this.publishSources = true
+		this.publishJavadoc = false
 		this.namer = new TaskAndConfigurationNamer(id)
 	}
 
@@ -72,6 +75,9 @@ class ExtendedPublication {
 		if (publishSources) {
 			setSourceJarTaskIfNotSet()
 		}
+		if (publishJavadoc) {
+			setJavadocJarTaskIfNotSet()
+		}
 	}
 
 	boolean isArchiveAttachedToRuntimeConfiguration() {
@@ -95,6 +101,12 @@ class ExtendedPublication {
 	private void setSourceJarTaskIfNotSet() {
 		if (sourcesArchiveTask == null) {
 			sourcesArchiveTask = findOrCreateSourcesJarTask()
+		}
+	}
+
+	private void setJavadocJarTaskIfNotSet() {
+		if (javadocArchiveTask == null) {
+			javadocArchiveTask = findOrCreateJavadocJarTask()
 		}
 	}
 
@@ -123,6 +135,13 @@ class ExtendedPublication {
 		resolveJarTask(
 				{ namer.sourcesJarTaskName },
 				{ CommonTaskFactory generator -> generator.createSourcesJarTask() }
+		)
+	}
+
+	private Jar findOrCreateJavadocJarTask() {
+		resolveJarTask(
+				{ namer.javadocJarTaskName },
+				{ CommonTaskFactory generator -> generator.createJavadocJarTask() }
 		)
 	}
 
