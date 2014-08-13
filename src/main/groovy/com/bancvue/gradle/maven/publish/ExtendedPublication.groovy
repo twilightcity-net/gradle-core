@@ -40,6 +40,8 @@ class ExtendedPublication {
 	Configuration runtimeConfiguration
 	boolean enabled
 	boolean publishSources
+	Closure config
+	Closure pom
 
 	ExtendedPublication(String id, Project project) {
 		this.id = id

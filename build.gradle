@@ -48,6 +48,23 @@ license {
 
 publishing_ext {
 	publication("mainTest")
+
+	pom {
+		packaging "jar"
+		url "https://github.com/BancVue/gradle-core"
+		developers {
+			developer {
+				id "bancvue_oss"
+				name "BancVue Open Source Development"
+				email "opensource@bancvue.com"
+			}
+		}
+		scm {
+			url "https://github.com/BancVue/gradle-core.git"
+			connection "scm:git:git@github.com:BancVue/gradle-core.git"
+			developerConnection "scm:git:git@github.com:BancVue/gradle-core.git"
+		}
+	}
 }
 
 bintray {
