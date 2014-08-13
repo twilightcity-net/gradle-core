@@ -48,7 +48,7 @@ class MavenPublishExtExtension {
 		project.publishing {
 			publications {
 				configurator.getPublicationsToApply().each { ExtendedPublication extendedPublication ->
-					extendedPublication.deriveUnsetVariables()
+					extendedPublication.deriveUnsetVariables(configurator.publishSources, configurator.publishJavadoc)
 
 					"${extendedPublication.name}"(MavenPublication) { MavenPublication mavenPublication ->
 						configurator.configureMavenPublication(extendedPublication, mavenPublication)
@@ -95,6 +95,14 @@ class MavenPublishExtExtension {
 		publicationConfigurator.pom = closure
 	}
 
+	void publishSources(boolean publishSources) {
+		publicationConfigurator.publishSources = publishSources
+	}
+
+	void publishJavadoc(boolean publishJavadoc) {
+		publicationConfigurator.publishJavadoc = publishJavadoc
+	}
+
 
 	private static class Configurator {
 
@@ -103,6 +111,8 @@ class MavenPublishExtExtension {
 		private Map<String, ExtendedPublication> publicationMap = [:]
 		private Closure config
 		private Closure pom
+		private boolean publishSources = true
+		private boolean publishJavadoc = false
 
 		Configurator(Project project) {
 			this.project = project

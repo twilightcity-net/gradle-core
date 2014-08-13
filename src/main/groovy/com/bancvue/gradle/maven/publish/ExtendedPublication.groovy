@@ -38,8 +38,8 @@ class ExtendedPublication {
 	SourceSet sourceSet
 	Configuration runtimeConfiguration
 	boolean enabled
-	boolean publishSources
-	boolean publishJavadoc
+	Boolean publishSources
+	Boolean publishJavadoc
 	Closure config
 	Closure pom
 
@@ -48,8 +48,6 @@ class ExtendedPublication {
 	ExtendedPublication(String id, Project project) {
 		this.project = project
 		this.enabled = true
-		this.publishSources = true
-		this.publishJavadoc = false
 		this.namer = new TaskAndConfigurationNamer(id)
 	}
 
@@ -65,7 +63,14 @@ class ExtendedPublication {
 	 * Jar tasks are resolved post evaluation since the jar task is dynamically created if it can't be found.
 	 * If this was done pre-evaluation, it could conflict with an as-yet-to-be-defined jar task.
 	 */
-	void deriveUnsetVariables() {
+	void deriveUnsetVariables(boolean defaultPublishSources, boolean defaultPublishJavadoc) {
+		if (publishSources == null) {
+			publishSources = defaultPublishSources
+		}
+		if (publishJavadoc == null) {
+			publishJavadoc = defaultPublishJavadoc
+		}
+
 		setArtifactIdIfNotSet()
 		setRuntimeConfigurationIfNotSet()
 		// NOTE: order is important!  sourceSet must be defined prior to the jar tasks since they may require

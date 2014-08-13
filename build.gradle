@@ -49,6 +49,7 @@ license {
 publishing_ext {
 	publication("mainTest")
 
+	publishJavadoc true
 	pom {
 		packaging "jar"
 		url "https://github.com/BancVue/gradle-core"
