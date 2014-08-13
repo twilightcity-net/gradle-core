@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 BancVue, LTD
+/*
+ * Copyright 2014 BancVue, LTD
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bancvue.gradle.maven.publish
+package com.bancvue.gradle.support
 
 import com.bancvue.gradle.categories.ProjectCategory
 import org.gradle.api.Project
 
-class ExtendedPublicationNameResolver {
+class TaskAndConfigurationNamer {
 
-	private String publicationId
+	private String sourceSetName
 
-	ExtendedPublicationNameResolver(String publicationId) {
-		this.publicationId = publicationId
+	TaskAndConfigurationNamer(String sourceSetName) {
+		this.sourceSetName = sourceSetName
 	}
 
-	String getPublicationIdAppendix() {
-		String prefix = publicationId
+	String getSourceSetName() {
+		sourceSetName
+	}
+
+	String getSourceSetNameAppendix() {
+		String prefix = sourceSetName
 		if (prefix.startsWith("main")) {
-			prefix = publicationId.replaceFirst("main", "")
+			prefix = sourceSetName.replaceFirst("main", "")
 			if (prefix.size() > 0) {
 				prefix = prefix.replaceFirst(prefix[0], prefix[0].toLowerCase())
 			}
@@ -38,7 +42,7 @@ class ExtendedPublicationNameResolver {
 	}
 
 	private String getArtifactIdAppendix() {
-		String artifactIdAppendix = publicationIdAppendix
+		String artifactIdAppendix = sourceSetNameAppendix
 		artifactIdAppendix.replaceAll(/[A-Z]/) { '-' + it }.toLowerCase()
 	}
 
@@ -53,15 +57,15 @@ class ExtendedPublicationNameResolver {
 	}
 
 	String getJarTaskName() {
-		createJarTaskName("jar")
+		createTaskName("jar")
 	}
 
 	String getSourcesJarTaskName() {
-		createJarTaskName("sourcesJar")
+		createTaskName("sourcesJar")
 	}
 
-	private String createJarTaskName(String jarBaseName) {
-		String jarTaskNamePostfix = publicationId
+	private String createTaskName(String jarBaseName) {
+		String jarTaskNamePostfix = sourceSetName
 		if (jarTaskNamePostfix == "main") {
 			jarTaskNamePostfix = ""
 		}
@@ -69,7 +73,7 @@ class ExtendedPublicationNameResolver {
 	}
 
 	String getRuntimeConfigurationName() {
-		String configurationName = publicationId
+		String configurationName = sourceSetName
 		if (configurationName == "main") {
 			configurationName = "runtime"
 		} else {
@@ -78,8 +82,14 @@ class ExtendedPublicationNameResolver {
 		configurationName
 	}
 
-	String getSourceSetName() {
-		publicationId
+	String getCompileConfigurationName() {
+		String configurationName = sourceSetName
+		if (configurationName == "main") {
+			configurationName = "compile"
+		} else {
+			configurationName += "Compile"
+		}
+		configurationName
 	}
 
 }

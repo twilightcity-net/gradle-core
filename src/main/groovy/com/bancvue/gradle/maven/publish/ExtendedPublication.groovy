@@ -15,7 +15,8 @@
  */
 package com.bancvue.gradle.maven.publish
 
-import com.bancvue.gradle.categories.ProjectCategory
+import com.bancvue.gradle.support.CommonTaskFactory
+import com.bancvue.gradle.support.TaskAndConfigurationNamer
 import groovy.util.logging.Slf4j
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -29,9 +30,6 @@ import org.gradle.util.ConfigureUtil
 @Slf4j
 class ExtendedPublication {
 
-	private String id
-	private ExtendedPublicationNameResolver resolver
-
 	String artifactId
 	Project project
 	AbstractArchiveTask archiveTask
@@ -39,16 +37,17 @@ class ExtendedPublication {
 	SourceSet sourceSet
 	Configuration runtimeConfiguration
 	boolean enabled
-	boolean publishSources
+	Boolean publishSources
 	Closure config
 	Closure pom
 
+	private TaskAndConfigurationNamer namer
+
 	ExtendedPublication(String id, Project project) {
-		this.id = id
 		this.project = project
 		this.enabled = true
 		this.publishSources = true
-		this.resolver = new ExtendedPublicationNameResolver(id)
+		this.namer = new TaskAndConfigurationNamer(id)
 	}
 
 	String getName() {
@@ -83,7 +82,7 @@ class ExtendedPublication {
 
 	private void setArtifactIdIfNotSet() {
 		if (artifactId == null) {
-			artifactId = resolver.getArtifactId(project)
+			artifactId = namer.getArtifactId(project)
 		}
 	}
 
@@ -103,56 +102,48 @@ class ExtendedPublication {
 		if (sourceSet == null) {
 			// findByName is used b/c SourceSet is optional; if not set and no archive tasks are available,
 			// then no archives will be attached to the maven publication
-			sourceSet = project.sourceSets.findByName(resolver.sourceSetName)
+			sourceSet = project.sourceSets.findByName(namer.sourceSetName)
 		}
 	}
 
 	private void setRuntimeConfigurationIfNotSet() {
 		if (runtimeConfiguration == null) {
-			runtimeConfiguration = project.configurations.getByName(resolver.runtimeConfigurationName)
+			runtimeConfiguration = project.configurations.getByName(namer.runtimeConfigurationName)
 		}
 	}
 
 	private Jar findOrCreateJarTask() {
-		resolveJarTask(false)
+		resolveJarTask(
+				{ namer.jarTaskName },
+				{ CommonTaskFactory generator -> generator.createJarTask() }
+		)
 	}
 
 	private Jar findOrCreateSourcesJarTask() {
-		resolveJarTask(true)
+		resolveJarTask(
+				{ namer.sourcesJarTaskName },
+				{ CommonTaskFactory generator -> generator.createSourcesJarTask() }
+		)
 	}
 
-	private Jar resolveJarTask(boolean isSourceJar) {
-		String jarTaskName = isSourceJar ? resolver.sourcesJarTaskName : resolver.jarTaskName
+	private Jar resolveJarTask(Closure getJarTaskName, Closure createJarTask) {
+		String jarTaskName = getJarTaskName()
 		Jar jarTask = project.tasks.findByName(jarTaskName)
 
 		if (jarTask == null) {
-			jarTask = createJarTaskIfSourceSetAvailable(jarTaskName, isSourceJar)
+			jarTask = createJarTaskIfSourceSetAvailable(jarTaskName, createJarTask)
 		}
 		jarTask
 	}
 
-	private Jar createJarTaskIfSourceSetAvailable(String jarTaskName, boolean isSourceJar) {
+	private Jar createJarTaskIfSourceSetAvailable(String jarTaskName, Closure createJarTask) {
 		Jar jarTask = null
 		if (sourceSet != null) {
-			jarTask = createJarTask(jarTaskName, isSourceJar)
+			jarTask = createJarTask(new CommonTaskFactory(project, sourceSet, namer))
+			project.getTasks().getByName(BasePlugin.ASSEMBLE_TASK_NAME).dependsOn(jarTask)
 		} else {
 			log.warn("Failed to resolve archive task=${jarTaskName} and unable to create task due to undefined SourceSet")
 		}
-		jarTask
-	}
-
-	private Jar createJarTask(String jarTaskName, boolean isSourceJar) {
-		String postfix = resolver.publicationIdAppendix
-		String classifierString = isSourceJar ? "sources" : null
-
-		Jar jarTask = ProjectCategory.createJarTask(project, jarTaskName, sourceSet.name, classifierString)
-		jarTask.configure {
-			if (postfix) {
-				baseName = "${baseName}-${postfix}"
-			}
-			from isSourceJar ? getSourceSet().allSource : getSourceSet().output
-		}
-		project.getTasks().getByName(BasePlugin.ASSEMBLE_TASK_NAME).dependsOn(jarTask)
 		jarTask
 	}
 

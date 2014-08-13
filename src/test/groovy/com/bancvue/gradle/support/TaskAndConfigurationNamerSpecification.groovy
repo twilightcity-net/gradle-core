@@ -13,41 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bancvue.gradle.maven.publish
+package com.bancvue.gradle.support
 
 import spock.lang.Specification
 
-class ExtendedPublicationNameResolverSpecification extends Specification {
+class TaskAndConfigurationNamerSpecification extends Specification {
 
-	private ExtendedPublicationNameResolver resolver
+	private TaskAndConfigurationNamer resolver
 
-	def "getPublicationIdAppendix should return empty string if id is main"() {
+	def "getSourceSetNameAppendix should return empty string if id is main"() {
 		when:
-		resolver = new ExtendedPublicationNameResolver("main")
+		resolver = new TaskAndConfigurationNamer("main")
 
 		then:
-		assert resolver.getPublicationIdAppendix() == ""
+		assert resolver.getSourceSetNameAppendix() == ""
 	}
 
-	def "getPublicationIdAppendix should strip main if id starts with main"() {
+	def "getSourceSetNameAppendix should strip main if id starts with main"() {
 		when:
-		resolver = new ExtendedPublicationNameResolver("mainTest")
+		resolver = new TaskAndConfigurationNamer("mainTest")
 
 		then:
-		resolver.getPublicationIdAppendix() == "test"
+		resolver.getSourceSetNameAppendix() == "test"
 	}
 
-	def "getPublicationIdAppendix should return publication id if id does not start with main"() {
+	def "getSourceSetNameAppendix should return publication id if id does not start with main"() {
 		when:
-		resolver = new ExtendedPublicationNameResolver("isnotmain")
+		resolver = new TaskAndConfigurationNamer("isnotmain")
 
 		then:
-		resolver.getPublicationIdAppendix() == "isnotmain"
+		resolver.getSourceSetNameAppendix() == "isnotmain"
 	}
 
 	def "getArtifactIdAppendix should de-camel case publication id"() {
 		when:
-		resolver = new ExtendedPublicationNameResolver("idWithCamelCase")
+		resolver = new TaskAndConfigurationNamer("idWithCamelCase")
 
 		then:
 		resolver.getArtifactIdAppendix() == "id-with-camel-case"
@@ -55,18 +55,18 @@ class ExtendedPublicationNameResolverSpecification extends Specification {
 
 	def "createJarTaskName should use base name if publication id is main"() {
 		when:
-		resolver = new ExtendedPublicationNameResolver("main")
+		resolver = new TaskAndConfigurationNamer("main")
 
 		then:
-		resolver.createJarTaskName("jar") == "jar"
+		resolver.getJarTaskName() == "jar"
 	}
 
 	def "createJarTaskName should append publication id to base name if base name is not main"() {
 		when:
-		resolver = new ExtendedPublicationNameResolver("mainTest")
+		resolver = new TaskAndConfigurationNamer("mainTest")
 
 		then:
-		resolver.createJarTaskName("jar") == "jarMainTest"
+		resolver.getJarTaskName() == "jarMainTest"
 	}
 
 }
