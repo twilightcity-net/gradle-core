@@ -19,9 +19,11 @@ import com.bancvue.gradle.resource.ClasspathUrlResolver
 import com.bancvue.gradle.resource.ProjectResourceDirUrlResolver
 import com.bancvue.gradle.resource.ProjectRootUrlResolver
 import com.bancvue.gradle.resource.UrlResolver
+import groovy.util.logging.Slf4j
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 
+@Slf4j
 class ResourceResolver {
 
 	public static ResourceResolver create(Project project) {
@@ -63,13 +65,17 @@ class ResourceResolver {
 	}
 
 	private URL getResourceUrlOrNull(String resourcePath) {
-		resolverChain.findResult { UrlResolver resolver ->
+		URL url = resolverChain.findResult { UrlResolver resolver ->
 			resolver.getResourceAsUrlOrNull(resourcePath)
 		}
+		log.debug("getResourceUrl, resourcePath=${resourcePath}, url=${url}")
+		url
 	}
 
 	String getResourceContent(String resourcePath) {
-		getResourceURL(resourcePath).text
+		URL url = getResourceURL(resourcePath)
+		log.debug("getResourceContent, url=${url}")
+		url.text
 	}
 
 }
