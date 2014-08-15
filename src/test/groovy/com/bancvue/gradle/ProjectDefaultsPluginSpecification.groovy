@@ -18,8 +18,10 @@ package com.bancvue.gradle
 import com.bancvue.gradle.test.AbstractPluginSpecification
 import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.compile.BaseForkOptions
 import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.testing.Test
 
 class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 
@@ -38,6 +40,7 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 
 		when:
 		applyPlugin()
+		evaluateProject()
 
 		then:
 		assertNamedPluginApplied('java')
@@ -49,18 +52,15 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		when:
 		project.apply(plugin: 'groovy')
 		applyPlugin()
+		evaluateProject()
 
 		then:
-		TaskCollection tasks = project.tasks.withType(JavaCompile)
-		tasks.size() > 0
-		tasks.each { JavaCompile task ->
+		assertSettingsAppliedToTasks(JavaCompile) { JavaCompile task ->
 			assert task.options.encoding == 'UTF-8'
 		}
 
 		and:
-		TaskCollection groovyTasks = project.tasks.withType(GroovyCompile)
-		groovyTasks.size() > 0
-		groovyTasks.each { GroovyCompile task ->
+		assertSettingsAppliedToTasks(GroovyCompile) { GroovyCompile task ->
 			assert task.groovyOptions.encoding == 'UTF-8'
 		}
 	}
@@ -74,27 +74,32 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		when:
 		project.apply(plugin: 'groovy')
 		applyPlugin()
+		evaluateProject()
 
 		then:
-		TaskCollection javaTasks = project.tasks.withType(JavaCompile)
-		javaTasks.size() > 0
-		javaTasks.each { JavaCompile compile ->
-			assert compile.options.forkOptions.memoryInitialSize == '16m'
-			assert compile.options.forkOptions.memoryMaximumSize == '24m'
-			assert compile.options.forkOptions.jvmArgs.contains('-XX:MaxPermSize=8m')
+		assertSettingsAppliedToTasks(JavaCompile) { JavaCompile compile ->
+			assertForkOptions(compile.options.forkOptions, '16m', '24m', '8m')
 		}
 
 		and:
-		TaskCollection groovyTasks = project.tasks.withType(GroovyCompile)
-		groovyTasks.size() > 0
-		groovyTasks.each { GroovyCompile compile ->
-			assert compile.groovyOptions.forkOptions.memoryInitialSize == '16m'
-			assert compile.groovyOptions.forkOptions.memoryMaximumSize == '24m'
-			assert compile.groovyOptions.forkOptions.jvmArgs.contains('-XX:MaxPermSize=8m')
+		assertSettingsAppliedToTasks(GroovyCompile) { GroovyCompile compile ->
+			assertForkOptions(compile.groovyOptions.forkOptions, '16m', '24m', '8m')
 		}
 	}
 
-	def "apply should set heap size for test tasks"() {
+	private void assertSettingsAppliedToTasks(Class type, Closure assertionClosure) {
+		TaskCollection tasks = project.tasks.withType(type)
+		assert tasks.size() > 0
+		tasks.each assertionClosure
+	}
+
+	private void assertForkOptions(BaseForkOptions forkOptions, String memoryInitial, String memoryMaximum, String maxPerm) {
+		assert forkOptions.memoryInitialSize == memoryInitial
+		assert forkOptions.memoryMaximumSize == memoryMaximum
+		assert forkOptions.jvmArgs.contains("-XX:MaxPermSize=${maxPerm}".toString())
+	}
+
+	def "apply should set memory settings for test tasks"() {
 		given:
 		project.ext.defaultMinTestHeapSize = '17m'
 		project.ext.defaultMaxTestHeapSize = '23m'
@@ -102,11 +107,10 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 
 		when:
 		applyPlugin()
+		evaluateProject()
 
 		then:
-		TaskCollection tasks = project.tasks.withType(org.gradle.api.tasks.testing.Test)
-		tasks.size() > 0
-		tasks.each { org.gradle.api.tasks.testing.Test test ->
+		assertSettingsAppliedToTasks(Test) { Test test ->
 			assert test.minHeapSize == '17m'
 			assert test.maxHeapSize == '23m'
 			assert test.jvmArgs.contains('-XX:MaxPermSize=5m')
@@ -121,25 +125,20 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		when:
 		project.apply(plugin: 'groovy')
 		applyPlugin()
+		evaluateProject()
 
 		then:
-		TaskCollection testTasks = project.tasks.withType(org.gradle.api.tasks.testing.Test)
-		testTasks.size() > 0
-		testTasks.each { org.gradle.api.tasks.testing.Test test ->
+		assertSettingsAppliedToTasks(Test) { Test test ->
 			assert test.systemProperties["java.io.tmpdir"] == "new_tmpdir_value"
 		}
 
 		and:
-		TaskCollection javaTasks = project.tasks.withType(JavaCompile)
-		javaTasks.size() > 0
-		javaTasks.each { JavaCompile compile ->
+		assertSettingsAppliedToTasks(JavaCompile) { JavaCompile compile ->
 			assert compile.options.forkOptions.jvmArgs.contains("-Djava.io.tmpdir=new_tmpdir_value")
 		}
 
 		and:
-		TaskCollection groovyTasks = project.tasks.withType(GroovyCompile)
-		groovyTasks.size() > 0
-		groovyTasks.each { GroovyCompile compile ->
+		assertSettingsAppliedToTasks(GroovyCompile) { GroovyCompile compile ->
 			assert compile.groovyOptions.forkOptions.jvmArgs.contains("-Djava.io.tmpdir=new_tmpdir_value")
 		}
 
@@ -154,6 +153,7 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 
 		when:
 		applyPlugin()
+		evaluateProject()
 
 		then:
 		jarTask.baseName == 'some-artifact'
@@ -175,6 +175,7 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		applyPlugin()
 		ProjectDefaultsPlugin plugin = getPlugin()
 		plugin.project = project
+		evaluateProject()
 
 		then:
 		plugin.getDefaultBaseNameForTask(jarTask) == 'someName'
@@ -185,10 +186,96 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		applyPlugin()
 		Jar jarTask = project.tasks.create('jarTask', Jar)
 		setArtifactId('some-artifact')
+		evaluateProject()
 
 		then:
 		ProjectDefaultsPlugin plugin = getPlugin()
 		plugin.getDefaultBaseNameForTask(jarTask) == 'some-artifact'
+	}
+
+	def "should allow settings to be configured after plugin has been applied"() {
+		given:
+		project.apply(plugin: 'groovy')
+		applyPlugin()
+
+		when:
+		project.ext.defaultJavaVersion = '1.5'
+		project.ext.defaultMinHeapSize = '1m'
+		project.ext.defaultMaxHeapSize = '2m'
+		project.ext.defaultMaxPermSize = '3m'
+		project.ext.defaultMinTestHeapSize = '4m'
+		project.ext.defaultMaxTestHeapSize = '5m'
+		project.ext.defaultMaxTestPermSize = '6m'
+		project.ext.defaultCompilerEncoding = 'ASCII'
+		evaluateProject()
+
+		then:
+		"${project.sourceCompatibility}" == '1.5'
+		"${project.targetCompatibility}" == '1.5'
+
+		and:
+		assertSettingsAppliedToTasks(JavaCompile) { JavaCompile compile ->
+			compile.options.encoding = 'ASCII'
+			assertForkOptions(compile.options.forkOptions, '1m', '2m', '3m')
+		}
+
+		and:
+		assertSettingsAppliedToTasks(GroovyCompile) { GroovyCompile compile ->
+			compile.groovyOptions.encoding = 'ASCII'
+			assertForkOptions(compile.groovyOptions.forkOptions, '1m', '2m', '3m')
+		}
+
+		and:
+		assertSettingsAppliedToTasks(Test) { Test test ->
+			assert test.minHeapSize == '4m'
+			assert test.maxHeapSize == '5m'
+			assert test.jvmArgs.contains('-XX:MaxPermSize=6m')
+		}
+	}
+
+	def "should respect memory settings applied directly to tasks after plugin has been applied"() {
+		given:
+		project.apply(plugin: 'groovy')
+		applyPlugin()
+
+		when:
+		project.tasks.withType(JavaCompile) { JavaCompile compile ->
+			compile.options.encoding = 'java-encoding'
+			compile.options.forkOptions.memoryInitialSize = '1m'
+			compile.options.forkOptions.memoryMaximumSize = '2m'
+			compile.options.forkOptions.jvmArgs << '-XX:MaxPermSize=3m'
+		}
+		project.tasks.withType(GroovyCompile) { GroovyCompile compile ->
+			compile.groovyOptions.encoding = 'groovy-encoding'
+			compile.groovyOptions.forkOptions.memoryInitialSize = '4m'
+			compile.groovyOptions.forkOptions.memoryMaximumSize = '5m'
+			compile.groovyOptions.forkOptions.jvmArgs << '-XX:MaxPermSize=6m'
+		}
+		project.tasks.withType(Test) { Test test ->
+			test.minHeapSize = '7m'
+			test.maxHeapSize = '8m'
+			test.jvmArgs('-XX:MaxPermSize=9m')
+		}
+		evaluateProject()
+
+		then:
+		assertSettingsAppliedToTasks(JavaCompile) { JavaCompile compile ->
+			assert compile.options.encoding == 'java-encoding'
+			assertForkOptions(compile.options.forkOptions, '1m', '2m', '3m')
+		}
+
+		and:
+		assertSettingsAppliedToTasks(GroovyCompile) { GroovyCompile compile ->
+			assert compile.groovyOptions.encoding == 'groovy-encoding'
+			assertForkOptions(compile.groovyOptions.forkOptions, '4m', '5m', '6m')
+		}
+
+		and:
+		assertSettingsAppliedToTasks(Test) { Test test ->
+			assert test.minHeapSize == '7m'
+			assert test.maxHeapSize == '8m'
+			assert test.jvmArgs.contains('-XX:MaxPermSize=9m')
+		}
 	}
 
 }
