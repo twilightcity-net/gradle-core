@@ -47,6 +47,7 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 
 	def "apply should set compiler encoding to Utf8"() {
 		when:
+		project.apply(plugin: 'groovy')
 		applyPlugin()
 
 		then:
@@ -54,6 +55,13 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		tasks.size() > 0
 		tasks.each { JavaCompile task ->
 			assert task.options.encoding == 'UTF-8'
+		}
+
+		and:
+		TaskCollection groovyTasks = project.tasks.withType(GroovyCompile)
+		groovyTasks.size() > 0
+		groovyTasks.each { GroovyCompile task ->
+			assert task.groovyOptions.encoding == 'UTF-8'
 		}
 	}
 

@@ -91,6 +91,10 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 		project.tasks.withType(JavaCompile) { JavaCompile compile ->
 			compile.options.encoding = defaultsProperties.compilerEncoding
 		}
+
+		project.tasks.withType(GroovyCompile) { GroovyCompile compile ->
+			compile.groovyOptions.encoding = defaultsProperties.compilerEncoding
+		}
 	}
 
 	private void setJavaCompatibilityVersion() {
