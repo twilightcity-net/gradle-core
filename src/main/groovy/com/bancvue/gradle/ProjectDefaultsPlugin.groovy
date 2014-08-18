@@ -17,7 +17,6 @@ package com.bancvue.gradle
 
 import com.bancvue.gradle.categories.ProjectCategory
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Jar
@@ -37,13 +36,15 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 		this.project = project
 		this.defaultsProperties = new ProjectDefaultsProperties(project)
 		project.apply(plugin: 'java')
-		setDefaultCompileMemorySettings()
-		setDefaultTestMemorySettings()
-		propagateJavaTmpDir()
-		setCompilerEncoding()
-		setJavaCompatibilityVersion()
 		addBuildDateAndJdkToJarManifest()
 		setDefaultBaseNameForJarTasks()
+		project.afterEvaluate {
+			setDefaultCompileMemorySettings()
+			setDefaultTestMemorySettings()
+			propagateJavaTmpDir()
+			setCompilerEncoding()
+			setJavaCompatibilityVersion()
+		}
 	}
 
 	private void setDefaultCompileMemorySettings() {
@@ -56,16 +57,24 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	}
 
 	private void setCompileMemorySettings(BaseForkOptions forkOptions) {
-		forkOptions.memoryInitialSize = defaultsProperties.minHeapSize
-		forkOptions.memoryMaximumSize = defaultsProperties.maxHeapSize
-		forkOptions.jvmArgs << "-XX:MaxPermSize=${defaultsProperties.maxPermSize}".toString()
+		forkOptions.memoryInitialSize = forkOptions.memoryInitialSize ?: defaultsProperties.minHeapSize
+		forkOptions.memoryMaximumSize = forkOptions.memoryMaximumSize ?: defaultsProperties.maxHeapSize
+		if (isMissingJvmArg(forkOptions, "-XX:MaxPermSize")) {
+			forkOptions.jvmArgs << "-XX:MaxPermSize=${defaultsProperties.maxPermSize}".toString()
+		}
+	}
+
+	private boolean isMissingJvmArg(def jvmArgContainer, String jvmArg) {
+		!jvmArgContainer.jvmArgs.find { it.startsWith(jvmArg) }
 	}
 
 	private void setDefaultTestMemorySettings() {
 		project.tasks.withType(Test) { Test test ->
-			test.minHeapSize = defaultsProperties.minTestHeapSize
-			test.maxHeapSize = defaultsProperties.maxTestHeapSize
-			test.jvmArgs("-XX:MaxPermSize=${defaultsProperties.maxTestPermSize}".toString())
+			test.minHeapSize = test.minHeapSize ?: defaultsProperties.minTestHeapSize
+			test.maxHeapSize = test.maxHeapSize ?: defaultsProperties.maxTestHeapSize
+			if (isMissingJvmArg(test, "-XX:MaxPermSize")) {
+				test.jvmArgs("-XX:MaxPermSize=${defaultsProperties.maxTestPermSize}".toString())
+			}
 		}
 	}
 
@@ -75,13 +84,19 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 			String jvmArgTmpDir = "-Djava.io.tmpdir=${javaTmpDir}".toString()
 
 			project.tasks.withType(Test) { Test test ->
-				test.jvmArgs(jvmArgTmpDir)
+				if (isMissingJvmArg(test, "-Djava.io.tmpdir")) {
+					test.jvmArgs(jvmArgTmpDir)
+				}
 			}
 			project.tasks.withType(GroovyCompile) { GroovyCompile compile ->
-				compile.groovyOptions.forkOptions.jvmArgs << jvmArgTmpDir
+				if (isMissingJvmArg(compile.groovyOptions.forkOptions, "-Djava.io.tmpdir")) {
+					compile.groovyOptions.forkOptions.jvmArgs << jvmArgTmpDir
+				}
 			}
 			project.tasks.withType(JavaCompile) { JavaCompile compile ->
-				compile.options.forkOptions.jvmArgs << jvmArgTmpDir
+				if (isMissingJvmArg(compile.options.forkOptions, "-Djava.io.tmpdir")) {
+					compile.options.forkOptions.jvmArgs << jvmArgTmpDir
+				}
 			}
 
 		}
@@ -89,7 +104,11 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 
 	private void setCompilerEncoding() {
 		project.tasks.withType(JavaCompile) { JavaCompile compile ->
-			compile.options.encoding = defaultsProperties.compilerEncoding
+			compile.options.encoding = compile.options.encoding ?: defaultsProperties.compilerEncoding
+		}
+
+		project.tasks.withType(GroovyCompile) { GroovyCompile compile ->
+			compile.groovyOptions.encoding = compile.groovyOptions.encoding ?: defaultsProperties.compilerEncoding
 		}
 	}
 
@@ -118,11 +137,8 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	}
 
 	private String getDefaultBaseNameForTask(Jar jar) {
-		String baseName = ProjectCategory.getArtifactIdOrNull(project)
-		if (baseName == null) {
-			baseName = jar.baseName
-		}
-		baseName
+		String artifactId = ProjectCategory.getArtifactIdOrNull(project)
+		artifactId ?: jar.baseName
 	}
 
 }

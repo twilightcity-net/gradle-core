@@ -23,8 +23,14 @@ class ProjectDefaultsProperties extends DefaultProjectPropertyContainer {
 	private static final String NAME = 'default'
 
 	private static final class Props {
+		/**
+		 * Sets the project's sourceCompatibility and targetCompatibility
+		 */
 		String javaVersion = '1.7'
 
+		/**
+		 * Default options.encoding for all JavaCompile tasks
+		 */
 		String compilerEncoding = 'UTF-8'
 
 		String minHeapSize = '64m'
