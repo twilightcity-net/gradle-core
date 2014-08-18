@@ -16,13 +16,10 @@
 package com.bancvue.gradle.test
 
 import com.bancvue.gradle.GradlePluginMixin
-import com.bancvue.gradle.categories.ProjectCategory
+import com.bancvue.gradle.support.CommonTaskFactory
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.SourceSet
-import org.gradle.api.tasks.bundling.Jar
-import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 
 @Mixin(GradlePluginMixin)
@@ -48,10 +45,7 @@ class TestExtPlugin implements Plugin<Project> {
 		if (project.file("src/mainTest").exists()) {
 			addConfigurationMainTest()
 			addSourceSetMainTest()
-			addJarMainTestTask()
-			addSourcesJarMainTestTask()
-			addJavadocMainTestTask()
-			addJavadocJarMainTestTask()
+			addJarTasks()
 			updateSourceSetTestToIncludeConfigurationMainTest()
 		}
 	}
@@ -69,52 +63,13 @@ class TestExtPlugin implements Plugin<Project> {
 		}
 	}
 
-	private void addJarMainTestTask() {
-		use(ProjectCategory) {
-			project.createJarTask("jarMainTest", "mainTest").configure {
-				baseName = baseName + "-test"
-				from project.sourceSets.mainTest.output
-			}
-		}
-	}
+	private void addJarTasks() {
+		SourceSet mainTest = project.sourceSets.mainTest
+		CommonTaskFactory taskFactory = new CommonTaskFactory(project, mainTest)
 
-	private void addSourcesJarMainTestTask() {
-		use(ProjectCategory) {
-			project.createJarTask("sourcesJarMainTest", "mainTest", "sources").configure {
-				baseName = baseName + "-test"
-				from project.sourceSets.mainTest.allSource
-			}
-		}
-	}
-
-	private void addJavadocMainTestTask() {
-		File mainTestDocsDir = getMainTestDocsDir()
-		SourceSet sourceSetMainTest = project.sourceSets.mainTest
-		Javadoc javadocMainTestTask = project.tasks.create("javadocMainTest", Javadoc)
-		javadocMainTestTask.configure {
-			source = sourceSetMainTest.allJava
-			classpath = sourceSetMainTest.output + sourceSetMainTest.compileClasspath
-			group = JavaBasePlugin.DOCUMENTATION_GROUP
-			description = "Generates Javadoc API documentation for the mainTest source code."
-			destinationDir = mainTestDocsDir
-		}
-	}
-
-	private File getMainTestDocsDir() {
-		use(ProjectCategory) {
-			new File(project.getJavaConvention().docsDir, "mainTestDocs")
-		}
-	}
-
-	private void addJavadocJarMainTestTask() {
-		Javadoc javadocMainTestTask = project.tasks.getByName("javadocMainTest")
-		use(ProjectCategory) {
-			project.createJarTask("javadocJarMainTest", "mainTest", "javadoc").configure {
-				dependsOn { javadocMainTestTask }
-				baseName = baseName + "-test"
-				from javadocMainTestTask.destinationDir
-			}
-		}
+		taskFactory.createJarTask()
+		taskFactory.createSourcesJarTask()
+		taskFactory.createJavadocJarTask()
 	}
 
 	private void updateSourceSetTestToIncludeConfigurationMainTest() {
