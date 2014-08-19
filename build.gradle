@@ -50,6 +50,7 @@ publishing_ext {
 	publishJavadoc true
 	pom {
 		packaging "jar"
+		description "A collection of gradle plugins meant to codify and streamline project development."
 		url "https://github.com/BancVue/gradle-core"
 		developers {
 			developer {
