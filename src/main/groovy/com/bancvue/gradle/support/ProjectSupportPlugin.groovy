@@ -31,7 +31,7 @@ class ProjectSupportPlugin implements Plugin<Project> {
 	void apply(Project project) {
 		this.project = project
 		addPrintClasspathTask()
-		addClearGroupCacheTask()
+		addClearGroupCacheTasks()
 	}
 
 	private void addPrintClasspathTask() {
@@ -39,10 +39,15 @@ class ProjectSupportPlugin implements Plugin<Project> {
 		printClasspath.group = TASK_GROUP_NAME
 	}
 
-	private void addClearGroupCacheTask() {
+	private void addClearGroupCacheTasks() {
 		ClearArtifactCache clearCacheTask = project.task("clearGroupCache", type: ClearArtifactCache)
 		clearCacheTask.group = TASK_GROUP_NAME
 		clearCacheTask.groupName = project.group
+
+		ClearArtifactCache clearCacheForProjectTask = project.task("clearGroupCacheForProject", type: ClearArtifactCache)
+		clearCacheForProjectTask.group = TASK_GROUP_NAME
+		clearCacheForProjectTask.groupName = project.group
+		clearCacheForProjectTask.restrictToProjectDependencies = true
 	}
 
 }
