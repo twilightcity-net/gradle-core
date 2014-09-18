@@ -87,25 +87,66 @@ class ClearArtifactCacheSpecification extends AbstractProjectSpecification {
 		ClearArtifactCache.collectGradleCacheDirsWithName(tempDir, "com.bancvue") == [new File(cacheDir, "com.bancvue")]
 	}
 	
-	@Unroll("clearArtifactCache should clear #cacheDirParentPath")
+	@Unroll("clearArtifactCache should clear #cacheDescription cache")
 	def "clearArtifactCache should clear all caches"() {
 		given:
 		clearArtifactCacheTask.userHome = tempDir
 		clearArtifactCacheTask.groupName = 'com.bancvue'
-		File cacheDir = new File(tempDir, cacheDirParentPath)
-		createDirs(cacheDir, caches)
+		File cacheRoot
+		if (cacheDirParentPath != null) {
+			cacheRoot = new File(tempDir, cacheDirParentPath)
+		} else {
+			cacheRoot = project.gradle.gradleUserHomeDir
+		}
+		createDirs(cacheRoot, [cachePath])
+		assert new File(cacheRoot, cachePath).exists()
 
 		when:
 		clearArtifactCacheTask.clearArtifactCache()
-		
+
 		then:
-		!new File(tempDir, cachePath).exists()
-		
+		!new File(cacheRoot, cachePath).exists()
+
 		where:
-		cacheDirParentPath                                 | caches                                     | cachePath
-		".groovy/grapes"                                   | ["com.bancvue"]                            | ".groovy/grapes/com.bancvue"
-		".m2/repository"                                   | ["com/bancvue"]                            | ".m2/repository/com/bancvue"
-		project.gradle.gradleUserHomeDir.absolutePath      | ["caches/modules-2/files-2.1/com.bancvue"] | ".gradle/caches/modules-2/files-2.1/com.bancvue"
+		cacheDescription | cacheDirParentPath   | cachePath
+		"groovy"         | ".groovy/grapes"     | "com.bancvue"
+		"maven"          | ".m2/repository"     | "com/bancvue"
+		"gradle"         | null                 | "caches/modules-2/files-2.1/com.bancvue"
+	}
+
+	@Unroll("clearArtifactCache should clear #cacheDescription of project dependencies")
+	def "clearArtifactCache should clear project dependency caches"() {
+		given:
+		ClearArtifactCache.DependencyResolver resolver = Mock()
+		clearArtifactCacheTask.userHome = tempDir
+		clearArtifactCacheTask.groupName = 'com.bancvue'
+		clearArtifactCacheTask.restrictToProjectDependencies = true
+		clearArtifactCacheTask.dependencyResolver = resolver
+		File cacheRoot
+		if (cacheDirParentPath != null) {
+			cacheRoot = new File(tempDir, cacheDirParentPath)
+		} else {
+			cacheRoot = project.gradle.gradleUserHomeDir
+		}
+		String dependencyCachePath = "${cachePath}/common-rest"
+		createDirs(cacheRoot, [dependencyCachePath])
+		resolver.getDependenciesForGroup(_, _) >> ['common-rest']
+		assert new File(cacheRoot, dependencyCachePath).exists()
+
+
+		when:
+		clearArtifactCacheTask.clearArtifactCache()
+
+		then:
+		cacheRoot.exists()
+		new File(cacheRoot, cachePath).exists()
+		!new File(cacheRoot, dependencyCachePath).exists()
+
+		where:
+		cacheDescription | cacheDirParentPath   | cachePath
+		"groovy"         | ".groovy/grapes"     | "com.bancvue"
+		"maven"          | ".m2/repository"     | "com/bancvue"
+		"gradle"         | null                 | "caches/modules-2/files-2.1/com.bancvue"
 	}
 
 	private void createDirs(File parent, List<String> dirNames) {

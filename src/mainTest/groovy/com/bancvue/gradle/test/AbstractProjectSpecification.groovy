@@ -15,50 +15,59 @@
  */
 package com.bancvue.gradle.test
 
+import com.google.common.io.Files
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
-import spock.lang.Shared
 import spock.lang.Specification
 
 abstract class AbstractProjectSpecification extends Specification {
 
-    @Rule
-    public TemporaryFolder projectDir = new TemporaryFolder()
-	@Shared
-    protected Project project
-    protected ProjectFileSystem projectFS
+	private File projectDir = Files.createTempDir()
+	private Project aProject = createProject()
+	private ProjectFileSystem aProjectFS = new ProjectFileSystem(aProject.rootDir)
 
-    abstract String getProjectName()
-
-    void setup() {
-        project = createProject()
-        projectFS = new ProjectFileSystem(project.rootDir)
-    }
-
-	protected void evaluateProject() {
-		project.evaluate()
+	void cleanup() {
+		projectDir.deleteDir()
 	}
 
-    protected Project createProject() {
-        ProjectBuilder.builder()
-                .withName("${projectName}-project")
-                .withProjectDir(projectDir.root)
-                .build()
-    }
+	protected String getProjectName() {
+		"root"
+	}
+
+	protected Project getProject() {
+		aProject
+	}
+
+	protected void setProject(Project project) {
+		aProject = project
+	}
+
+	protected ProjectFileSystem getProjectFS() {
+		aProjectFS
+	}
+
+	protected void evaluateProject() {
+		aProject.evaluate()
+	}
+
+	protected Project createProject() {
+		ProjectBuilder.builder()
+				.withName("${projectName}-project")
+				.withProjectDir(projectDir)
+				.build()
+	}
 
 	protected Project createSubProject(String subProjectName) {
-		File subProjectDir = projectFS.file(subProjectName)
+		File subProjectDir = aProjectFS.file(subProjectName)
 
 		ProjectBuilder.builder()
 				.withName(subProjectName)
 				.withProjectDir(subProjectDir)
-				.withParent(project)
+				.withParent(aProject)
 				.build()
 	}
 
 	protected void setArtifactId(String artifactId) {
-        project.ext['artifactId'] = artifactId
-    }
+		aProject.ext['artifactId'] = artifactId
+	}
 }
