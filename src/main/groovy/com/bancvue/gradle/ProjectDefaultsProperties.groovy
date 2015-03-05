@@ -15,6 +15,7 @@
  */
 package com.bancvue.gradle
 
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 
 
@@ -26,7 +27,7 @@ class ProjectDefaultsProperties extends DefaultProjectPropertyContainer {
 		/**
 		 * Sets the project's sourceCompatibility and targetCompatibility
 		 */
-		String javaVersion = '1.7'
+		String javaVersion = JavaVersion.VERSION_1_8
 
 		/**
 		 * Default options.encoding for all JavaCompile tasks
@@ -35,11 +36,9 @@ class ProjectDefaultsProperties extends DefaultProjectPropertyContainer {
 
 		String minHeapSize = '64m'
 		String maxHeapSize = '256m'
-		String maxPermSize = '64m'
 
 		String minTestHeapSize = '64m'
 		String maxTestHeapSize = '512m'
-		String maxTestPermSize = '64m'
 	}
 
 	@Delegate

@@ -69,7 +69,6 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		given:
 		project.ext.defaultMinHeapSize = '16m'
 		project.ext.defaultMaxHeapSize = '24m'
-		project.ext.defaultMaxPermSize = '8m'
 
 		when:
 		project.apply(plugin: 'groovy')
@@ -78,12 +77,12 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 
 		then:
 		assertSettingsAppliedToTasks(JavaCompile) { JavaCompile compile ->
-			assertForkOptions(compile.options.forkOptions, '16m', '24m', '8m')
+			assertForkOptions(compile.options.forkOptions, '16m', '24m')
 		}
 
 		and:
 		assertSettingsAppliedToTasks(GroovyCompile) { GroovyCompile compile ->
-			assertForkOptions(compile.groovyOptions.forkOptions, '16m', '24m', '8m')
+			assertForkOptions(compile.groovyOptions.forkOptions, '16m', '24m')
 		}
 	}
 
@@ -93,17 +92,15 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		tasks.each assertionClosure
 	}
 
-	private void assertForkOptions(BaseForkOptions forkOptions, String memoryInitial, String memoryMaximum, String maxPerm) {
+	private void assertForkOptions(BaseForkOptions forkOptions, String memoryInitial, String memoryMaximum) {
 		assert forkOptions.memoryInitialSize == memoryInitial
 		assert forkOptions.memoryMaximumSize == memoryMaximum
-		assert forkOptions.jvmArgs.contains("-XX:MaxPermSize=${maxPerm}".toString())
 	}
 
 	def "apply should set memory settings for test tasks"() {
 		given:
 		project.ext.defaultMinTestHeapSize = '17m'
 		project.ext.defaultMaxTestHeapSize = '23m'
-		project.ext.defaultMaxTestPermSize = '5m'
 
 		when:
 		applyPlugin()
@@ -113,7 +110,6 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		assertSettingsAppliedToTasks(Test) { Test test ->
 			assert test.minHeapSize == '17m'
 			assert test.maxHeapSize == '23m'
-			assert test.jvmArgs.contains('-XX:MaxPermSize=5m')
 		}
 	}
 
@@ -202,10 +198,8 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		project.ext.defaultJavaVersion = '1.5'
 		project.ext.defaultMinHeapSize = '1m'
 		project.ext.defaultMaxHeapSize = '2m'
-		project.ext.defaultMaxPermSize = '3m'
 		project.ext.defaultMinTestHeapSize = '4m'
 		project.ext.defaultMaxTestHeapSize = '5m'
-		project.ext.defaultMaxTestPermSize = '6m'
 		project.ext.defaultCompilerEncoding = 'ASCII'
 		evaluateProject()
 
@@ -216,20 +210,19 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		and:
 		assertSettingsAppliedToTasks(JavaCompile) { JavaCompile compile ->
 			compile.options.encoding = 'ASCII'
-			assertForkOptions(compile.options.forkOptions, '1m', '2m', '3m')
+			assertForkOptions(compile.options.forkOptions, '1m', '2m')
 		}
 
 		and:
 		assertSettingsAppliedToTasks(GroovyCompile) { GroovyCompile compile ->
 			compile.groovyOptions.encoding = 'ASCII'
-			assertForkOptions(compile.groovyOptions.forkOptions, '1m', '2m', '3m')
+			assertForkOptions(compile.groovyOptions.forkOptions, '1m', '2m')
 		}
 
 		and:
 		assertSettingsAppliedToTasks(Test) { Test test ->
 			assert test.minHeapSize == '4m'
 			assert test.maxHeapSize == '5m'
-			assert test.jvmArgs.contains('-XX:MaxPermSize=6m')
 		}
 	}
 
@@ -243,38 +236,34 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 			compile.options.encoding = 'java-encoding'
 			compile.options.forkOptions.memoryInitialSize = '1m'
 			compile.options.forkOptions.memoryMaximumSize = '2m'
-			compile.options.forkOptions.jvmArgs << '-XX:MaxPermSize=3m'
 		}
 		project.tasks.withType(GroovyCompile) { GroovyCompile compile ->
 			compile.groovyOptions.encoding = 'groovy-encoding'
 			compile.groovyOptions.forkOptions.memoryInitialSize = '4m'
 			compile.groovyOptions.forkOptions.memoryMaximumSize = '5m'
-			compile.groovyOptions.forkOptions.jvmArgs << '-XX:MaxPermSize=6m'
 		}
 		project.tasks.withType(Test) { Test test ->
 			test.minHeapSize = '7m'
 			test.maxHeapSize = '8m'
-			test.jvmArgs('-XX:MaxPermSize=9m')
 		}
 		evaluateProject()
 
 		then:
 		assertSettingsAppliedToTasks(JavaCompile) { JavaCompile compile ->
 			assert compile.options.encoding == 'java-encoding'
-			assertForkOptions(compile.options.forkOptions, '1m', '2m', '3m')
+			assertForkOptions(compile.options.forkOptions, '1m', '2m')
 		}
 
 		and:
 		assertSettingsAppliedToTasks(GroovyCompile) { GroovyCompile compile ->
 			assert compile.groovyOptions.encoding == 'groovy-encoding'
-			assertForkOptions(compile.groovyOptions.forkOptions, '4m', '5m', '6m')
+			assertForkOptions(compile.groovyOptions.forkOptions, '4m', '5m')
 		}
 
 		and:
 		assertSettingsAppliedToTasks(Test) { Test test ->
 			assert test.minHeapSize == '7m'
 			assert test.maxHeapSize == '8m'
-			assert test.jvmArgs.contains('-XX:MaxPermSize=9m')
 		}
 	}
 
