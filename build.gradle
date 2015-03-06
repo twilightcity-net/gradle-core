@@ -77,7 +77,7 @@ bintray {
 	pkg {
 		repo = 'maven'
 		userOrg = 'bancvue'
-		name = project.ext['artifactId']
+		name = project.group + ':' + project.ext['artifactId']
 		desc = project.description
 		websiteUrl = 'https://github.com/BancVue/gradle-core'
 		issueTrackerUrl = 'https://github.com/BancVue/gradle-core/issues'
