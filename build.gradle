@@ -1,4 +1,11 @@
 buildscript {
+	ext {
+		if (!project.hasProperty("nexusUrl")) {
+			nexusUrl = "http://nexus-dev.blackbaudcloud.com"
+		}
+		repositoryReleaseUrl = nexusUrl + "/content/repositories/releases"
+	}
+
 	repositories {
 		jcenter()
 	}
