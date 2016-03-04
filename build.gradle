@@ -1,7 +1,7 @@
 buildscript {
 	ext {
 		if (!project.hasProperty("nexusUrl")) {
-			nexusUrl = "http://nexus-dev.blackbaudcloud.com"
+			nexusUrl = "https://nexus-lonxt-dev.blackbaudcloud.com"
 		}
 		repositoryReleaseUrl = nexusUrl + "/content/repositories/releases"
 	}
