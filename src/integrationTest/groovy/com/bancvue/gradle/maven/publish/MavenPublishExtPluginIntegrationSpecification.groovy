@@ -29,6 +29,12 @@ class MavenPublishExtPluginIntegrationSpecification extends AbstractPluginIntegr
 	}
 
 	private void setupLocalMavenRepoAndApplyPlugin() {
+		projectFS.file("gradle.properties") << """
+artifactId=artifact
+group=group
+version=1.0
+"""
+
 		buildFile << """
 ext.repositoryUsername=''
 ext.repositoryPassword=''
@@ -37,9 +43,6 @@ ext.artifactId='artifact'
 
 apply plugin: 'com.bancvue.maven-publish-ext'
 apply plugin: 'com.bancvue.project-defaults' // set jar baseName to artifactId
-
-group = 'group'
-version = '1.0'
 """
 	}
 
@@ -134,6 +137,69 @@ publishing_ext {
 		assertArchiveBuiltAndUploadedToMavenRepo("artifact", "sources")
 		assertArchiveBuiltAndUploadedToMavenRepo("artifact-custom")
 		assertArchiveBuiltAndUploadedToMavenRepo("artifact-custom", "sources")
+	}
+
+	def "should respect artifactId defined in extended publication block"() {
+		given:
+		emptyClassFile("src/custom/java/CustomClass.java")
+		setupLocalMavenRepoAndApplyPlugin()
+		buildFile << """
+configurations {
+	custom
+}
+
+sourceSets {
+	custom {
+		java {
+			srcDir 'src/custom/java'
+		}
+	}
+}
+
+publishing_ext {
+	publication("custom") {
+		artifactId "custom-override"
+	}
+}
+"""
+
+		when:
+		run("publish")
+
+		then:
+		assertArchiveBuiltAndUploadedToMavenRepo("custom-override")
+		assertArchiveBuiltAndUploadedToMavenRepo("custom-override", "sources")
+	}
+
+	def "should respect artifactId defined in mainTest publication block"() {
+		given:
+		emptyClassFile("src/mainTest/java/MainTestClass.java")
+		setupLocalMavenRepoAndApplyPlugin()
+		buildFile << """
+apply plugin: 'com.bancvue.test-ext'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	mainTestCompile('org.spockframework:spock-core:0.7-groovy-1.8')
+}
+
+publishing_ext {
+	publication('mainTest') {
+		artifactId "custom-test"
+	}
+}
+"""
+
+		when:
+		run("publish")
+
+		then:
+		println projectFS.file("build/libs").listFiles()
+		assertArchiveBuiltAndUploadedToMavenRepo("custom-test")
+		assertArchiveBuiltAndUploadedToMavenRepo("custom-test", "sources")
 	}
 
 	def "should use custom source set and configuration if configured"() {
@@ -288,6 +354,7 @@ publishing_ext {
 		run("publish")
 
 		then:
+		println projectFS.file("build/libs").listFiles()
 		PomFile pomFile = getPomFile("artifact")
 		pomFile.assertExclusion("http-builder", "*", "commons-lang")
 		pomFile.assertExclusion("http-builder", "xml-resolver", "xml-resolver")

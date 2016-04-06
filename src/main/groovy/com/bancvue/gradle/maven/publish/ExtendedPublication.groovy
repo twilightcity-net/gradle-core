@@ -157,6 +157,9 @@ class ExtendedPublication {
 		if (jarTask == null) {
 			jarTask = createJarTaskIfSourceSetAvailable(jarTaskName, createJarTask)
 		}
+		if (jarTask) {
+			jarTask.baseName = artifactId
+		}
 		jarTask
 	}
 
