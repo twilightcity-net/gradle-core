@@ -132,21 +132,21 @@ class ExtendedPublication {
 	private Jar findOrCreateJarTask() {
 		resolveJarTask(
 				{ namer.jarTaskName },
-				{ CommonTaskFactory generator -> generator.createJarTask(artifactId) }
+				{ CommonTaskFactory generator -> generator.createJarTask() }
 		)
 	}
 
 	private Jar findOrCreateSourcesJarTask() {
 		resolveJarTask(
 				{ namer.sourcesJarTaskName },
-				{ CommonTaskFactory generator -> generator.createSourcesJarTask(artifactId) }
+				{ CommonTaskFactory generator -> generator.createSourcesJarTask() }
 		)
 	}
 
 	private Jar findOrCreateJavadocJarTask() {
 		resolveJarTask(
 				{ namer.javadocJarTaskName },
-				{ CommonTaskFactory generator -> generator.createJavadocJarTask(artifactId) }
+				{ CommonTaskFactory generator -> generator.createJavadocJarTask() }
 		)
 	}
 
