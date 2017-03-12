@@ -125,7 +125,7 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 
 		then:
 		assertSettingsAppliedToTasks(Test) { Test test ->
-			assert test.systemProperties["java.io.tmpdir"] == "new_tmpdir_value"
+			assert test.allJvmArgs.contains("-Djava.io.tmpdir=new_tmpdir_value")
 		}
 
 		and:

@@ -57,7 +57,8 @@ class NamedTestConfigurationPlugin implements Plugin<Project> {
 		project.sourceSets {
 			"${configurationName}" {
 				compileClasspath = main.output + test.compileClasspath - test.output +
-						project.configurations."${configurationName}Compile"
+						project.configurations."${configurationName}Compile" +
+						project.configurations."${configurationName}CompileOnly"
 				runtimeClasspath = project.sourceSets."${configurationName}".output + main.output +
 						test.runtimeClasspath - test.output + project.configurations."${configurationName}Runtime"
 			}

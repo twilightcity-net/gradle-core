@@ -51,13 +51,13 @@ class TestExtPlugin implements Plugin<Project> {
 	}
 
 	private void addConfigurationMainTest() {
-		createNamedConfigurationExtendingFrom("mainTest", "compile", "runtime")
+		createNamedConfigurationExtendingFrom("mainTest", "compile", "compileOnly", "runtime")
 	}
 
 	private void addSourceSetMainTest() {
 		project.sourceSets {
 			mainTest {
-				compileClasspath = main.output + project.configurations.mainTestCompile
+				compileClasspath = main.output + project.configurations.mainTestCompile + project.configurations.mainTestCompileOnly
 				runtimeClasspath = mainTest.output + main.output + project.configurations.mainTestRuntime
 			}
 		}
@@ -76,7 +76,8 @@ class TestExtPlugin implements Plugin<Project> {
 		project.sourceSets {
 			test {
 				compileClasspath = mainTest.output + main.output +
-						project.configurations.mainTestCompile + compileClasspath
+						project.configurations.mainTestCompile +
+						project.configurations.mainTestCompileOnly + compileClasspath
 				runtimeClasspath = test.output + mainTest.output + main.output +
 						project.configurations.mainTestRuntime + runtimeClasspath
 			}

@@ -53,18 +53,25 @@ class GradlePluginMixin {
 
 	void createNamedConfigurationExtendingFrom(String configurationName, String extendsFromConfigurationName) {
 		String extendsFromCompileConfigurationName = "${extendsFromConfigurationName}Compile"
+		String extendsFromCompileOnlyConfigurationName = "${extendsFromConfigurationName}CompileOnly"
 		String extendsFromRuntimeConfigurationName = "${extendsFromConfigurationName}Runtime"
-		createNamedConfigurationExtendingFrom(configurationName, extendsFromCompileConfigurationName, extendsFromRuntimeConfigurationName)
+		createNamedConfigurationExtendingFrom(configurationName, extendsFromCompileConfigurationName,
+                                              extendsFromCompileOnlyConfigurationName, extendsFromRuntimeConfigurationName)
 	}
 
-	void createNamedConfigurationExtendingFrom(String configurationName, String extendsFromCompileConfigurationName, String extendsFromRuntimeConfigurationName) {
+	void createNamedConfigurationExtendingFrom(String configurationName, String extendsFromCompileConfigurationName,
+												String extendsFromCompileOnlyConfigurationName, String extendsFromRuntimeConfigurationName) {
 		Configuration extendsFromCompileConfiguration = acquireConfigurationByName(extendsFromCompileConfigurationName)
+		Configuration extendsFromCompileOnlyConfiguration = acquireConfigurationByName(extendsFromCompileOnlyConfigurationName)
 		Configuration extendsFromRuntimeConfiguration = acquireConfigurationByName(extendsFromRuntimeConfigurationName)
 
 		acquirePluginProject().configurations {
 			"${configurationName}" {}
 			"${configurationName}Compile" {
 				extendsFrom(extendsFromCompileConfiguration)
+			}
+			"${configurationName}CompileOnly" {
+				extendsFrom(extendsFromCompileOnlyConfiguration)
 			}
 			"${configurationName}Runtime" {
 				extendsFrom(extendsFromRuntimeConfiguration)
