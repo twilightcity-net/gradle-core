@@ -175,4 +175,40 @@ apply plugin: 'com.bancvue.integration-test'
 		assertIdeaModuleFileContainsExpectedResourceFolder(expectedImlFile, "src/integrationTest/resources", true)
 	}
 
+	def "should include compileOnly dependencies"() {
+		given:
+		buildFile << """
+apply plugin: 'groovy'
+apply plugin: 'com.bancvue.ide-ext'
+apply plugin: 'com.bancvue.test-ext'
+apply plugin: 'com.bancvue.component-test'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compileOnly 'cglib:cglib-nodep:2.2.2'
+	testCompileOnly 'org.objenesis:objenesis:1.3'
+	mainTestCompileOnly 'commons-io:commons-io:2.4'
+	componentTestCompileOnly 'org.apache.commons:commons-collections4:4.0'
+}
+        """
+		mkdir("src/main/java")
+		mkdir("src/test/groovy")
+		mkdir("src/mainTest")
+		mkdir("src/componentTest/groovy")
+
+		when:
+		run("idea")
+
+		then:
+		File expectedImlFile = file("${projectFS.name}.iml")
+		expectedImlFile.exists()
+		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/cglib/cglib-nodep/2.2.2/")
+		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/org.objenesis/objenesis/1.3/")
+		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/commons-io/commons-io/2.4/")
+		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/org.apache.commons/commons-collections4/4.0/")
+	}
+
 }

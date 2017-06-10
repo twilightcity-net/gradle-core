@@ -179,8 +179,9 @@ class IdeExtPlugin implements Plugin<Project> {
 				}
 			}
 
-			compileConfigurations = findConfigurationsMatching(project, /(?i).*(?<!test)compile$/)
-			runtimeConfigurations = findConfigurationsMatching(project, /(?i).*(?<!test)runtime$/)
+			compileConfigurations = findConfigurationsMatching(project, /(?i).*(?<!test>)compile$/) +
+					findConfigurationsMatching(project, /(?i).*(?<!test>)compileonly$/)
+			runtimeConfigurations = findConfigurationsMatching(project, /(?i).*(?<!test>)runtime$/)
 			testRuntimeConfigurations = findConfigurationsMatching(project, /(?i).*testruntime$/)
 		}
 
