@@ -29,33 +29,64 @@ class MavenRepositoryPropertiesSpecification extends Specification {
 		properties = new MavenRepositoryProperties(project)
 	}
 
-	def "hasCredentialsDefined should return false if username only defined"() {
+	def "hasPublishCredentialsDefined should return false if username only defined"() {
 		when:
 		properties.username = "username"
 
 		then:
-		!properties.hasCredentialsDefined()
+		!properties.hasPublishCredentialsDefined()
 	}
 
-	def "hasCredentialsDefined should return false if password only defined"() {
+	def "hasPublishCredentialsDefined should return false if password only defined"() {
 		when:
 		properties.password = "password"
 
 		then:
-		!properties.hasCredentialsDefined()
+		!properties.hasPublishCredentialsDefined()
 	}
 
-	def "hasCredentialsDefined should return false if username and password not defined"() {
+	def "hasPublishCredentialsDefined should return false if username and password not defined"() {
 		expect:
-		!properties.hasCredentialsDefined()
+		!properties.hasPublishCredentialsDefined()
 	}
 	
-	def "hasCredentialsDefined should return true if username and password defined"() {
+	def "hasPublishCredentialsDefined should return true if username and password defined"() {
 		when:
 		properties.username = "username"
 		properties.password = "password"
 
 		then:
-		properties.hasCredentialsDefined()
+		properties.hasPublishCredentialsDefined()
 	}
+
+	def "hasReadCredentialsDefined should return false if username only defined"() {
+		when:
+		properties.readUsername = "username"
+
+		then:
+		!properties.hasReadCredentialsDefined()
+	}
+
+	def "hasReadCredentialsDefined should return false if password only defined"() {
+		when:
+		properties.readPassword = "password"
+
+		then:
+		!properties.hasReadCredentialsDefined()
+	}
+
+	def "hasReadCredentialsDefined should return false if username and password not defined"() {
+		expect:
+		!properties.hasReadCredentialsDefined()
+	}
+
+	def "hasReadCredentialsDefined should return true if username and password defined"() {
+		when:
+		properties.readUsername = "username"
+		properties.readPassword = "password"
+
+		then:
+		properties.hasReadCredentialsDefined()
+	}
+
 }

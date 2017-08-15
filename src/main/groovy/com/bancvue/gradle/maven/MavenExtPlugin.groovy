@@ -77,9 +77,14 @@ class MavenExtPlugin implements Plugin<Project> {
 
 	private void addMavenLocalAndOrganizationArtifactRepository() {
 		project.repositories.mavenLocal()
-
 		project.repositories {
 			maven {
+				if (repositoryProperties.hasReadCredentialsDefined()) {
+					credentials {
+						username repositoryProperties.readUsername
+						password repositoryProperties.readPassword
+					}
+				}
 				name repositoryProperties.name
 				url repositoryProperties.publicUrl
 			}

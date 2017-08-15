@@ -50,6 +50,18 @@ class MavenRepositoryProperties extends DefaultProjectPropertyContainer {
 		 * happen on a CI server and will be passed in by the CI job.
 		 */
 		String password
+
+		/**
+		 * Read/Download repository password.  Only needed if building in VSTS.
+		 * Will happen on a CI server and will be passed in by the CI job.
+		 */
+		String readUsername
+
+		/**
+		 * Read/Download repository password.  Only needed if building in VSTS.
+		 * Will happen on a CI server and will be passed in by the CI job.
+		 */
+		String readPassword
 	}
 
 	@Delegate
@@ -59,8 +71,12 @@ class MavenRepositoryProperties extends DefaultProjectPropertyContainer {
 		super(project, NAME)
 	}
 
-	boolean hasCredentialsDefined() {
+	boolean hasPublishCredentialsDefined() {
 		username && password
+	}
+
+	boolean hasReadCredentialsDefined() {
+		readUsername && readPassword
 	}
 
 }

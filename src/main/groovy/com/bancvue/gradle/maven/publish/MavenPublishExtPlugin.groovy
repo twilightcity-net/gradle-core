@@ -63,6 +63,12 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 		project.repositories.mavenLocal()
 		project.repositories {
 			maven {
+				if (repositoryProperties.hasReadCredentialsDefined()) {
+					credentials {
+						username repositoryProperties.readUsername
+						password repositoryProperties.readPassword
+					}
+				}
 				name repositoryProperties.name
 				url repositoryProperties.publicUrl
 			}
@@ -87,7 +93,7 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 				maven {
 					name repositoryProperties.name
 					url acquireRepositoryPublishUrl()
-					if (repositoryProperties.hasCredentialsDefined()) {
+					if (repositoryProperties.hasPublishCredentialsDefined()) {
 						credentials {
 							username repositoryProperties.username
 							password repositoryProperties.password
