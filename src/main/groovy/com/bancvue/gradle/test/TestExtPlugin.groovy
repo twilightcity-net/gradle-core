@@ -35,35 +35,57 @@ class TestExtPlugin implements Plugin<Project> {
 	void apply(Project project) {
 		this.project = project
 		project.apply(plugin: "java")
-		addMainTestConfigurationIfMainTestDirDefined()
+		configureMainTestAndSharedTest()
 		updateTestLoggersToWriteStackTracesOnTestFailure()
 		udpateTestLoggersToWriteSkippedTestEvents()
 		addStyledTestOutputTask()
 	}
 
-	private void addMainTestConfigurationIfMainTestDirDefined() {
+	private void configureMainTestAndSharedTest() {
+		addMainTestAndSharedTestConfigurations()
+		addMainTestAndSharedTestSourceSets()
+		updateSourceSetTestToIncludeConfigurationSharedTest()
+
 		if (project.file("src/mainTest").exists()) {
-			addConfigurationMainTest()
-			addSourceSetMainTest()
-			addJarTasks()
-			updateSourceSetTestToIncludeConfigurationMainTest()
+			addMainTestJarTasks()
 		}
 	}
 
-	private void addConfigurationMainTest() {
-		createNamedConfigurationExtendingFrom("mainTest", "compile", "compileOnly", "runtime")
+	private void addMainTestAndSharedTestConfigurations() {
+		createNamedConfigurationExtendingFrom("mainTest", "compile", "compileOnly", null)
+		createNamedConfigurationExtendingFrom("sharedTest", "compile", "compileOnly", "runtime")
 	}
 
-	private void addSourceSetMainTest() {
+	private void addMainTestAndSharedTestSourceSets() {
 		project.sourceSets {
 			mainTest {
-				compileClasspath = main.output + project.configurations.mainTestCompile + project.configurations.mainTestCompileOnly
-				runtimeClasspath = mainTest.output + main.output + project.configurations.mainTestRuntime
+				compileClasspath = main.output +
+						project.configurations.mainTestCompile +
+						project.configurations.mainTestCompileOnly +
+						project.configurations.sharedTestCompile +
+						project.configurations.sharedTestCompileOnly
+				runtimeClasspath = mainTest.output +
+						project.configurations.mainTestRuntime
+			}
+		}
+
+		project.sourceSets {
+			sharedTest {
+				compileClasspath = mainTest.output + main.output +
+						project.configurations.mainTestCompile +
+						project.configurations.mainTestCompileOnly +
+						project.configurations.sharedTestCompile +
+						project.configurations.sharedTestCompileOnly
+				runtimeClasspath = sharedTest.output + mainTest.output + main.output +
+						project.configurations.mainTestRuntime +
+						project.configurations.mainTestCompileOnly +
+						project.configurations.sharedTestRuntime +
+						project.configurations.sharedTestCompileOnly
 			}
 		}
 	}
 
-	private void addJarTasks() {
+	private void addMainTestJarTasks() {
 		SourceSet mainTest = project.sourceSets.mainTest
 		CommonTaskFactory taskFactory = new CommonTaskFactory(project, mainTest)
 
@@ -72,14 +94,11 @@ class TestExtPlugin implements Plugin<Project> {
 		taskFactory.createJavadocJarTask()
 	}
 
-	private void updateSourceSetTestToIncludeConfigurationMainTest() {
+	private void updateSourceSetTestToIncludeConfigurationSharedTest() {
 		project.sourceSets {
 			test {
-				compileClasspath = mainTest.output + main.output +
-						project.configurations.mainTestCompile +
-						project.configurations.mainTestCompileOnly + compileClasspath
-				runtimeClasspath = test.output + mainTest.output + main.output +
-						project.configurations.mainTestRuntime + runtimeClasspath
+				compileClasspath = sharedTest.output + sharedTest.compileClasspath + compileClasspath
+				runtimeClasspath = test.output + sharedTest.runtimeClasspath + runtimeClasspath
 			}
 		}
 	}

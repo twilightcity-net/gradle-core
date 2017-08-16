@@ -16,7 +16,6 @@
 package com.bancvue.gradle
 
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ConfigurableFileCollection
 import org.slf4j.Logger
@@ -61,26 +60,32 @@ class GradlePluginMixin {
 
 	void createNamedConfigurationExtendingFrom(String configurationName, String extendsFromCompileConfigurationName,
 												String extendsFromCompileOnlyConfigurationName, String extendsFromRuntimeConfigurationName) {
-		Configuration extendsFromCompileConfiguration = acquireConfigurationByName(extendsFromCompileConfigurationName)
-		Configuration extendsFromCompileOnlyConfiguration = acquireConfigurationByName(extendsFromCompileOnlyConfigurationName)
-		Configuration extendsFromRuntimeConfiguration = acquireConfigurationByName(extendsFromRuntimeConfigurationName)
+		Configuration extendsFromCompileConfiguration = findConfigurationByName(extendsFromCompileConfigurationName)
+		Configuration extendsFromCompileOnlyConfiguration = findConfigurationByName(extendsFromCompileOnlyConfigurationName)
+		Configuration extendsFromRuntimeConfiguration = findConfigurationByName(extendsFromRuntimeConfigurationName)
 
 		acquirePluginProject().configurations {
 			"${configurationName}" {}
 			"${configurationName}Compile" {
-				extendsFrom(extendsFromCompileConfiguration)
+				if (extendsFromCompileConfiguration != null) {
+					extendsFrom(extendsFromCompileConfiguration)
+				}
 			}
 			"${configurationName}CompileOnly" {
-				extendsFrom(extendsFromCompileOnlyConfiguration)
+				if (extendsFromCompileOnlyConfiguration != null) {
+					extendsFrom(extendsFromCompileOnlyConfiguration)
+				}
 			}
 			"${configurationName}Runtime" {
-				extendsFrom(extendsFromRuntimeConfiguration)
+				if (extendsFromRuntimeConfiguration != null) {
+					extendsFrom(extendsFromRuntimeConfiguration)
+				}
 			}
 		}
 	}
 
-	Configuration acquireConfigurationByName(String extendsFromCompileConfigurationName) {
-		acquirePluginProject().configurations.getByName(extendsFromCompileConfigurationName)
+	Configuration findConfigurationByName(String configurationName) {
+		configurationName != null ? acquirePluginProject().configurations.getByName(configurationName) : null
 	}
 
 }
