@@ -42,8 +42,8 @@ repositories {
 }
 
 dependencies {
-    testCompile localGroovy()
-    testCompile 'junit:junit:4.11'
+    sharedTestCompile localGroovy()
+    sharedTestCompile 'junit:junit:4.11'
 }
 
 sourceSets {

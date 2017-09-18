@@ -30,14 +30,15 @@ class JacocoExtPluginIntegrationSpecification extends AbstractPluginIntegrationS
 
 		buildFile << """
 apply plugin: 'groovy'
+apply plugin: 'com.bancvue.test-ext'
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-    testCompile localGroovy()
-    testCompile 'junit:junit:4.11'
+    sharedTestCompile localGroovy()
+    sharedTestCompile 'junit:junit:4.11'
 }
 """
 	}
@@ -118,7 +119,6 @@ apply plugin: 'com.bancvue.component-test'
 		createSrcAndTestFiles(mainTestSrcFile, componentTestDir)
 		buildFile << """
 apply plugin: 'com.bancvue.jacoco-ext'
-apply plugin: 'com.bancvue.test-ext'
 apply plugin: 'com.bancvue.component-test'
 
 jacocoComponentTestReport {

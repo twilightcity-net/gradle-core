@@ -52,37 +52,24 @@ class TestExtPlugin implements Plugin<Project> {
 	}
 
 	private void addMainTestAndSharedTestConfigurations() {
-		createNamedConfigurationExtendingFrom("mainTest", "compile", "compileOnly", null)
-		createNamedConfigurationExtendingFrom("sharedTest", "compile", "compileOnly", "runtime")
+		createNamedConfigurationExtendingFrom("mainTest", ["compile"], ["compileOnly"], [])
+		createNamedConfigurationExtendingFrom("sharedTest", ["compile", "mainTestCompile"], ["compileOnly", "mainTestCompileOnly"], ["runtime"])
 	}
 
 	private void addMainTestAndSharedTestSourceSets() {
 		project.sourceSets {
 			mainTest {
-				compileClasspath = main.output +
-						project.configurations.mainTestCompile +
-						project.configurations.mainTestCompileOnly +
-						project.configurations.sharedTestCompile +
-						project.configurations.sharedTestCompileOnly
-				runtimeClasspath = mainTest.output +
-						project.configurations.mainTestRuntime
+				compileClasspath = main.output + compileClasspath
+				runtimeClasspath = mainTest.output + main.output + runtimeClasspath
 			}
 		}
 
 		project.sourceSets {
-			sharedTest {
-				compileClasspath = mainTest.output + main.output +
-						project.configurations.mainTestCompile +
-						project.configurations.mainTestCompileOnly +
-						project.configurations.sharedTestCompile +
-						project.configurations.sharedTestCompileOnly
-				runtimeClasspath = sharedTest.output + mainTest.output + main.output +
-						project.configurations.mainTestRuntime +
-						project.configurations.mainTestCompileOnly +
-						project.configurations.sharedTestRuntime +
-						project.configurations.sharedTestCompileOnly
-			}
-		}
+            sharedTest {
+                compileClasspath = mainTest.output + main.output + compileClasspath
+                runtimeClasspath = sharedTest.output + mainTest.output + main.output + runtimeClasspath
+            }
+        }
 	}
 
 	private void addMainTestJarTasks() {

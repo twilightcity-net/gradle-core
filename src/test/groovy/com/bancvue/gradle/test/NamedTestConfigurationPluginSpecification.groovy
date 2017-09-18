@@ -54,9 +54,9 @@ class NamedTestConfigurationPluginSpecification extends AbstractPluginSpecificat
 		then:
 		project.configurations.functionalTest
 		project.configurations.functionalTestCompile
-		project.configurations.functionalTestCompile.extendsFrom.contains(project.configurations.testCompile)
+		project.configurations.functionalTestCompile.extendsFrom.contains(project.configurations.sharedTestCompile)
 		project.configurations.functionalTestRuntime
-		project.configurations.functionalTestRuntime.extendsFrom.contains(project.configurations.testRuntime)
+		project.configurations.functionalTestRuntime.extendsFrom.contains(project.configurations.sharedTestRuntime)
 	}
 
 	def "apply should not add functionalTest configuration if src dir does not exist"() {

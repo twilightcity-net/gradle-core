@@ -54,34 +54,34 @@ class GradlePluginMixin {
 		String extendsFromCompileConfigurationName = "${extendsFromConfigurationName}Compile"
 		String extendsFromCompileOnlyConfigurationName = "${extendsFromConfigurationName}CompileOnly"
 		String extendsFromRuntimeConfigurationName = "${extendsFromConfigurationName}Runtime"
-		createNamedConfigurationExtendingFrom(configurationName, extendsFromCompileConfigurationName,
-                                              extendsFromCompileOnlyConfigurationName, extendsFromRuntimeConfigurationName)
+		createNamedConfigurationExtendingFrom(configurationName, [extendsFromCompileConfigurationName],
+                                              [extendsFromCompileOnlyConfigurationName], [extendsFromRuntimeConfigurationName])
 	}
 
-	void createNamedConfigurationExtendingFrom(String configurationName, String extendsFromCompileConfigurationName,
-												String extendsFromCompileOnlyConfigurationName, String extendsFromRuntimeConfigurationName) {
-		Configuration extendsFromCompileConfiguration = findConfigurationByName(extendsFromCompileConfigurationName)
-		Configuration extendsFromCompileOnlyConfiguration = findConfigurationByName(extendsFromCompileOnlyConfigurationName)
-		Configuration extendsFromRuntimeConfiguration = findConfigurationByName(extendsFromRuntimeConfigurationName)
+	void createNamedConfigurationExtendingFrom(String configurationName,
+											   List<String> extendsFromCompileConfigurationNames,
+											   List<String> extendsFromCompileOnlyConfigurationNames,
+											   List<String> extendsFromRuntimeConfigurationNames) {
 
-		acquirePluginProject().configurations {
-			"${configurationName}" {}
-			"${configurationName}Compile" {
-				if (extendsFromCompileConfiguration != null) {
-					extendsFrom(extendsFromCompileConfiguration)
-				}
-			}
-			"${configurationName}CompileOnly" {
-				if (extendsFromCompileOnlyConfiguration != null) {
-					extendsFrom(extendsFromCompileOnlyConfiguration)
-				}
-			}
-			"${configurationName}Runtime" {
-				if (extendsFromRuntimeConfiguration != null) {
-					extendsFrom(extendsFromRuntimeConfiguration)
-				}
-			}
+		acquirePluginProject().configurations.create(configurationName)
+		createNamedConfigurationExtendingFrom("${configurationName}Compile".toString(), extendsFromCompileConfigurationNames)
+		createNamedConfigurationExtendingFrom("${configurationName}CompileOnly".toString(), extendsFromCompileOnlyConfigurationNames)
+		createNamedConfigurationExtendingFrom("${configurationName}Runtime".toString(), extendsFromRuntimeConfigurationNames)
+	}
+
+    Configuration createNamedConfigurationExtendingFrom(String configurationName, List<String> extendsFromConfigurationNames) {
+		Configuration configuration = acquirePluginProject().configurations.create(configurationName)
+		List<Configuration> extendsFromConfigurations = findConfigurationsByName(extendsFromConfigurationNames)
+		if (extendsFromConfigurations.isEmpty() == false) {
+			configuration.setExtendsFrom(extendsFromConfigurations)
 		}
+		configuration
+	}
+
+	List<Configuration> findConfigurationsByName(List<String> configurationNames) {
+		configurationNames.collect {
+			findConfigurationByName(it)
+		}.findAll { it != null }
 	}
 
 	Configuration findConfigurationByName(String configurationName) {
