@@ -99,7 +99,7 @@ class IdeExtPlugin implements Plugin<Project> {
 				testSourceDirs += info.testSourceDirs
 				scopes.COMPILE.plus += info.compileConfigurations
 				scopes.RUNTIME.plus += info.runtimeConfigurations - info.compileConfigurations
-				scopes.TEST.plus += info.testRuntimeConfigurations - info.runtimeConfigurations
+				scopes.TEST.plus += info.testConfigurations
 
 				iml {
 					withXml { provider ->
@@ -152,7 +152,7 @@ class IdeExtPlugin implements Plugin<Project> {
 
 		project.eclipse {
 			classpath {
-				plusConfigurations += info.getRuntimeConfigurations() + info.getTestRuntimeConfigurations()
+				plusConfigurations += info.getRuntimeConfigurations() + info.getTestConfigurations()
 			}
 		}
 	}
@@ -164,7 +164,7 @@ class IdeExtPlugin implements Plugin<Project> {
 		Set<File> testSourceDirs
 		Set<Configuration> compileConfigurations
 		Set<Configuration> runtimeConfigurations
-		Set<Configuration> testRuntimeConfigurations
+		Set<Configuration> testConfigurations
 
 		ProjectInfo(Project project) {
 			sourceDirs = []
@@ -179,10 +179,11 @@ class IdeExtPlugin implements Plugin<Project> {
 				}
 			}
 
-			compileConfigurations = findConfigurationsMatching(project, /(?i).*(?<!test>)compile$/) +
-					findConfigurationsMatching(project, /(?i).*(?<!test>)compileonly$/)
-			runtimeConfigurations = findConfigurationsMatching(project, /(?i).*(?<!test>)runtime$/)
-			testRuntimeConfigurations = findConfigurationsMatching(project, /(?i).*testruntime$/)
+			compileConfigurations = findConfigurationsMatching(project, /(?i).*(?<!test)compile$/) +
+					findConfigurationsMatching(project, /(?i).*(?<!test)compileonly$/)
+			runtimeConfigurations = findConfigurationsMatching(project, /(?i).*(?<!test)runtime$/)
+			testConfigurations = findConfigurationsMatching(project, /(?i).*testcompile$/) +
+					findConfigurationsMatching(project, /(?i).*testcompileonly$/)
 		}
 
 		private Set<Configuration> findConfigurationsMatching(Project project, String regex) {
@@ -192,6 +193,5 @@ class IdeExtPlugin implements Plugin<Project> {
 		}
 
 	}
-
 
 }

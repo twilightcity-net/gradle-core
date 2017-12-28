@@ -51,7 +51,7 @@ sourceSets {
 		then:
 		File expectedImlFile = file("${projectFS.name}.iml")
 		expectedImlFile.exists()
-		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/org.apache.commons/commons-collections4/4.0/")
+		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/org.apache.commons/commons-collections4/4.0/", "TEST")
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/main/java", false)
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/other/java", false)
 		assertIdeaModuleFileContainsExpectedSourceFolder(expectedImlFile, "src/test/groovy", true)
@@ -86,15 +86,20 @@ sourceSets {
 		}
 	}
 
-	private void assertIdeaModuleFileContainsExpectedDependency(File expectedImlFile, String expectedUrlPath) {
+	private void assertIdeaModuleFileContainsExpectedDependency(File expectedImlFile, String expectedUrlPath, String expectedScope = null) {
 		def module = new XmlParser().parseText(expectedImlFile.text)
 
-		List result = module.component.orderEntry.library.CLASSES.root.findAll {
-			it.@url =~ expectedUrlPath
+		def orderEntry = module.component.orderEntry.find { def orderEntry ->
+			orderEntry.library.CLASSES.root.find {
+				it.@url =~ expectedUrlPath
+			}
 		}
 
-		if (!result) {
+		if (!orderEntry) {
 			fail("Expected dependency url=${expectedUrlPath} not found in iml content=${expectedImlFile.text}")
+		}
+		if (expectedScope != null && orderEntry.@scope != expectedScope) {
+			fail("Expected dependency url=${expectedUrlPath} not in expected scope=${expectedScope}, was=${orderEntry.@scope}")
 		}
 	}
 
@@ -206,9 +211,9 @@ dependencies {
 		File expectedImlFile = file("${projectFS.name}.iml")
 		expectedImlFile.exists()
 		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/cglib/cglib-nodep/2.2.2/")
-		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/org.objenesis/objenesis/1.3/")
-		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/commons-io/commons-io/2.4/")
-		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/org.apache.commons/commons-collections4/4.0/")
+		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/org.objenesis/objenesis/1.3/", "TEST")
+		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/commons-io/commons-io/2.4/", "TEST")
+		assertIdeaModuleFileContainsExpectedDependency(expectedImlFile, "/org.apache.commons/commons-collections4/4.0/", "TEST")
 	}
 
 }
