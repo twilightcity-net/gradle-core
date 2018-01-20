@@ -243,29 +243,32 @@ class MavenPublishExtExtension {
 			Set runtimeDependencies = dependencyResolver.getRuntimeDependencies(extendedPublication)
 
 			log.info("Attaching dependencies to maven publication ${mavenPublication.name}")
-			applyConfigurePomClosureToMavenPublication(mavenPublication) {
-				dependencies {
-					runtimeDependencies.each { Dependency aDependency ->
-						List<Exclusion> exclusionList = dependencyResolver.getDependencyExclusions(aDependency)
+			mavenPublication.pom.withXml {
+				def dependenciesNode = asNode().getAt("dependencies")[0]
+				if (dependenciesNode == null) {
+					dependenciesNode = asNode().appendNode("dependencies")
+				}
 
-						dependency {
-							groupId aDependency.group
-							artifactId aDependency.name
-							version aDependency.version
-							scope "runtime"
+				runtimeDependencies.each { Dependency aDependency ->
+					addDependency(dependenciesNode, aDependency, "runtime")
+				}
+			}
+		}
 
-							if (exclusionList) {
-								exclusions {
-									exclusionList.each { Exclusion item ->
-										exclusion {
-											groupId item.groupId
-											artifactId item.artifactId
-										}
-									}
-								}
-							}
-						}
-					}
+		private void addDependency(def dependenciesNode, Dependency aDependency, String scope) {
+			def dependencyNode = dependenciesNode.appendNode('dependency')
+			dependencyNode.appendNode('groupId', aDependency.group)
+			dependencyNode.appendNode('artifactId', aDependency.name)
+			dependencyNode.appendNode('version', aDependency.version)
+			dependencyNode.appendNode('scope', scope)
+
+			List<Exclusion> exclusionList = dependencyResolver.getDependencyExclusions(aDependency)
+			if (exclusionList) {
+				def exclusionsNode = dependencyNode.appendNode("exclusions")
+				exclusionList.each { Exclusion item ->
+					def exclusionNode = exclusionsNode.appendNode("exclusion")
+					exclusionNode.appendNode("groupId", item.groupId)
+					exclusionNode.appendNode("artifactId", item.artifactId)
 				}
 			}
 		}

@@ -27,7 +27,7 @@ import org.gradle.api.tasks.SourceSet
 
 class CpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 
-	static final String PLUGIN_NAME = 'com.bancvue.cpd'
+	static final String PLUGIN_NAME = 'org.dreamscale.cpd'
 
 	static final String UNIFIED_REPORT_TASK_NAME = "cpdAll"
 

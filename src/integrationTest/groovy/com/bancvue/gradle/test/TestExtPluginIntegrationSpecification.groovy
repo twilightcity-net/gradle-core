@@ -25,7 +25,7 @@ class TestExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpe
 		emptyClassFile("src/mainTest/java/Class.java")
 		buildFile << """
 apply plugin: 'java'
-apply plugin: 'com.bancvue.test-ext'
+apply plugin: 'org.dreamscale.test-ext'
 
 jarMainTest.archiveName='mainTest.jar'
         """
@@ -50,7 +50,7 @@ public class Class {}
 """
 		buildFile << """
 apply plugin: 'java'
-apply plugin: 'com.bancvue.test-ext'
+apply plugin: 'org.dreamscale.test-ext'
 
 javadocJarMainTest.archiveName='mainTestJavadoc.jar'
         """
@@ -69,7 +69,7 @@ javadocJarMainTest.archiveName='mainTestJavadoc.jar'
 		given:
 		buildFile << """
 apply plugin: 'groovy'
-apply plugin: 'com.bancvue.test-ext'
+apply plugin: 'org.dreamscale.test-ext'
 
 repositories {
 	mavenCentral()

@@ -41,8 +41,11 @@ ext.repositoryPassword=''
 ext.repositoryReleaseUrl='${mavenRepo.toURI()}'
 ext.artifactId='artifact'
 
-apply plugin: 'com.bancvue.maven-publish-ext'
-apply plugin: 'com.bancvue.project-defaults' // set jar baseName to artifactId
+apply plugin: 'org.dreamscale.maven-publish-ext'
+apply plugin: 'org.dreamscale.project-defaults' // set jar baseName to artifactId
+
+group = 'group'
+version = '1.0'
 """
 	}
 
@@ -89,7 +92,7 @@ apply plugin: 'com.bancvue.project-defaults' // set jar baseName to artifactId
 		given:
 		emptyClassFile("src/other/java/MainClass.java")
 		buildFile << """
-apply plugin: 'com.bancvue.maven-publish-ext'
+apply plugin: 'org.dreamscale.maven-publish-ext'
 
 publishing_ext {
 	publication("main") {
@@ -176,7 +179,7 @@ publishing_ext {
 		emptyClassFile("src/mainTest/java/MainTestClass.java")
 		setupLocalMavenRepoAndApplyPlugin()
 		buildFile << """
-apply plugin: 'com.bancvue.test-ext'
+apply plugin: 'org.dreamscale.test-ext'
 
 repositories {
 	mavenCentral()
@@ -326,7 +329,7 @@ dependencies {
 		emptyClassFile("src/mainTest/java/MainTestClass.java")
 		setupLocalMavenRepoAndApplyPlugin()
 		buildFile << """
-apply plugin: 'com.bancvue.test-ext'
+apply plugin: 'org.dreamscale.test-ext'
 
 repositories {
 	mavenCentral()

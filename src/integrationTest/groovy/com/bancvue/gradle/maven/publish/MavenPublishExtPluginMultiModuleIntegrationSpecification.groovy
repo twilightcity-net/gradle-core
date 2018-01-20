@@ -33,7 +33,7 @@ class MavenPublishExtPluginMultiModuleIntegrationSpecification extends AbstractP
 
 	private TestFile initMultiModuleBuildFile() {
 		buildFile << """
-apply plugin: 'com.bancvue.maven-publish-ext'
+apply plugin: 'org.dreamscale.maven-publish-ext'
 
 ext.artifactId='artifact'
 
@@ -42,7 +42,7 @@ repositories {
 }
 
 allprojects {
-	apply plugin: 'com.bancvue.project-defaults' // set jar baseName to artifactId
+	apply plugin: 'org.dreamscale.project-defaults' // set jar baseName to artifactId
 
 	ext.repositoryUsername=''
 	ext.repositoryPassword=''
@@ -71,7 +71,7 @@ dependencies {
 }
 """
 		file("publishedDependency/build.gradle") << """
-apply plugin: 'com.bancvue.maven-publish-ext'
+apply plugin: 'org.dreamscale.maven-publish-ext'
 """
 
 		when:
@@ -91,7 +91,7 @@ apply plugin: 'com.bancvue.maven-publish-ext'
 		file("settings.gradle") << "include 'subModule', 'subModulePublishedDependency', 'subModuleLocalDependency'"
 		initMultiModuleBuildFile()
 		file("subModule/build.gradle") << """
-apply plugin: 'com.bancvue.maven-publish-ext'
+apply plugin: 'org.dreamscale.maven-publish-ext'
 
 dependencies {
 	compile project(":subModulePublishedDependency")
@@ -99,7 +99,7 @@ dependencies {
 }
 """
 		file("subModulePublishedDependency/build.gradle") << """
-apply plugin: 'com.bancvue.maven-publish-ext'
+apply plugin: 'org.dreamscale.maven-publish-ext'
 """
 
 		when:
@@ -124,8 +124,8 @@ dependencies {
 }
 """
 		file("publishedDependency/build.gradle") << """
-apply plugin: 'com.bancvue.test-ext'
-apply plugin: 'com.bancvue.maven-publish-ext'
+apply plugin: 'org.dreamscale.test-ext'
+apply plugin: 'org.dreamscale.maven-publish-ext'
 
 publishing_ext {
 	publication("mainTest")

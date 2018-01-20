@@ -29,7 +29,7 @@ import org.gradle.api.plugins.BasePlugin
 @Slf4j
 class MavenExtPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = 'com.bancvue.maven-ext'
+	static final String PLUGIN_NAME = 'org.dreamscale.maven-ext'
 
 	private Project project
 	private MavenRepositoryProperties repositoryProperties

@@ -1,26 +1,18 @@
 buildscript {
-	ext {
-		if (!project.hasProperty("nexusUrl")) {
-			nexusUrl = "https://nexus-oscf-dev.blackbaudcloud.com"
-		}
-		repositoryReleaseUrl = nexusUrl + "/content/repositories/releases"
-		repositorySnapshotUrl = nexusUrl + "/content/repositories/snapshots"
-	}
-
 	repositories {
 		jcenter()
 	}
 	dependencies {
 		classpath 'com.github.townsfolk:gradle-release:1.2'
-		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
+		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
 	}
 }
 
 
 apply plugin: 'release'
-apply plugin: "com.bancvue.core-oss"
-apply plugin: "com.bancvue.integration-test"
-apply plugin: "com.bancvue.maven-publish-ext"
+apply plugin: "org.dreamscale.core-oss"
+apply plugin: "org.dreamscale.integration-test"
+apply plugin: "org.dreamscale.maven-publish-ext"
 apply plugin: 'com.jfrog.bintray'
 
 repositories {
@@ -32,7 +24,7 @@ dependencies {
 	compile "nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0"
 
 	mainTestCompile 'commons-io:commons-io:2.4'
-	mainTestCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
+	mainTestCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
 		exclude group: 'org.codehaus.groovy'
 	}
 	mainTestCompile 'cglib:cglib-nodep:2.2.2'
@@ -42,7 +34,7 @@ dependencies {
 check.dependsOn integrationTest
 
 license {
-	ext.name = "BancVue, LTD"
+	ext.name = "DreamScale, Inc"
 	skipExistingHeaders true
 }
 
@@ -59,43 +51,43 @@ publishing_ext {
 	pom {
 		packaging "jar"
 		description "A collection of gradle plugins meant to codify and streamline project development."
-		url "https://github.com/BancVue/gradle-core"
+		url "https://github.com/dreamscale-io/gradle-core"
 		developers {
 			developer {
-				id "bancvue_oss"
-				name "BancVue Open Source Development"
-				email "opensource@bancvue.com"
+				id "dreamscale"
+				name "DreamScale Open Source Development"
+				email "opensource@dreamscale.io"
 			}
 		}
 		scm {
-			url "https://github.com/BancVue/gradle-core.git"
-			connection "scm:git:git@github.com:BancVue/gradle-core.git"
-			developerConnection "scm:git:git@github.com:BancVue/gradle-core.git"
+			url "https://github.com/dreamscale-io/gradle-core.git"
+			connection "scm:git:git@github.com:dreamscale-io/gradle-core.git"
+			developerConnection "scm:git:git@github.com:dreamscale-io/gradle-core.git"
 		}
 	}
 }
 
 bintray {
-	user = 'bancvue'
-	key = '--changeme--'
+	user = project.hasProperty('bintray.user') ? project.property('bintray.user') : System.getenv('BINTRAY_USER')
+	key = project.hasProperty('bintray.key') ? project.property('bintray.key') : System.getenv('BINTRAY_API_KEY')
 
 	publications = ['gradleCore', 'gradleCoreTest']
 	dryRun = false
 	publish = false
 	pkg {
-		repo = 'maven'
-		userOrg = 'bancvue'
+		repo = 'maven-public'
+		userOrg = 'dreamscale'
 		name = project.group + ':' + project.ext['artifactId']
 		desc = project.description
-		websiteUrl = 'https://github.com/BancVue/gradle-core'
-		issueTrackerUrl = 'https://github.com/BancVue/gradle-core/issues'
-		vcsUrl = 'https://github.com/BancVue/gradle-core.git'
+		websiteUrl = 'https://github.com/dreamscale-io/gradle-core'
+		issueTrackerUrl = 'https://github.com/dreamscale-io/gradle-core/issues'
+		vcsUrl = 'https://github.com/dreamscale-io/gradle-core.git'
 		licenses = ['Apache-2.0']
 		labels = ['gradle']
 		publicDownloadNumbers = true
 		version {
 			vcsTag = project.version
-			attributes = ['gradle-plugin': 'com.bancvue.core-oss:com.bancvue:gradle-core']
+			attributes = ['gradle-plugin': 'org.dreamscale.core-oss:org.dreamscale:gradle-core']
 		}
 	}
 }

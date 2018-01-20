@@ -37,8 +37,8 @@ ext {
 	licenseName='BancVue'
 }
 
-apply plugin: 'com.bancvue.test-ext'
-apply plugin: 'com.bancvue.license-ext'
+apply plugin: 'org.dreamscale.test-ext'
+apply plugin: 'org.dreamscale.license-ext'
         """
 
 		when:
@@ -58,7 +58,7 @@ apply plugin: 'com.bancvue.license-ext'
 		File srcFile = emptyClassFile('src/main/java/Class.java')
 		buildFile << """
 apply plugin: 'java'
-apply plugin: 'com.bancvue.license-ext'
+apply plugin: 'org.dreamscale.license-ext'
 
 license {
     ext.year='1975'
@@ -85,7 +85,7 @@ ext {
 }
 
 apply plugin: 'java'
-apply plugin: 'com.bancvue.license-ext'
+apply plugin: 'org.dreamscale.license-ext'
         """
 
 		when:
@@ -101,7 +101,7 @@ apply plugin: 'com.bancvue.license-ext'
 		File srcFile = emptyClassFile('src/main/java/Class.java')
 		buildFile << """
 apply plugin: 'java'
-apply plugin: 'com.bancvue.license-ext'
+apply plugin: 'org.dreamscale.license-ext'
 
 license {
 	ignoreFailures true
@@ -120,8 +120,8 @@ license {
 		File srcFile = emptyClassFile('src/mainTest/java/Class.java')
 		buildFile << """
 apply plugin: 'java'
-apply plugin: 'com.bancvue.license-ext'
-apply plugin: 'com.bancvue.test-ext'
+apply plugin: 'org.dreamscale.license-ext'
+apply plugin: 'org.dreamscale.test-ext'
 
 license {
 	ignoreFailures true

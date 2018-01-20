@@ -40,8 +40,8 @@ version = '1.0'
 		given:
 		emptyClassFile("src/main/java/Class.java")
 		buildFile << """
-apply plugin: 'com.bancvue.project-defaults'
-apply plugin: 'com.bancvue.maven-ext'
+apply plugin: 'org.dreamscale.project-defaults'
+apply plugin: 'org.dreamscale.maven-ext'
 		"""
 
 		when:
@@ -57,7 +57,7 @@ apply plugin: 'com.bancvue.maven-ext'
 	def "should supportdeployer customizations in build file"() {
 		given:
 		buildFile << """
-apply plugin: 'com.bancvue.maven-ext'
+apply plugin: 'org.dreamscale.maven-ext'
 
 project.uploadArchives {
 	repositories.mavenDeployer {

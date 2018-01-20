@@ -21,7 +21,7 @@ class JacocoExtPluginMultiModuleIntegrationSpecification extends AbstractPluginI
 		buildFile << """
 allprojects {
 	apply plugin: 'groovy'
-	apply plugin: 'com.bancvue.jacoco-ext'
+	apply plugin: 'org.dreamscale.jacoco-ext'
 
 	repositories {
 		mavenCentral()

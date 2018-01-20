@@ -25,7 +25,7 @@ import org.gradle.api.Project
 
 class CoreOssPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = 'com.bancvue.core-oss'
+	static final String PLUGIN_NAME = 'org.dreamscale.core-oss'
 
 	private Project project
 

@@ -27,7 +27,7 @@ import org.gradle.api.Task
 @Mixin(GradlePluginMixin)
 class MavenPublishExtPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = 'com.bancvue.maven-publish-ext'
+	static final String PLUGIN_NAME = 'org.dreamscale.maven-publish-ext'
 
 	private Project project
 	private MavenRepositoryProperties repositoryProperties

@@ -25,8 +25,8 @@ class IdeExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpec
 		given:
 		buildFile << """
 apply plugin: 'groovy'
-apply plugin: 'com.bancvue.ide-ext'
-apply plugin: 'com.bancvue.integration-test'
+apply plugin: 'org.dreamscale.ide-ext'
+apply plugin: 'org.dreamscale.integration-test'
 
 repositories {
 	mavenCentral()
@@ -107,8 +107,8 @@ sourceSets {
 		given:
 		buildFile << """
 apply plugin: 'groovy'
-apply plugin: 'com.bancvue.ide-ext'
-apply plugin: 'com.bancvue.component-test'
+apply plugin: 'org.dreamscale.ide-ext'
+apply plugin: 'org.dreamscale.component-test'
 
 repositories {
 	mavenCentral()
@@ -162,8 +162,8 @@ dependencies {
 		given:
 		buildFile << """
 apply plugin: 'groovy'
-apply plugin: 'com.bancvue.ide-ext'
-apply plugin: 'com.bancvue.integration-test'
+apply plugin: 'org.dreamscale.ide-ext'
+apply plugin: 'org.dreamscale.integration-test'
         """
 		mkdir("src/main/resources")
 		mkdir("src/test/resources")
@@ -184,9 +184,9 @@ apply plugin: 'com.bancvue.integration-test'
 		given:
 		buildFile << """
 apply plugin: 'groovy'
-apply plugin: 'com.bancvue.ide-ext'
-apply plugin: 'com.bancvue.test-ext'
-apply plugin: 'com.bancvue.component-test'
+apply plugin: 'org.dreamscale.ide-ext'
+apply plugin: 'org.dreamscale.test-ext'
+apply plugin: 'org.dreamscale.component-test'
 
 repositories {
 	mavenCentral()

@@ -30,7 +30,7 @@ class JacocoExtPluginIntegrationSpecification extends AbstractPluginIntegrationS
 
 		buildFile << """
 apply plugin: 'groovy'
-apply plugin: 'com.bancvue.test-ext'
+apply plugin: 'org.dreamscale.test-ext'
 
 repositories {
 	mavenCentral()
@@ -95,8 +95,8 @@ public class ${testName} {
 		createSrcAndTestFiles(mainSrcFile, componentTestDir)
 		buildFile << """
 // NOTE: jacoco-ext is intentionally applied first to verify behavior when the build is modified after the plugin is applied
-apply plugin: 'com.bancvue.jacoco-ext'
-apply plugin: 'com.bancvue.component-test'
+apply plugin: 'org.dreamscale.jacoco-ext'
+apply plugin: 'org.dreamscale.component-test'
 """
 
 		when:
@@ -118,8 +118,8 @@ apply plugin: 'com.bancvue.component-test'
 		createSrcAndTestFiles(mainSrcFile, testDir)
 		createSrcAndTestFiles(mainTestSrcFile, componentTestDir)
 		buildFile << """
-apply plugin: 'com.bancvue.jacoco-ext'
-apply plugin: 'com.bancvue.component-test'
+apply plugin: 'org.dreamscale.jacoco-ext'
+apply plugin: 'org.dreamscale.component-test'
 
 jacocoComponentTestReport {
 	sourceSets sourceSets.main
@@ -146,7 +146,7 @@ jacocoComponentTestReport {
 		given:
 		createSrcAndTestFiles(mainSrcFile, testDir)
 		buildFile << """
-apply plugin: 'com.bancvue.jacoco-ext'
+apply plugin: 'org.dreamscale.jacoco-ext'
 """
 
 		when:

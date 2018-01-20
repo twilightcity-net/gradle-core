@@ -22,7 +22,7 @@ import org.gradle.api.tasks.SourceSet
 
 public class JavaExtPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = 'com.bancvue.java-ext'
+	static final String PLUGIN_NAME = 'org.dreamscale.java-ext'
 
 	private Project project
 

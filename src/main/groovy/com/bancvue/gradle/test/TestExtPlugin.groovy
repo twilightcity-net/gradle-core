@@ -25,7 +25,7 @@ import org.gradle.api.tasks.testing.Test
 @Mixin(GradlePluginMixin)
 class TestExtPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = "com.bancvue.test-ext"
+	static final String PLUGIN_NAME = "org.dreamscale.test-ext"
 	static final String VERIFICATION_GROUP_NAME = "Verification"
 
 

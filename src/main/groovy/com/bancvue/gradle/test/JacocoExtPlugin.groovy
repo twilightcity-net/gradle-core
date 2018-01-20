@@ -26,7 +26,7 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
 
 class JacocoExtPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = "com.bancvue.jacoco-ext"
+	static final String PLUGIN_NAME = "org.dreamscale.jacoco-ext"
 
 
 	private Project project

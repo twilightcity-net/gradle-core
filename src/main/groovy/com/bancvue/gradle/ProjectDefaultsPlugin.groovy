@@ -27,7 +27,7 @@ import org.gradle.api.tasks.testing.Test
 
 class ProjectDefaultsPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = 'com.bancvue.project-defaults'
+	static final String PLUGIN_NAME = 'org.dreamscale.project-defaults'
 
 	private Project project
 	private ProjectDefaultsProperties defaultsProperties
