@@ -40,6 +40,7 @@ class CoreOssPlugin implements Plugin<Project> {
 		applyJacocoExtPlugin()
 		applyIdeExtPlugin()
 		applyProjectSupportPlugin()
+		applyBuildTimerPlugin()
 	}
 
 	private void applyJavaExtPlugin() {
@@ -76,6 +77,10 @@ class CoreOssPlugin implements Plugin<Project> {
 
 	private void applyProjectDefaultsPlugin() {
 		project.apply(plugin: ProjectDefaultsPlugin.PLUGIN_NAME)
+	}
+
+	private void applyBuildTimerPlugin() {
+		project.apply(plugin: "net.jokubasdargis.build-timer")
 	}
 
 }

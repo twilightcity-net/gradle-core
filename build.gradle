@@ -21,6 +21,7 @@ repositories {
 
 dependencies {
 	compile gradleApi()
+	compile "net.jokubasdargis.buildtimer:gradle-plugin:0.1.1"
 	compile "nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0"
 
 	mainTestCompile 'commons-io:commons-io:2.4'

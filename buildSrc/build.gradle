@@ -1,10 +1,11 @@
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
     compile gradleApi()
-	compile 'nl.javadude.gradle.plugins:license-gradle-plugin:0.9.0'
+    compile "net.jokubasdargis.buildtimer:gradle-plugin:0.1.1"
+    compile "nl.javadude.gradle.plugins:license-gradle-plugin:0.9.0"
 }
 
 sourceSets {
