@@ -36,6 +36,7 @@ class ExtendedPublication {
 	AbstractArchiveTask sourcesArchiveTask
 	AbstractArchiveTask javadocArchiveTask
 	SourceSet sourceSet
+	Configuration compileConfiguration
 	Configuration runtimeConfiguration
 	boolean enabled
 	Boolean publishSources
@@ -73,6 +74,7 @@ class ExtendedPublication {
 
 		setArtifactIdIfNotSet()
 		setRuntimeConfigurationIfNotSet()
+		setCompileConfigurationIfNotSet()
 		// NOTE: order is important!  sourceSet must be defined prior to the jar tasks since they may require
 		// the sourceSet if the tasks need to be dynamically constructed
 		setSourceSetIfNotSet()
@@ -126,6 +128,12 @@ class ExtendedPublication {
 	private void setRuntimeConfigurationIfNotSet() {
 		if (runtimeConfiguration == null) {
 			runtimeConfiguration = project.configurations.getByName(namer.runtimeConfigurationName)
+		}
+	}
+
+	private void setCompileConfigurationIfNotSet() {
+		if (compileConfiguration == null) {
+			compileConfiguration = project.configurations.getByName(namer.compileConfigurationName)
 		}
 	}
 

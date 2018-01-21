@@ -240,7 +240,8 @@ class MavenPublishExtExtension {
 		}
 
 		private void attachDependenciesToMavenPublication(ExtendedPublication extendedPublication, MavenPublication mavenPublication) {
-			Set runtimeDependencies = dependencyResolver.getRuntimeDependencies(extendedPublication)
+			Set compileDependencies = dependencyResolver.getCompileDependencies(extendedPublication)
+			Set runtimeDependencies = dependencyResolver.getRuntimeDependencies(extendedPublication) - compileDependencies
 
 			log.info("Attaching dependencies to maven publication ${mavenPublication.name}")
 			mavenPublication.pom.withXml {
@@ -249,6 +250,9 @@ class MavenPublishExtExtension {
 					dependenciesNode = asNode().appendNode("dependencies")
 				}
 
+				compileDependencies.each { Dependency aDependency ->
+					addDependency(dependenciesNode, aDependency, "compile")
+				}
 				runtimeDependencies.each { Dependency aDependency ->
 					addDependency(dependenciesNode, aDependency, "runtime")
 				}

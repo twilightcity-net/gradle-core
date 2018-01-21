@@ -67,11 +67,17 @@ class DependencyResolver {
 		}
 	}
 
-	Set<Dependency> getRuntimeDependencies(ExtendedPublication publication) {
-		Set runtimeDependencies = []
-		DependencySet allDependencies = publication.runtimeConfiguration.allDependencies
+	Set<Dependency> getCompileDependencies(ExtendedPublication publication) {
+		getDependencies(publication.compileConfiguration)
+	}
 
-		allDependencies.each { Dependency aDependency ->
+	Set<Dependency> getRuntimeDependencies(ExtendedPublication publication) {
+		getDependencies(publication.runtimeConfiguration)
+	}
+
+	Set<Dependency> getDependencies(Configuration configuration) {
+		Set runtimeDependencies = []
+		configuration.allDependencies.each { Dependency aDependency ->
 			if (aDependency instanceof ProjectDependency) {
 				runtimeDependencies.addAll(getConfigurationExternalDependencies(aDependency as ProjectDependency))
 			} else if (aDependency.group && aDependency.name && aDependency.version) {

@@ -225,6 +225,7 @@ sourceSets {
 publishing_ext {
 	publication("other") {
 		sourceSet sourceSets.doesNotMatchConvention
+		compileConfiguration configurations.doesNotMatchConvention
 		runtimeConfiguration configurations.doesNotMatchConvention
 	}
 }
