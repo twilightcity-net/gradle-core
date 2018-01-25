@@ -16,71 +16,24 @@
 package com.bancvue.gradle
 
 import com.bancvue.gradle.license.LicenseExtPlugin
-import com.bancvue.gradle.support.ProjectSupportPlugin
-import com.bancvue.gradle.test.ComponentTestPlugin
-import com.bancvue.gradle.test.JacocoExtPlugin
-import com.bancvue.gradle.test.TestExtPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+
 class CoreOssPlugin implements Plugin<Project> {
 
-	static final String PLUGIN_NAME = 'org.dreamscale.core-oss'
+    static final String PLUGIN_NAME = 'org.dreamscale.core-oss'
 
-	private Project project
+    private Project project
 
-	public void apply(Project project) {
-		this.project = project
-		applyJavaExtPlugin()
-		applyGroovyPlugin()
-		applyProjectDefaultsPlugin()
-		applyLicenseExtPlugin()
-		applyTestExtPlugin()
-		applyComponentTestPlugin()
-		applyJacocoExtPlugin()
-		applyIdeExtPlugin()
-		applyProjectSupportPlugin()
-		applyBuildTimerPlugin()
-	}
+    void apply(Project project) {
+        this.project = project
+        project.apply(plugin: CorePlugin.PLUGIN_NAME)
+        applyLicenseExtPlugin()
+    }
 
-	private void applyJavaExtPlugin() {
-		project.apply(plugin: JavaExtPlugin.PLUGIN_NAME)
-	}
-
-	private void applyGroovyPlugin() {
-		project.apply(plugin: 'groovy')
-	}
-
-	private void applyIdeExtPlugin() {
-		project.apply(plugin: IdeExtPlugin.PLUGIN_NAME)
-	}
-
-	private void applyLicenseExtPlugin() {
-		project.apply(plugin: LicenseExtPlugin.PLUGIN_NAME)
-	}
-
-	private void applyTestExtPlugin() {
-		project.apply(plugin: TestExtPlugin.PLUGIN_NAME)
-	}
-
-	private void applyComponentTestPlugin() {
-		project.apply(plugin: ComponentTestPlugin.PLUGIN_NAME)
-	}
-
-	private void applyJacocoExtPlugin() {
-		project.apply(plugin: JacocoExtPlugin.PLUGIN_NAME)
-	}
-
-	private void applyProjectSupportPlugin() {
-		project.apply(plugin: ProjectSupportPlugin.PLUGIN_NAME)
-	}
-
-	private void applyProjectDefaultsPlugin() {
-		project.apply(plugin: ProjectDefaultsPlugin.PLUGIN_NAME)
-	}
-
-	private void applyBuildTimerPlugin() {
-		project.apply(plugin: "net.jokubasdargis.build-timer")
-	}
+    private void applyLicenseExtPlugin() {
+        project.apply(plugin: LicenseExtPlugin.PLUGIN_NAME)
+    }
 
 }
