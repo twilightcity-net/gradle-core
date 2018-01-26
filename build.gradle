@@ -4,7 +4,6 @@ buildscript {
 	}
 	dependencies {
 		classpath 'com.github.townsfolk:gradle-release:1.2'
-		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
 	}
 }
 
@@ -12,8 +11,6 @@ buildscript {
 apply plugin: 'release'
 apply plugin: "org.dreamscale.core-oss"
 apply plugin: "org.dreamscale.integration-test"
-apply plugin: "org.dreamscale.maven-publish-ext"
-apply plugin: 'com.jfrog.bintray'
 
 repositories {
 	jcenter()
@@ -23,6 +20,7 @@ dependencies {
 	compile gradleApi()
 	compile "net.jokubasdargis.buildtimer:gradle-plugin:0.1.1"
 	compile "nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0"
+	compile "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
 
 	mainTestCompile 'commons-io:commons-io:2.4'
 	mainTestCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
@@ -47,45 +45,19 @@ license {
 
 publishing_ext {
 	publication("mainTest")
-
 	publishJavadoc true
-	pom {
-		packaging "jar"
-		description "A collection of gradle plugins meant to codify and streamline project development."
-		url "https://github.com/dreamscale-io/gradle-core"
-		developers {
-			developer {
-				id "dreamscale"
-				name "DreamScale Open Source Development"
-				email "opensource@dreamscale.io"
-			}
-		}
-		scm {
-			url "https://github.com/dreamscale-io/gradle-core.git"
-			connection "scm:git:git@github.com:dreamscale-io/gradle-core.git"
-			developerConnection "scm:git:git@github.com:dreamscale-io/gradle-core.git"
-		}
-	}
 }
 
-bintray {
-	user = project.hasProperty('bintray.user') ? project.property('bintray.user') : System.getenv('BINTRAY_USER')
-	key = project.hasProperty('bintray.key') ? project.property('bintray.key') : System.getenv('BINTRAY_API_KEY')
 
+ext["organization.repo.url"] = "https://github.com/dreamscale-io"
+
+bintray {
 	publications = ['gradleCore', 'gradleCoreTest']
-	dryRun = false
-	publish = false
 	pkg {
 		repo = 'maven-public'
 		userOrg = 'dreamscale'
-		name = project.group + ':' + project.ext['artifactId']
-		desc = project.description
-		websiteUrl = 'https://github.com/dreamscale-io/gradle-core'
-		issueTrackerUrl = 'https://github.com/dreamscale-io/gradle-core/issues'
-		vcsUrl = 'https://github.com/dreamscale-io/gradle-core.git'
 		licenses = ['Apache-2.0']
 		labels = ['gradle']
-		publicDownloadNumbers = true
 		version {
 			vcsTag = project.version
 			attributes = ['gradle-plugin': 'org.dreamscale.core-oss:org.dreamscale:gradle-core']

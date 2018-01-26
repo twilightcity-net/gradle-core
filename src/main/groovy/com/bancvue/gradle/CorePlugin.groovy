@@ -15,6 +15,7 @@
  */
 package com.bancvue.gradle
 
+import com.bancvue.gradle.maven.publish.MavenPublishExtPlugin
 import com.bancvue.gradle.support.ProjectSupportPlugin
 import com.bancvue.gradle.test.ComponentTestPlugin
 import com.bancvue.gradle.test.JacocoExtPlugin
@@ -39,6 +40,7 @@ class CorePlugin implements Plugin<Project> {
         applyIdeExtPlugin()
         applyProjectSupportPlugin()
         applyBuildTimerPlugin()
+        applyMavenPublishAndBintrayPlugins()
     }
 
     private void applyJavaExtPlugin() {
@@ -75,6 +77,55 @@ class CorePlugin implements Plugin<Project> {
 
     private void applyBuildTimerPlugin() {
         project.apply(plugin: "net.jokubasdargis.build-timer")
+    }
+
+    private void applyMavenPublishAndBintrayPlugins() {
+        project.apply(plugin: MavenPublishExtPlugin.PLUGIN_NAME)
+        project.apply(plugin: "com.jfrog.bintray")
+
+        String artifactId = getProjectProperty("artifactId")
+        String orgRepoUrl = getProjectProperty("organization.repo.url")
+        String bintrayRepo = getProjectPropertyOrEnvValue("bintray.repo", "BINTRAY_REPO")
+        String bintrayUserOrg = getProjectPropertyOrEnvValue("bintray.userOrg", "BINTRAY_USER_ORG")
+
+        project.bintray {
+            user = getProjectPropertyOrEnvValue("bintray.user", "BINTRAY_USER")
+            key = getProjectPropertyOrEnvValue("bintray.apiKey", "BINTRAY_API_KEY")
+
+            dryRun = false
+            publish = false
+            pkg {
+                if (artifactId != null) {
+                    name = project.group + ':' + artifactId
+                }
+                desc = project.description
+                if (bintrayRepo != null) {
+                    repo = bintrayRepo
+                }
+                if (bintrayUserOrg != null) {
+                    userOrg = bintrayUserOrg
+                }
+                if (orgRepoUrl != null) {
+                    websiteUrl = "${orgRepoUrl}/${artifactId}"
+                    issueTrackerUrl = "${orgRepoUrl}/${artifactId}/issues"
+                    vcsUrl = "${orgRepoUrl}/${artifactId}.git"
+                }
+                publicDownloadNumbers = true
+            }
+        }
+
+    }
+
+    private String getProjectProperty(String propertyName) {
+        project.hasProperty(propertyName) ? project.property(propertyName) : null
+    }
+
+    private String getProjectPropertyOrEnvValue(String propertyName, String envKey) {
+        String value = getProjectProperty(propertyName)
+        if (value == null) {
+            value = System.getenv(envKey)
+        }
+        value
     }
 
 }

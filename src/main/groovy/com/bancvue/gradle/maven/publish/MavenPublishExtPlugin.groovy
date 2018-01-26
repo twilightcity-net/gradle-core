@@ -32,12 +32,13 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 	private Project project
 	private MavenRepositoryProperties repositoryProperties
 
-	public void apply(Project project) {
+	void apply(Project project) {
 		this.project = project
 		this.repositoryProperties = new MavenRepositoryProperties(project)
 		project.apply(plugin: JavaExtPlugin.PLUGIN_NAME)
 		addArtifactDependencyAndPublishingSupport()
 		addPublishingExtExtension()
+		applyPomSettingsFromProperties()
 	}
 
 	private void addPublishingExtExtension() {
@@ -102,6 +103,47 @@ class MavenPublishExtPlugin implements Plugin<Project> {
 				}
 			}
 		}
+	}
+
+	private void applyPomSettingsFromProperties() {
+		String artifactId = getOptionalProjectProperty("artifactId")
+		String orgRepoUrl = getOptionalProjectProperty("organization.repo.url")
+		String orgRepoConnection = getOptionalProjectProperty("organization.repo.connection")
+		String pomPackaging = getOptionalProjectProperty("maven.pom.packaging")
+		String pomDeveloperId = getOptionalProjectProperty("maven.pom.developer.id")
+
+		project.publishing_ext {
+			pom {
+				if (pomPackaging != null) {
+					packaging pomPackaging
+				}
+				if (orgRepoUrl != null && artifactId != null) {
+					url "${orgRepoUrl}/${artifactId}"
+				}
+				if (pomDeveloperId != null) {
+					developers {
+						developer {
+							id pomDeveloperId
+							name getOptionalProjectProperty("maven.pom.developer.name")
+							email getOptionalProjectProperty("maven.pom.developer.email")
+						}
+					}
+				}
+				if (orgRepoUrl != null && artifactId != null) {
+					scm {
+						url "${orgRepoUrl}/${artifactId}.git"
+						if (orgRepoConnection != null) {
+							connection "${orgRepoConnection}/${artifactId}.git"
+							developerConnection "${orgRepoConnection}/${artifactId}.git"
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private String getOptionalProjectProperty(String propertyName) {
+		project.hasProperty(propertyName) ? project.property(propertyName) : null
 	}
 
 }

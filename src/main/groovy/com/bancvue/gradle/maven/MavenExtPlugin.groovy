@@ -34,7 +34,7 @@ class MavenExtPlugin implements Plugin<Project> {
 	private Project project
 	private MavenRepositoryProperties repositoryProperties
 
-	public void apply(Project project) {
+	void apply(Project project) {
 		this.project = project
 		this.repositoryProperties = new MavenRepositoryProperties(project)
 		project.apply(plugin: JavaExtPlugin.PLUGIN_NAME)
@@ -120,6 +120,7 @@ class MavenExtPlugin implements Plugin<Project> {
 			}
 		}
 	}
+
 
 	private void addBasicDescriptionToMavenPOM(MavenPom pom) {
 		pom.project {
