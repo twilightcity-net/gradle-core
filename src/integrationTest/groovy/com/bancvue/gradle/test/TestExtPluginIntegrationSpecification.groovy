@@ -16,7 +16,7 @@
 package com.bancvue.gradle.test
 
 import com.bancvue.zip.ZipArchive
-import org.gradle.testkit.functional.ExecutionResult
+import org.gradle.testkit.runner.BuildResult
 
 class TestExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
@@ -89,10 +89,10 @@ class SomeTest extends spock.lang.Specification {
 }
 """
 		when:
-		ExecutionResult result = run("test", "styledTestOutput")
+		BuildResult result = run("test", "styledTestOutput")
 
 		then:
-		result.standardOutput =~ /styled test output test/
+		result.output =~ /styled test output test/
 	}
 
 }

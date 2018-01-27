@@ -15,7 +15,7 @@
  */
 package com.bancvue.gradle.pmd
 import com.bancvue.exception.ExceptionSupport
-import org.gradle.tooling.BuildException
+import org.gradle.testkit.runner.UnexpectedBuildFailure
 
 @Mixin(ExceptionSupport)
 class CpdPluginIntegrationSpecification extends AbstractCpdPluginIntegrationSpecification {
@@ -45,7 +45,7 @@ cpd {
 		run("check")
 
 		then:
-		thrown(BuildException)
+		thrown(UnexpectedBuildFailure)
 		file("build/reports/cpd/all.xml").text =~ /duplication/
 		file("build/reports/cpd/all.html").exists()
 	}
@@ -65,7 +65,7 @@ cpd {
 		run("check")
 
 		then:
-		thrown(BuildException)
+		thrown(UnexpectedBuildFailure)
 		file("build/reports/cpd/mainTest.xml").text =~ /duplication/
 		file("build/reports/cpd/mainTest.html").exists()
 	}
@@ -81,7 +81,7 @@ cpd {
 		run(CpdPlugin.UNIFIED_REPORT_TASK_NAME)
 
 		then:
-		BuildException ex = thrown()
+		UnexpectedBuildFailure ex = thrown()
 		getRootCause(ex).message =~ /Task '${CpdPlugin.UNIFIED_REPORT_TASK_NAME}' not found in root project/
 	}
 
@@ -104,7 +104,7 @@ apply plugin: 'org.dreamscale.test-ext'
 		run("check")
 
 		then:
-		thrown(BuildException)
+		thrown(UnexpectedBuildFailure)
 		file("build/reports/cpd/all.xml").text =~ /duplication/
 	}
 
@@ -128,7 +128,7 @@ sourceSets {
 		run("check")
 
 		then:
-		notThrown(BuildException)
+		notThrown(UnexpectedBuildFailure)
 
 		// verify the content of the file would actually generate a cpd failure
 		when:
@@ -136,7 +136,7 @@ sourceSets {
 		run("check")
 
 		then:
-		thrown(BuildException)
+		thrown(UnexpectedBuildFailure)
 		file("build/reports/cpd/all.xml").text =~ /duplication/
 	}
 
@@ -153,7 +153,7 @@ cpd {
 		run("check")
 
 		then:
-		thrown(BuildException)
+		thrown(UnexpectedBuildFailure)
 		file("build/reports/cpd/all.xml").text =~ /duplication/
 	}
 

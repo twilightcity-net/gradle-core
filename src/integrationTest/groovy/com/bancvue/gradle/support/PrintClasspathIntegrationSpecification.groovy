@@ -16,7 +16,7 @@
 package com.bancvue.gradle.support
 
 import com.bancvue.gradle.test.AbstractPluginIntegrationSpecification
-import org.gradle.testkit.functional.ExecutionResult
+import org.gradle.testkit.runner.BuildResult
 
 class PrintClasspathIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
@@ -31,10 +31,10 @@ task printClasspath(type: com.bancvue.gradle.support.PrintClasspath)
         """
 
 		when:
-		ExecutionResult result = run("printClasspath")
+		BuildResult result = run("printClasspath")
 
 		then:
-		String output = result.standardOutput
+		String output = result.output
 		output =~ /main.compileClasspath/
 		output =~ /main.runtimeClasspath/
 		output =~ /test.compileClasspath/
@@ -50,10 +50,10 @@ task printClasspath(type: com.bancvue.gradle.support.PrintClasspath)
         """
 
 		when:
-		ExecutionResult result = run("printClasspath", "-PsourceSetName=main")
+		BuildResult result = run("printClasspath", "-PsourceSetName=main")
 
 		then:
-		String output = result.standardOutput
+		String output = result.output
 		output =~ /main.compileClasspath/
 		output =~ /main.runtimeClasspath/
 		!(output =~ /test.compileClasspath/)

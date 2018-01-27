@@ -20,48 +20,48 @@ import org.apache.commons.io.FilenameUtils
 
 class TestFile extends File {
 
-	TestFile(File file) {
-		super(file.toURI())
-	}
+    TestFile(File file) {
+        super(file.toURI())
+    }
 
-	String getBaseName() {
-		FilenameUtils.getBaseName(name)
-	}
+    String getBaseName() {
+        FilenameUtils.getBaseName(name)
+    }
 
-	TestFile mkdir(String relativePath){
-		TestFile dir = file(relativePath)
-		dir.mkdirs()
-		dir
-	}
+    TestFile mkdir(String relativePath){
+        TestFile dir = file(relativePath)
+        dir.mkdirs()
+        dir
+    }
 
-	ZipArchive archive(String relativePath) {
-		TestFile file = file(relativePath)
-		new ZipArchive(file)
-	}
+    ZipArchive archive(String relativePath) {
+        TestFile file = file(relativePath)
+        new ZipArchive(file)
+    }
 
-	TestFile file(String relativePath) {
-		File file = new File(this, relativePath)
-		new TestFile(file)
-	}
+    TestFile file(String relativePath) {
+        File file = new File(this, relativePath)
+        new TestFile(file)
+    }
 
-	TestFile file(String relativePath, String fileName) {
-		File parentDir = file(relativePath)
-		new TestFile(new File(parentDir, fileName))
-	}
+    TestFile file(String relativePath, String fileName) {
+        File parentDir = file(relativePath)
+        new TestFile(new File(parentDir, fileName))
+    }
 
-	void write(String text) {
-		parentFile.mkdirs()
- 		super.write(text)
-	}
+    void write(String text) {
+        parentFile.mkdirs()
+         super.write(text)
+    }
 
-	TestFile leftShift(Object content) {
-		parentFile.mkdirs()
-		super.leftShift(content)
-		this
-	}
+    TestFile leftShift(Object content) {
+        parentFile.mkdirs()
+        super.leftShift(content)
+        this
+    }
 
-	URL toURL() {
-		toURI().toURL()
-	}
+    URL toURL() {
+        toURI().toURL()
+    }
 
 }

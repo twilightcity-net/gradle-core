@@ -19,30 +19,30 @@ import org.apache.commons.io.FilenameUtils
 
 class ProjectFileSystem extends TestFile {
 
-	ProjectFileSystem(File baseDir) {
-		super(baseDir)
-	}
+    ProjectFileSystem(File baseDir) {
+        super(baseDir)
+    }
 
-	void initBuildDir() {
-		buildDir.mkdirs()
-	}
+    void initBuildDir() {
+        buildDir.mkdirs()
+    }
 
-	TestFile getBuildDir() {
-		file("build")
-	}
+    TestFile getBuildDir() {
+        file("build")
+    }
 
-	TestFile getBuildFile() {
-		file("build.gradle")
-	}
+    TestFile getBuildFile() {
+        file("build.gradle")
+    }
 
-	TestFile emptyClassFile(String filePath, String content = "") {
-		TestFile classFile = file(filePath)
-		String className = FilenameUtils.getBaseName(classFile.name)
-		classFile << """class ${className} {
+    TestFile emptyClassFile(String filePath, String content = "") {
+        TestFile classFile = file(filePath)
+        String className = FilenameUtils.getBaseName(classFile.name)
+        classFile << """class ${className} {
 ${content}
 }
 """
-		classFile
-	}
+        classFile
+    }
 }
 

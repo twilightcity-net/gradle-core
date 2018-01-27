@@ -15,7 +15,7 @@
  */
 package com.bancvue.gradle.test
 
-import org.gradle.testkit.functional.ExecutionResult
+import org.gradle.testkit.runner.BuildResult
 
 class ComponentTestPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
@@ -56,10 +56,10 @@ componentTest.testLogging.showStandardStreams = true
 """
 
 		when:
-		ExecutionResult result = run("check")
+		BuildResult result = run("check")
 
 		then:
-		result.standardOutput =~ /Located resource .*resource.txt/
+		result.output =~ /Located resource .*resource.txt/
 	}
 
 }

@@ -27,21 +27,21 @@ import spock.lang.Specification
  */
 abstract class AbstractPluginSupportSpecification extends Specification {
 
-	@Rule
-	public TemporaryFolder projectDir = new TemporaryFolder()
-	protected Project project
-	protected ProjectFileSystem projectFS
+    @Rule
+    public TemporaryFolder projectDir = new TemporaryFolder()
+    protected Project project
+    protected ProjectFileSystem projectFS
 
-	void setup() {
-		project = createProject()
-		projectFS = new ProjectFileSystem(project.rootDir)
-	}
+    void setup() {
+        project = createProject()
+        projectFS = new ProjectFileSystem(project.rootDir)
+    }
 
-	protected Project createProject() {
-		ProjectBuilder.builder()
-			.withName("plugin-support")
-			.withProjectDir(projectDir.root)
-			.build()
-	}
+    protected Project createProject() {
+        ProjectBuilder.builder()
+            .withName("plugin-support")
+            .withProjectDir(projectDir.root)
+            .build()
+    }
 
 }

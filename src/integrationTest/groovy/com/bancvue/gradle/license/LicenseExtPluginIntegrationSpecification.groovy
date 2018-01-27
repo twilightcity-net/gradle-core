@@ -17,7 +17,7 @@ package com.bancvue.gradle.license
 
 import com.bancvue.exception.ExceptionSupport
 import com.bancvue.gradle.test.AbstractPluginIntegrationSpecification
-import org.gradle.testkit.functional.ExecutionResult
+import org.gradle.testkit.runner.BuildResult
 
 @Mixin(ExceptionSupport)
 class LicenseExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
@@ -109,10 +109,10 @@ license {
         """
 
 		when:
-		ExecutionResult result = run("licenseCheck")
+		BuildResult result = run("licenseCheck")
 
 		then:
-		result.standardOutput =~ /Missing header in: .*${srcFile.name}/
+		result.output =~ /Missing header in: .*${srcFile.name}/
 	}
 
 	def "licenseCheck should check class files for configurations added after license plugin is applied"() {
@@ -129,10 +129,10 @@ license {
         """
 
 		when:
-		ExecutionResult result = run("licenseCheck", "--info")
+		BuildResult result = run("licenseCheck", "--info")
 
 		then:
-		result.standardOutput =~ /Missing header in: .*${srcFile.name}/
+		result.output =~ /Missing header in: .*${srcFile.name}/
 	}
 
 }

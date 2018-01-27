@@ -20,22 +20,22 @@ import org.gradle.api.Task
 
 class TaskCategory {
 
-	static void assertMustRunAfter(Task self, String taskName) {
-		Task task = self.getProject().getTasks().getByName(taskName)
-		assertMustRunAfter(self, task)
-	}
+    static void assertMustRunAfter(Task self, String taskName) {
+        Task task = self.getProject().getTasks().getByName(taskName)
+        assertMustRunAfter(self, task)
+    }
 
-	static void assertMustRunAfter(Task self, Task task) {
-		assert self.getMustRunAfter().getDependencies(self).contains(task)
-	}
+    static void assertMustRunAfter(Task self, Task task) {
+        assert self.getMustRunAfter().getDependencies(self).contains(task)
+    }
 
-	static void assertMustRunBefore(Task self, String taskName) {
-		Task task = self.getProject().getTasks().getByName(taskName)
-		assertMustRunBefore(self, task)
-	}
+    static void assertMustRunBefore(Task self, String taskName) {
+        Task task = self.getProject().getTasks().getByName(taskName)
+        assertMustRunBefore(self, task)
+    }
 
-	static void assertMustRunBefore(Task self, Task task) {
-		assert task.getMustRunAfter().getDependencies(task).contains(self)
-	}
+    static void assertMustRunBefore(Task self, Task task) {
+        assert task.getMustRunAfter().getDependencies(task).contains(self)
+    }
 
 }

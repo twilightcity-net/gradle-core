@@ -15,7 +15,7 @@
  */
 package com.bancvue.gradle.pmd
 import com.bancvue.exception.ExceptionSupport
-import org.gradle.tooling.BuildException
+import org.gradle.testkit.runner.UnexpectedBuildFailure
 
 @Mixin(ExceptionSupport)
 class CpdPluginMultiProjectIntegrationSpecification extends AbstractCpdPluginIntegrationSpecification {
@@ -55,7 +55,7 @@ allprojects {
 		run("check")
 
 		then:
-		thrown(BuildException)
+		thrown(UnexpectedBuildFailure)
 		assertDuplicationDetected()
 	}
 
@@ -77,7 +77,7 @@ cpd {
 		run("check")
 
 		then:
-		notThrown(BuildException)
+		notThrown(UnexpectedBuildFailure)
 	}
 
 	def "should fail if duplicate token threshold exceeded in files across projects"() {
@@ -109,7 +109,7 @@ allprojects {
 		run("check")
 
 		then:
-		thrown(BuildException)
+		thrown(UnexpectedBuildFailure)
 		assertDuplicationDetected()
 	}
 
@@ -133,7 +133,7 @@ subprojects {
 		run("check")
 
 		then:
-		thrown(BuildException)
+		thrown(UnexpectedBuildFailure)
 		assertDuplicationDetected()
 	}
 
