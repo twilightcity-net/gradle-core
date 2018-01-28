@@ -26,7 +26,7 @@ import org.gradle.api.Project
 @Slf4j
 class ResourceResolver {
 
-	public static ResourceResolver create(Project project) {
+	static ResourceResolver create(Project project) {
 		List<UrlResolver> resolverChain = [
 				new ProjectResourceDirUrlResolver(project),
 				new ProjectRootUrlResolver(project),
@@ -76,6 +76,15 @@ class ResourceResolver {
 		URL url = getResourceURL(resourcePath)
 		log.debug("getResourceContent, url=${url}")
 		url.text
+	}
+
+	void extractResourceToFile(String resourcePath, File targetFile, boolean executable = false) {
+		targetFile.parentFile.mkdirs()
+		targetFile.text = getResourceContent(resourcePath)
+		if (executable) {
+			targetFile.executable = true
+		}
+
 	}
 
 }

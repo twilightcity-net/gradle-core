@@ -14,6 +14,9 @@ apply plugin: "org.dreamscale.integration-test"
 
 repositories {
 	jcenter()
+	maven {
+		url "https://dl.bintray.com/dreamscale/maven-public"
+	}
 }
 
 dependencies {
@@ -21,6 +24,7 @@ dependencies {
 	compile "net.jokubasdargis.buildtimer:gradle-plugin:0.1.1"
 	compile "nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0"
 	compile "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
+	compile "org.dreamscale:gradle-docker:1.+"
 
 	mainTestCompile gradleTestKit()
 	mainTestCompile 'commons-io:commons-io:2.4'
@@ -39,6 +43,7 @@ license {
 }
 
 [licenseMain, licenseFormatMain]*.exclude "licenses/*"
+[licenseMain, licenseFormatMain]*.exclude "**/*.sh"
 // exclude the test kit source which was copied from a different project (https://github.com/alkemist/gradle-test-kit)
 // and has it's own license
 [licenseMainTest, licenseFormatMainTest]*.exclude "org/gradle/testkit/**"
