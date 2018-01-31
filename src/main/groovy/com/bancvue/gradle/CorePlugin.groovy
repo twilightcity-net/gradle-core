@@ -39,7 +39,7 @@ class CorePlugin implements Plugin<Project> {
         applyJacocoExtPlugin()
         applyIdeExtPlugin()
         applyProjectSupportPlugin()
-        applyBuildTimerPlugin()
+        applyBuilderTimerPluginIfProjectIsRoot()
         applyMavenPublishAndBintrayPlugins()
     }
 
@@ -75,8 +75,10 @@ class CorePlugin implements Plugin<Project> {
         project.apply(plugin: ProjectDefaultsPlugin.PLUGIN_NAME)
     }
 
-    private void applyBuildTimerPlugin() {
-        project.apply(plugin: "net.jokubasdargis.build-timer")
+    private void applyBuilderTimerPluginIfProjectIsRoot() {
+        if (project == project.rootProject) {
+            project.apply(plugin: "net.jokubasdargis.build-timer")
+        }
     }
 
     private void applyMavenPublishAndBintrayPlugins() {
