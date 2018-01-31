@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dreamscale.gradle
+package org.dreamscale.gradle.ide
 
 import org.dreamscale.gradle.test.AbstractPluginSpecification
 

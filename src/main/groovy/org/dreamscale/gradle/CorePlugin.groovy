@@ -15,6 +15,7 @@
  */
 package org.dreamscale.gradle
 
+import org.dreamscale.gradle.ide.IdeExtPlugin
 import org.dreamscale.gradle.maven.publish.MavenPublishExtPlugin
 import org.dreamscale.gradle.support.ProjectSupportPlugin
 import org.dreamscale.gradle.test.ComponentTestPlugin
