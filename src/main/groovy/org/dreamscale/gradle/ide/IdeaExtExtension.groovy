@@ -36,7 +36,7 @@ class IdeaExtExtension {
         defaultConfigurationVmParameter("Application", vmParameter)
     }
 
-    void testConfigurationVmParameter(def vmParameter) {
+    void junitConfigurationVmParameter(def vmParameter) {
         defaultConfigurationVmParameter("JUnit", vmParameter)
     }
 
@@ -44,10 +44,10 @@ class IdeaExtExtension {
         defaultConfigurationVmParameter("Spring Boot", vmParameter)
     }
 
-    void configurationVmParameter(def vmParameter) {
+    void globalVmParameter(def vmParameter) {
         applicationConfigurationVmParameter(vmParameter)
         springBootConfigurationVmParameter(vmParameter)
-        testConfigurationVmParameter(vmParameter)
+        junitConfigurationVmParameter(vmParameter)
     }
 
 }

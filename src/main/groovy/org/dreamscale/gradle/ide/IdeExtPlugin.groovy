@@ -48,7 +48,7 @@ class IdeExtPlugin implements Plugin<Project> {
         project.apply(plugin: 'idea')
         addRefreshIdeaTask()
         addRefreshIdeaModuleTask()
-        moveCleanIdeaWorkspaceToIdeGroup()
+        repairCleanIdeaWorkspaceTask()
         updateIdeaSourcePathAndScopesAfterProjectEvaluation(ideaProject)
 
         if (project.idea.project) {
@@ -64,17 +64,6 @@ class IdeExtPlugin implements Plugin<Project> {
             if (shouldUpdateIdePaths()) {
                 ideaProject.updateIdeaSourcePathsAndScopesPriorToModuleTaskExecution()
             }
-        }
-    }
-
-    /**
-     * no task depends on cleanIdeaWorkspace and it's getting listed in group 'Other', so
-     * move it to the IDE group
-     */
-    private void moveCleanIdeaWorkspaceToIdeGroup() {
-        Task cleanIdeaWorkspace = project.tasks.findByName('cleanIdeaWorkspace')
-        if (cleanIdeaWorkspace != null) {
-            cleanIdeaWorkspace.group = IDE_GROUP_NAME
         }
     }
 
@@ -96,6 +85,21 @@ class IdeExtPlugin implements Plugin<Project> {
         refreshIdeaModule.group = IDE_GROUP_NAME
         refreshIdeaModule.description = 'Clean and generate IDEA module file'
         refreshIdeaModule.dependsOn(cleanIdeaModule, ideaModule)
+    }
+
+    /**
+     * For whatever reason, idea executes ideaWorkspace but cleanIdea does not execute cleanIdeaWorkspace.
+     * Also, no task depends on cleanIdeaWorkspace and it's getting listed in group 'Other', so
+     * move it to the IDE group.
+     */
+    private void repairCleanIdeaWorkspaceTask() {
+        Task cleanIdeaWorkspace = project.tasks.findByName('cleanIdeaWorkspace')
+        // workspace tasks are only available on the root project
+        if (cleanIdeaWorkspace != null) {
+            Task cleanIdea = project.tasks.getByName('cleanIdea')
+            cleanIdea.dependsOn(cleanIdeaWorkspace)
+            cleanIdeaWorkspace.group = IDE_GROUP_NAME
+        }
     }
 
 

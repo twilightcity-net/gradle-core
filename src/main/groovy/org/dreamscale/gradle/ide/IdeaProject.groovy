@@ -149,27 +149,36 @@ class IdeaProject {
             workspace {
                 iws.withXml { xmlFile ->
                     def runManager = xmlFile.asNode().component.find { it.@name == 'RunManager' }
-                    def applicationDefaults = runManager.configuration.find {
+                    def configurationNode = runManager.configuration.find {
                         it.@default == 'true' && it.@factoryName == configurationName
                     }
 
-                    if (applicationDefaults != null) {
-                        applicationDefaults.option.find { it.@name == 'VM_PARAMETERS' }.replaceNode {
-                            option(name: 'VM_PARAMETERS', value: vmParameterString)
-                        }
-                    } else {
-                        projectLogger.warn("Failed to resolve configuration with name=${configurationName}, unable to set VM_PARAMETERS=${vmParameterString}")
+                    if (configurationNode == null) {
+                        String type = getConfigurationType(configurationName)
+                        configurationNode = runManager.appendNode('configuration', [default: 'true', type: type])
+                        configurationNode.appendNode('option', [name: 'VM_PARAMETERS'])
+                    }
+
+                    configurationNode.option.find { it.@name == 'VM_PARAMETERS' }.replaceNode {
+                        option(name: 'VM_PARAMETERS', value: vmParameterString)
                     }
                 }
             }
         }
     }
 
+    private String getConfigurationType(String factoryName) {
+        if (factoryName == "Spring Boot") {
+            return "SpringBootApplicationConfigurationType"
+        }
+        factoryName
+    }
+
     private String createVmParameterString(List<String> vmParameters) {
         StringBuilder builder = new StringBuilder()
         vmParameters.each { def vmParameter ->
             String vmParameterString = vmParameter instanceof Closure ? vmParameter.call() : vmParameter.toString()
-            builder.append("-D${vmParameterString} ")
+            builder.append("${vmParameterString} ")
         }
         builder.size() > 0 ? builder.toString() : null
     }
