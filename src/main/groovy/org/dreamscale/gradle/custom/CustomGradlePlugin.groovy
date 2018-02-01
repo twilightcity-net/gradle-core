@@ -18,6 +18,7 @@ package org.dreamscale.gradle.custom
 import org.dreamscale.gradle.ResourceResolver
 import org.dreamscale.gradle.maven.publish.MavenPublishExtPlugin
 import org.dreamscale.gradle.maven.MavenRepositoryProperties
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -32,7 +33,7 @@ class CustomGradlePlugin implements Plugin<Project> {
 	private Project project
 	private CustomGradleProperties gradleProperties
 
-	public void apply(Project project) {
+	void apply(Project project) {
 		this.project = project
 		gradleProperties = new CustomGradleProperties(project)
 		applyJavaPlugin()
@@ -68,9 +69,11 @@ class CustomGradlePlugin implements Plugin<Project> {
 
 	private void addBuildCustomGradleDistroTask() {
 		DownloadGradle downloadGradleTask = addDownloadGradleTask()
+		File gradleInitializationScript = new File(project.buildDir, 'tmp/customized.gradle')
+		Task writeInitializationScriptContentTask = addwriteInitializationScriptContentTask(gradleInitializationScript)
 		Task buildCustomGradleDistroTask = project.tasks.create('buildCustomGradleDistro', Zip)
 		buildCustomGradleDistroTask.configure {
-			dependsOn { downloadGradleTask }
+			dependsOn { [downloadGradleTask, writeInitializationScriptContentTask] }
 			doFirst { println "configure internal zip" }
 			group = 'Build'
 			description = 'Add extra files to company Gradle distribution'
@@ -80,22 +83,25 @@ class CustomGradlePlugin implements Plugin<Project> {
 			from project.zipTree(downloadGradleTask.destinationFile)
 			into(downloadGradleTask.distributionNameBase) {
 				into('init.d') {
-					from createGradleInitializationScript()
+					from gradleInitializationScript
 				}
 			}
 		}
 	}
 
-	private File createGradleInitializationScript() {
-		File gradleInitializationScript = new File(project.buildDir, 'tmp/customized.gradle')
-		gradleInitializationScript.parentFile.mkdirs()
-		gradleInitializationScript.write(getGradleInitializationScriptContent())
-		gradleInitializationScript
-	}
+	Task addwriteInitializationScriptContentTask(File file) {
+		project.tasks.create('writeInitializationScriptContent') {
+			doLast {
+				ResourceResolver resolver = ResourceResolver.create(project)
+				String content = resolver.getResourceContent(gradleProperties.scriptResourcePath)
+				if (content == null || content.trim().isEmpty()) {
+					throw new GradleException("No content found at resource path=${gradleProperties.scriptResourcePath}")
+				}
 
-	private String getGradleInitializationScriptContent() {
-		ResourceResolver resolver = ResourceResolver.create(project)
-		resolver.getResourceContent(gradleProperties.scriptResourcePath)
+				file.parentFile.mkdirs()
+				file.write(content)
+			}
+		}
 	}
 
 	private void addMavenPublication() {
