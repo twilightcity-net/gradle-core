@@ -24,6 +24,9 @@ import org.dreamscale.gradle.test.TestExtPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+import java.util.jar.JarFile
+import java.util.jar.Manifest
+
 class CorePlugin implements Plugin<Project> {
 
     static final String PLUGIN_NAME = 'org.dreamscale.core'
@@ -42,6 +45,7 @@ class CorePlugin implements Plugin<Project> {
         applyProjectSupportPlugin()
         applyBuilderTimerPluginIfProjectIsRoot()
         applyMavenPublishAndBintrayPlugins()
+        printGradleCorePluginVersion()
     }
 
     private void applyJavaExtPlugin() {
@@ -129,6 +133,30 @@ class CorePlugin implements Plugin<Project> {
             value = System.getenv(envKey)
         }
         value
+    }
+
+    void printGradleCorePluginVersion() {
+        if (shouldPrintGradleCoreVersion()) {
+            File gradleCoreJar = project.buildscript.configurations.classpath.find {
+                it.name.startsWith("gradle-core") && it.absolutePath.contains("dreamscale")
+            }
+
+            if (gradleCoreJar != null) {
+                try {
+                    JarFile jarFile = new JarFile(gradleCoreJar)
+                    String version = jarFile.manifest.mainAttributes.getValue("Implementation-Version")
+                    if (version != null) {
+                        project.logger.lifecycle("Using org.dreamscale.core:${version}")
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace()
+                }
+            }
+        }
+    }
+
+    private boolean shouldPrintGradleCoreVersion() {
+        project == project.rootProject && project.hasProperty("dreamscale.printCorePluginVersion")
     }
 
 }

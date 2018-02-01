@@ -54,6 +54,11 @@ publishing_ext {
 	publishJavadoc true
 }
 
+jar {
+    manifest {
+        attributes("Implementation-Version": project.version)
+    }
+}
 
 ext["organization.repo.url"] = "https://github.com/dreamscale-io"
 
