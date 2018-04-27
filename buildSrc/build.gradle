@@ -1,7 +1,7 @@
 repositories {
     jcenter()
     maven {
-        url "https://dl.bintray.com/dreamscale/maven-public"
+        url "https://dl.bintray.com/dreamscale-io/maven-public"
     }
 }
 

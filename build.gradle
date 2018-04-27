@@ -15,7 +15,7 @@ apply plugin: "org.dreamscale.integration-test"
 repositories {
 	jcenter()
 	maven {
-		url "https://dl.bintray.com/dreamscale/maven-public"
+		url "https://dl.bintray.com/dreamscale-io/maven-public"
 	}
 }
 
@@ -66,7 +66,7 @@ bintray {
 	publications = ['gradleCore', 'gradleCoreTest']
 	pkg {
 		repo = 'maven-public'
-		userOrg = 'dreamscale'
+		userOrg = 'dreamscale-io'
 		licenses = ['Apache-2.0']
 		labels = ['gradle']
 		version {
