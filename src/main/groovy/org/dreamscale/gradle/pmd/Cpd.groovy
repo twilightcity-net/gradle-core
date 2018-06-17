@@ -17,6 +17,7 @@ package org.dreamscale.gradle.pmd
 
 import org.dreamscale.gradle.ResourceResolver
 import groovy.util.slurpersupport.GPathResult
+import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.project.IsolatedAntBuilder
@@ -73,6 +74,13 @@ class Cpd extends SourceTask implements VerificationTask, Reporting<CpdReports> 
 	@Override
 	CpdReports reports(Closure closure) {
 		reports.configure(closure)
+	}
+
+	@Override
+	CpdReports reports(Action a) {
+		reports.configure {
+			a.execute(it)
+		}
 	}
 
 	@TaskAction

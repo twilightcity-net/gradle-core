@@ -78,10 +78,10 @@ sourceSets {
 			fail("Expected sourceFolder url=${expectedUrl} not found in iml content=${expectedImlFile.text}")
 		}
 		assert result.size() == 1
-		assert Boolean.parseBoolean(result[0].@isTestSource) == isTestFolder
 		if (isResourceFolder) {
 			assert result[0].@type == (isTestFolder ? "java-test-resource" : "java-resource")
 		} else {
+			assert Boolean.parseBoolean(result[0].@isTestSource) == isTestFolder
 			assert result[0].@type == null
 		}
 	}

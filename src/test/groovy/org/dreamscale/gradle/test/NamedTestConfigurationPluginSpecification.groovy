@@ -79,7 +79,7 @@ class NamedTestConfigurationPluginSpecification extends AbstractPluginSpecificat
 		Task functionalTestTask = project.tasks.getByName('functionalTest')
 		functionalTestTask
 		functionalTestTask.group == 'Verification'
-		functionalTestTask.testClassesDir == project.sourceSets.functionalTest.output.classesDir
+		functionalTestTask.testClassesDirs == project.sourceSets.functionalTest.output
 		functionalTestTask.classpath == project.sourceSets.functionalTest.runtimeClasspath
 		functionalTestTask.reports.html.destination == new File(project.buildDir, 'reports/functionalTests')
 		functionalTestTask.reports.junitXml.destination == new File(project.buildDir, 'functionalTest-results')

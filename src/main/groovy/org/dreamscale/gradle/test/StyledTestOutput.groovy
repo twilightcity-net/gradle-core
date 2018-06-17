@@ -21,10 +21,10 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.TestDescriptor
 import org.gradle.api.tasks.testing.TestResult
-import org.gradle.logging.StyledTextOutput
-import org.gradle.logging.StyledTextOutputFactory
+import org.gradle.internal.logging.text.StyledTextOutput
+import org.gradle.internal.logging.text.StyledTextOutputFactory
 
-import static org.gradle.logging.StyledTextOutput.Style
+import static org.gradle.internal.logging.text.StyledTextOutput.Style
 
 /**
  * Adapted (copied) from https://github.com/brunodecarvalho/gradle-plugins/blob/master/colored-test-output.gradle
@@ -61,4 +61,5 @@ class StyledTestOutput extends DefaultTask {
 		}
 		style
 	}
+
 }

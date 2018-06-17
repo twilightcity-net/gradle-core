@@ -108,9 +108,10 @@ apply plugin: 'org.dreamscale.component-test'
 		file("build/jacoco/componentTest.exec").size() > 0
 		file("build/jacoco/jacocoAllMerge.exec").size() > 0
 		// verify coverage was generated for all test configurations
-		file("build/reports/jacoco/test/html/index.html").exists()
-		file("build/reports/jacoco/componentTest/html/index.html").exists()
-		file("build/reports/jacoco/all/html/index.html").exists()
+		println projectFS.absolutePath
+		file("build/reports/jacoco/jacocoTestReport/html/index.html").exists()
+		file("build/reports/jacoco/jacocoComponentTestReport/html/index.html").exists()
+		file("build/reports/jacoco/jacocoAllReport/html/index.html").exists()
 	}
 
 	def "should include all main source sets by default and also respect overrides when configured"() {
@@ -131,9 +132,10 @@ jacocoComponentTestReport {
 		run("coverage")
 
 		then:
-		TestFile testCoverageReport = file("build/reports/jacoco/test/test.xml")
-		TestFile componentTestCoverageReport = file("build/reports/jacoco/componentTest/componentTest.xml")
-		TestFile allCoverageReport = file("build/reports/jacoco/all/all.xml")
+		println projectFS.absolutePath
+		TestFile testCoverageReport = file("build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+		TestFile componentTestCoverageReport = file("build/reports/jacoco/jacocoComponentTestReport/jacocoComponentTestReport.xml")
+		TestFile allCoverageReport = file("build/reports/jacoco/jacocoAllReport/jacocoAllReport.xml")
 		assertCoverageReportReferencesTestFile(testCoverageReport, mainSrcFile)
 		assertCoverageReportReferencesTestFile(testCoverageReport, mainTestSrcFile)
 		assertCoverageReportReferencesTestFile(allCoverageReport, mainSrcFile)
@@ -153,8 +155,8 @@ apply plugin: 'org.dreamscale.jacoco-ext'
 		run("coverage")
 
 		then:
-		file("build/reports/jacoco/test/html/bv/${mainSrcFile.baseName}.html").exists()
-		file("build/reports/jacoco/test/html/bv/${mainSrcFile.name}.html").exists()
+		file("build/reports/jacoco/jacocoTestReport/html/bv/${mainSrcFile.baseName}.html").exists()
+		file("build/reports/jacoco/jacocoTestReport/html/bv/${mainSrcFile.name}.html").exists()
 	}
 
 }

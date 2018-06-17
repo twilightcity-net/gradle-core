@@ -94,11 +94,11 @@ class DependencyResolver {
 	}
 
 	private Configuration getAssociatedConfiguration(ProjectDependency projectDependency) {
-		String configurationName = projectDependency.configuration
-		if (configurationName == "default") {
+		String configurationName = projectDependency.targetConfiguration
+		if (configurationName == null || configurationName == "default") {
 			configurationName = "runtime"
 		}
-		projectDependency.dependencyProject.getConfigurations().getByName(configurationName)
+		projectDependency.dependencyProject.configurations.getByName(configurationName)
 	}
 
 

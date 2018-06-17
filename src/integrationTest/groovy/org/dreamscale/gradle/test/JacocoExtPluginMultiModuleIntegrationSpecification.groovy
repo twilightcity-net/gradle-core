@@ -77,7 +77,7 @@ public class ${testName} {
 		run("coverage")
 
 		then:
-		String allResults = file("build/reports/jacoco/all/all.xml").text
+		String allResults = file("build/reports/jacoco/jacocoAllReport/jacocoAllReport.xml").text
 		allResults =~ /SomeClass/
 		allResults =~ /Module1Class/
 		allResults =~ /Module2Class/
@@ -95,7 +95,7 @@ jacoco_ext {
 		run("coverage")
 
 		then:
-		String allResults = file("build/reports/jacoco/all/all.xml").text
+		String allResults = file("build/reports/jacoco/jacocoAllReport/jacocoAllReport.xml").text
 		allResults =~ /SomeClass/
 		!(allResults =~ /Module1Class/)
 		!(allResults =~ /Module2Class/)

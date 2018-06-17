@@ -91,12 +91,9 @@ class CpdPlugin extends AbstractCodeQualityPlugin<Cpd> {
 		extension as CpdExtension
 	}
 
-	protected void createConfigurations() {
-		super.createConfigurations()
-
-		Configuration cpdConfiguration = project.configurations.getByName(configurationName)
-		cpdConfiguration.incoming.beforeResolve {
-			DependencySet dependencies = cpdConfiguration.dependencies
+	protected void configureConfiguration(Configuration config) {
+		config.incoming.beforeResolve {
+			DependencySet dependencies = config.dependencies
 			if (dependencies.isEmpty()) {
 				dependencies.add(project.dependencies.create(getPmdDependencyGav()))
 			}
