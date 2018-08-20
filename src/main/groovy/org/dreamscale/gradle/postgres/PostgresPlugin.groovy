@@ -76,7 +76,7 @@ class PostgresPlugin implements Plugin<Project> {
 
                 database = "${database}${testDatabase ? "-test" : ""}"
                 println "Creating Postgres database '${database}'"
-                commandLine 'docker', 'exec', pluginExtension.dockerContainerName, 'create_database_if_not_created.sh', pluginExtension.postgresUsername, database
+                commandLine 'docker', 'exec', pluginExtension.dockerContainerName, '/tmp/create_database_if_not_created.sh', pluginExtension.postgresUsername, database
             }
         }
 
@@ -94,7 +94,7 @@ class PostgresPlugin implements Plugin<Project> {
             doFirst {
                 ResourceResolver.create(project).extractResourceToFile("postgres/create_database_if_not_created.sh", createDatabaseScript, true)
             }
-            commandLine "docker", "cp", createDatabaseScript.absolutePath, "${pluginExtension.dockerContainerName}:/usr/local/bin"
+            commandLine "docker", "cp", createDatabaseScript.absolutePath, "${pluginExtension.dockerContainerName}:/tmp"
         }
 
         externalServiceTaskManager.addInitializationTask(injectCreateDatabaseScript)
