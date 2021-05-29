@@ -16,9 +16,9 @@
 package org.dreamscale.exception
 
 
-class ExceptionSupport {
+trait ExceptionSupport {
 
-	static Throwable getRootCause(Throwable exception) {
+	Throwable getRootCause(Throwable exception) {
 		Throwable result = exception
 		while(result.cause != null) {
 			result = result.cause
@@ -34,7 +34,7 @@ class ExceptionSupport {
 	PlaceholderException. In order to verify that our correct internal exception is thrown, we have to inspect the
 	exceptionClassName on the PlaceholderException.
 	 */
-	static Throwable getRootCauseAndVerifyPlaceholderExceptionClassName(Throwable exception, Class exceptionClass) {
+	Throwable getRootCauseAndVerifyPlaceholderExceptionClassName(Throwable exception, Class exceptionClass) {
 		Throwable cause = getRootCause(exception)
 		assert cause.getExceptionClassName() == exceptionClass.name
 		cause

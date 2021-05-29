@@ -16,15 +16,16 @@
 package org.dreamscale.gradle.support
 
 import org.dreamscale.exception.ExceptionSupport
-import com.google.common.io.Files
 import org.dreamscale.gradle.test.AbstractProjectSpecification
 import org.gradle.api.GradleException
-import org.gradle.api.tasks.TaskExecutionException
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 import spock.lang.Unroll
 
-@Mixin(ExceptionSupport)
-class ClearArtifactCacheSpecification extends AbstractProjectSpecification {
+class ClearArtifactCacheSpecification extends AbstractProjectSpecification implements ExceptionSupport {
 
+	@Rule
+	private TemporaryFolder temporaryFolder
 	private File tempDir
 	private ClearArtifactCache clearArtifactCacheTask
 
@@ -34,17 +35,16 @@ class ClearArtifactCacheSpecification extends AbstractProjectSpecification {
 	}
 
 	void setup() {
-		tempDir = Files.createTempDir()
+		tempDir = temporaryFolder.root
 		clearArtifactCacheTask = project.tasks.create("clearArtifactCacheTask", ClearArtifactCache)
 	}
 
 	def "clearArtifactCache should not try to clear cache if group name is not provided"() {
 		when:
-		clearArtifactCacheTask.execute()
+		clearArtifactCacheTask.clearArtifactCache()
 
 		then:
-		TaskExecutionException exception = thrown()
-		GradleException cause = getRootCause(exception)
+		GradleException cause = thrown()
 		cause.getMessage() == "Required property 'groupName' not set"
 	}
 

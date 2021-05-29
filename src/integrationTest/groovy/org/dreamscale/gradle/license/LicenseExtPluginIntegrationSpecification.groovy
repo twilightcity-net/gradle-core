@@ -19,8 +19,7 @@ import org.dreamscale.exception.ExceptionSupport
 import org.dreamscale.gradle.test.AbstractPluginIntegrationSpecification
 import org.gradle.testkit.runner.BuildResult
 
-@Mixin(ExceptionSupport)
-class LicenseExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
+class LicenseExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification implements ExceptionSupport {
 
 	/**************************************************************************************************************
 	 * NOTE: if these test fail in an IDE, you may need to add 'licenses/*' to the compiler settings so resources
