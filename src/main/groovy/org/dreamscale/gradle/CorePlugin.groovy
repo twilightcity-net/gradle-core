@@ -20,13 +20,12 @@ import org.dreamscale.gradle.maven.publish.MavenPublishExtPlugin
 import org.dreamscale.gradle.support.ManifestAugmentor
 import org.dreamscale.gradle.support.ProjectSupportPlugin
 import org.dreamscale.gradle.test.ComponentTestPlugin
-import org.dreamscale.gradle.test.JacocoExtPlugin
+
 import org.dreamscale.gradle.test.TestExtPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 import java.util.jar.JarFile
-import java.util.jar.Manifest
 
 class CorePlugin implements Plugin<Project> {
 
@@ -41,7 +40,6 @@ class CorePlugin implements Plugin<Project> {
         applyProjectDefaultsPlugin()
         applyTestExtPlugin()
         applyComponentTestPlugin()
-        applyJacocoExtPlugin()
         applyIdeExtPlugin()
         applyProjectSupportPlugin()
         applyBuilderTimerPluginIfProjectIsRoot()
@@ -68,10 +66,6 @@ class CorePlugin implements Plugin<Project> {
 
     private void applyComponentTestPlugin() {
         project.apply(plugin: ComponentTestPlugin.PLUGIN_NAME)
-    }
-
-    private void applyJacocoExtPlugin() {
-        project.apply(plugin: JacocoExtPlugin.PLUGIN_NAME)
     }
 
     private void applyProjectSupportPlugin() {
