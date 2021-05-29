@@ -1,8 +1,6 @@
 repositories {
+    mavenLocal()
     jcenter()
-    maven {
-        url "https://dl.bintray.com/dreamscale-io/maven-public"
-    }
     maven {
         url "https://plugins.gradle.org/m2/"
     }
@@ -12,7 +10,6 @@ dependencies {
     compile gradleApi()
     compile "net.jokubasdargis.buildtimer:gradle-plugin:0.3.0"
     compile "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"
-    compile "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
     compile 'org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r'
     compile "org.dreamscale:gradle-docker:1.+"
 }

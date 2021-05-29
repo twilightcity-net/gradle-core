@@ -43,7 +43,7 @@ class CorePlugin implements Plugin<Project> {
         applyIdeExtPlugin()
         applyProjectSupportPlugin()
         applyBuilderTimerPluginIfProjectIsRoot()
-        applyMavenPublishAndBintrayPlugins()
+        applyMavenPublishPlugin()
         printGradleCorePluginVersion()
         augmentArtifactManifest()
     }
@@ -82,41 +82,8 @@ class CorePlugin implements Plugin<Project> {
         }
     }
 
-    private void applyMavenPublishAndBintrayPlugins() {
+    private void applyMavenPublishPlugin() {
         project.apply(plugin: MavenPublishExtPlugin.PLUGIN_NAME)
-        project.apply(plugin: "com.jfrog.bintray")
-
-        String artifactId = getProjectProperty("artifactId")
-        String orgRepoUrl = getProjectProperty("organization.repo.url")
-        String bintrayRepo = getProjectPropertyOrEnvValue("bintray.repo", "BINTRAY_REPO")
-        String bintrayUserOrg = getProjectPropertyOrEnvValue("bintray.userOrg", "BINTRAY_USER_ORG")
-
-        project.bintray {
-            user = getProjectPropertyOrEnvValue("bintray.user", "BINTRAY_USER")
-            key = getProjectPropertyOrEnvValue("bintray.apiKey", "BINTRAY_API_KEY")
-
-            dryRun = false
-            publish = false
-            pkg {
-                if (artifactId != null) {
-                    name = project.group + ':' + artifactId
-                }
-                desc = project.description
-                if (bintrayRepo != null) {
-                    repo = bintrayRepo
-                }
-                if (bintrayUserOrg != null) {
-                    userOrg = bintrayUserOrg
-                }
-                if (orgRepoUrl != null) {
-                    websiteUrl = "${orgRepoUrl}/${artifactId}"
-                    issueTrackerUrl = "${orgRepoUrl}/${artifactId}/issues"
-                    vcsUrl = "${orgRepoUrl}/${artifactId}.git"
-                }
-                publicDownloadNumbers = true
-            }
-        }
-
     }
 
     private String getProjectProperty(String propertyName) {

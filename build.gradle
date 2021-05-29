@@ -2,21 +2,14 @@ buildscript {
 	repositories {
 		jcenter()
 	}
-	dependencies {
-		classpath 'com.github.townsfolk:gradle-release:1.2'
-	}
 }
 
-
-apply plugin: 'release'
 apply plugin: "org.dreamscale.core-oss"
 apply plugin: "org.dreamscale.integration-test"
 
 repositories {
+	mavenLocal()
 	jcenter()
-	maven {
-		url "https://dl.bintray.com/dreamscale-io/maven-public"
-	}
     maven {
         url "https://plugins.gradle.org/m2/"
     }
@@ -26,7 +19,6 @@ dependencies {
 	compile gradleApi()
 	compile "net.jokubasdargis.buildtimer:gradle-plugin:0.3.0"
 	compile "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"
-	compile "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
 	compile 'org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r'
 	compile "org.dreamscale:gradle-docker:1.+"
 
@@ -65,17 +57,3 @@ jar {
 }
 
 ext["organization.repo.url"] = "https://github.com/dreamscale-io"
-
-bintray {
-	publications = ['gradleCore', 'gradleCoreTest']
-	pkg {
-		repo = 'maven-public'
-		userOrg = 'dreamscale-io'
-		licenses = ['Apache-2.0']
-		labels = ['gradle']
-		version {
-			vcsTag = project.version
-			attributes = ['gradle-plugin': 'org.dreamscale.core-oss:org.dreamscale:gradle-core']
-		}
-	}
-}
