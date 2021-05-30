@@ -4,7 +4,7 @@ i=0
 TIMEOUT=30
 
 while true; do
-	docker exec postgres pg_isready >& /dev/null
+	docker exec __postgres__ pg_isready >& /dev/null
 
 	if [ $? -ne 0 ] && [ $i -lt $TIMEOUT ]; then
 		sleep 1

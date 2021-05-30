@@ -17,7 +17,7 @@ package org.dreamscale.gradle.postgres
 
 import org.dreamscale.gradle.ResourceResolver
 import org.dreamscale.gradle.support.ExternalServiceTaskManager
-import org.dreamscale.gradle.docker.DockerPlugin
+import org.betterdevxp.dockerdsl.DockerDslPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -25,7 +25,7 @@ import org.gradle.api.tasks.Exec
 
 class PostgresPlugin implements Plugin<Project> {
 
-    static final String PLUGIN_NAME = "postgres"
+    static final String PLUGIN_NAME = "org.dreamscale.postgres"
 
     private Project project
     private ExternalServiceTaskManager externalServiceTaskManager
@@ -49,16 +49,16 @@ class PostgresPlugin implements Plugin<Project> {
     }
 
     private void createPostgresDockerContainer() {
-        project.apply(plugin: DockerPlugin.PLUGIN_NAME)
+        project.apply(plugin: DockerDslPlugin.NAME)
 
         project.afterEvaluate {
-            project.dockerContainers {
+            project.dockerdsl {
                 container {
                     name pluginExtension.dockerContainerName
                     imageName pluginExtension.dockerImageName
-                    publish "${pluginExtension.postgresPort}:5432"
-                    env "POSTGRES_USER=${pluginExtension.postgresUsername}"
-                    env "POSTGRES_PASSWORD=${pluginExtension.postgresPassword}"
+                    portBinding "${pluginExtension.postgresPort}:5432"
+                    envVar "POSTGRES_USER=${pluginExtension.postgresUsername}"
+                    envVar "POSTGRES_PASSWORD=${pluginExtension.postgresPassword}"
                 }
             }
         }
@@ -93,8 +93,8 @@ class PostgresPlugin implements Plugin<Project> {
         Task injectCreateDatabaseScript = project.tasks.create(name: "injectCreateDatabaseScriptIntoPostgresContainer", type: Exec, dependsOn: waitForPostgresInitializationTask) {
             doFirst {
                 ResourceResolver.create(project).extractResourceToFile("postgres/create_database_if_not_created.sh", createDatabaseScript, true)
+                commandLine "docker", "cp", createDatabaseScript.absolutePath, "${pluginExtension.dockerContainerName}:/tmp"
             }
-            commandLine "docker", "cp", createDatabaseScript.absolutePath, "${pluginExtension.dockerContainerName}:/tmp"
         }
 
         externalServiceTaskManager.addInitializationTask(injectCreateDatabaseScript)
@@ -106,12 +106,13 @@ class PostgresPlugin implements Plugin<Project> {
         Task waitForPostgres = project.tasks.create(name: "waitForPostgres", type: Exec) {
             doFirst {
                 ResourceResolver.create(project).extractResourceToFile("postgres/wait_for_postgres.sh", waitForPostgresScript, true)
+                waitForPostgresScript.text = waitForPostgresScript.text.replace("__postgres__", pluginExtension.dockerContainerName)
             }
             commandLine waitForPostgresScript.absolutePath
         }
 
         project.afterEvaluate {
-            String startPostgresTaskName = (project.hasProperty("postgres.refreshContainer") ? "refresh" : "start") + pluginExtension.dockerContainerName.capitalize()
+            String startPostgresTaskName = (project.hasProperty("postgres.refreshContainer") ? "refresh" : "start") + pluginExtension.taskSuffix
             waitForPostgres.dependsOn project.tasks.getByName(startPostgresTaskName)
         }
 

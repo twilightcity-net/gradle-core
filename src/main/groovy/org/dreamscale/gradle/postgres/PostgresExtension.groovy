@@ -31,4 +31,8 @@ class PostgresExtension {
 
     String applicationDatabaseName
 
+    String getTaskSuffix() {
+        dockerContainerName.replaceAll("(_|-)([A-Za-z0-9])", { Object[] it -> it[2].toUpperCase() }).capitalize()
+    }
+
 }

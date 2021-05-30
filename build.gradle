@@ -20,7 +20,7 @@ dependencies {
 	compile "net.jokubasdargis.buildtimer:gradle-plugin:0.3.0"
 	compile "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"
 	compile 'org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r'
-	compile "org.dreamscale:gradle-docker:1.+"
+	compile "org.betterdevxp:gradle-docker-dsl-plugin:0.+"
 
 	mainTestCompile gradleTestKit()
 	mainTestCompile 'commons-io:commons-io:2.4'
