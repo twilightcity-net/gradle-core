@@ -24,6 +24,7 @@ dependencies {
 
 	mainTestCompile gradleTestKit()
 	mainTestCompile 'commons-io:commons-io:2.4'
+	mainTestCompile 'com.google.guava:guava:30.1.1-jre'
 	mainTestCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
 		exclude group: 'org.codehaus.groovy'
 	}
@@ -34,7 +35,7 @@ dependencies {
 check.dependsOn integrationTest
 
 license {
-	ext.name = "DreamScale, Inc"
+	ext.name = "TwilightCity, Inc"
 	skipExistingHeaders true
 }
 
@@ -56,4 +57,4 @@ jar {
     }
 }
 
-ext["organization.repo.url"] = "https://github.com/dreamscale-io"
+ext["organization.repo.url"] = "https://github.com/twilightcity-net"

@@ -31,7 +31,7 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 
 	void setup() {
 		project.version = '1.0'
-		setArtifactId('bancvue')
+		setArtifactId('dreamscale')
 	}
 
 	def "apply should apply java plugin and set compatibility"() {

@@ -81,17 +81,17 @@ class ClearArtifactCacheSpecification extends AbstractProjectSpecification imple
 	def "collectGradleCacheDirsWithName"() {
 		given:
 		File cacheDir = new File(tempDir, "caches/artifacts-24/filestore")
-		createDirs(cacheDir, ["com.bancvue", "nomatch", "com.bancvue.nomatch"])
+		createDirs(cacheDir, ["org.twilightcity", "nomatch", "org.twilightcity.nomatch"])
 
 		expect:
-		ClearArtifactCache.collectGradleCacheDirsWithName(tempDir, "com.bancvue") == [new File(cacheDir, "com.bancvue")]
+		ClearArtifactCache.collectGradleCacheDirsWithName(tempDir, "org.twilightcity") == [new File(cacheDir, "org.twilightcity")]
 	}
 	
 	@Unroll("clearArtifactCache should clear #cacheDescription cache")
 	def "clearArtifactCache should clear all caches"() {
 		given:
 		clearArtifactCacheTask.userHome = tempDir
-		clearArtifactCacheTask.groupName = 'com.bancvue'
+		clearArtifactCacheTask.groupName = 'org.twilightcity'
 		File cacheRoot
 		if (cacheDirParentPath != null) {
 			cacheRoot = new File(tempDir, cacheDirParentPath)
@@ -109,9 +109,9 @@ class ClearArtifactCacheSpecification extends AbstractProjectSpecification imple
 
 		where:
 		cacheDescription | cacheDirParentPath   | cachePath
-		"groovy"         | ".groovy/grapes"     | "com.bancvue"
-		"maven"          | ".m2/repository"     | "com/bancvue"
-		"gradle"         | null                 | "caches/modules-2/files-2.1/com.bancvue"
+		"groovy"         | ".groovy/grapes"     | "org.twilightcity"
+		"maven"          | ".m2/repository"     | "org/twilightcity"
+		"gradle"         | null                 | "caches/modules-2/files-2.1/org.twilightcity"
 	}
 
 	@Unroll("clearArtifactCache should clear #cacheDescription of project dependencies")
@@ -119,7 +119,7 @@ class ClearArtifactCacheSpecification extends AbstractProjectSpecification imple
 		given:
 		ClearArtifactCache.DependencyResolver resolver = Mock()
 		clearArtifactCacheTask.userHome = tempDir
-		clearArtifactCacheTask.groupName = 'com.bancvue'
+		clearArtifactCacheTask.groupName = 'org.twilightcity'
 		clearArtifactCacheTask.restrictToProjectDependencies = true
 		clearArtifactCacheTask.dependencyResolver = resolver
 		File cacheRoot
@@ -144,9 +144,9 @@ class ClearArtifactCacheSpecification extends AbstractProjectSpecification imple
 
 		where:
 		cacheDescription | cacheDirParentPath   | cachePath
-		"groovy"         | ".groovy/grapes"     | "com.bancvue"
-		"maven"          | ".m2/repository"     | "com/bancvue"
-		"gradle"         | null                 | "caches/modules-2/files-2.1/com.bancvue"
+		"groovy"         | ".groovy/grapes"     | "org.twilightcity"
+		"maven"          | ".m2/repository"     | "org/twilightcity"
+		"gradle"         | null                 | "caches/modules-2/files-2.1/org.twilightcity"
 	}
 
 	private void createDirs(File parent, List<String> dirNames) {
