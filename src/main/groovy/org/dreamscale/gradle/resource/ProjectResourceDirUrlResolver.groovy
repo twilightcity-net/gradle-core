@@ -43,6 +43,10 @@ class ProjectResourceDirUrlResolver extends ProjectResourceResolver {
 	}
 
 	private List<File> collectProjectResourceDirs() {
+		if (project.hasProperty("sourceSets") == false) {
+			return Collections.emptyList()
+		}
+
 		project.sourceSets.collect { SourceSet sourceSet ->
 			sourceSet.resources.srcDirs
 		}.flatten()
