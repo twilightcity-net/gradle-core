@@ -81,8 +81,6 @@ class NamedTestConfigurationPluginSpecification extends AbstractPluginSpecificat
 		functionalTestTask.group == 'Verification'
 		functionalTestTask.testClassesDirs == project.sourceSets.functionalTest.output
 		functionalTestTask.classpath == project.sourceSets.functionalTest.runtimeClasspath
-		functionalTestTask.reports.html.destination == new File(project.buildDir, 'reports/functionalTests')
-		functionalTestTask.reports.junitXml.destination == new File(project.buildDir, 'functionalTest-results')
 	}
 
 	def "apply should configure functionalTest to run after unit test"() {

@@ -78,12 +78,6 @@ class NamedTestConfigurationPlugin implements Plugin<Project> {
 			classpath = { project.sourceSets."${configurationName}".runtimeClasspath }
 			testClassesDirs = { project.sourceSets."${configurationName}".output }
 		}
-		testTask.reports.html.conventionMapping.map("destination", {
-			new File(project.reporting.baseDir, "${configurationName}s")
-		})
-		testTask.reports.junitXml.conventionMapping.map("destination", {
-			new File(project.buildDir, "${configurationName}-results")
-		})
 		testTask
 	}
 
