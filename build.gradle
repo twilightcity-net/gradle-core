@@ -46,11 +46,6 @@ license {
 [licenseMainTest, licenseFormatMainTest]*.exclude "org/gradle/testkit/**"
 
 
-publishing_ext {
-	publication("mainTest")
-	publishJavadoc true
-}
-
 jar {
     manifest {
         attributes("Implementation-Version": project.version)

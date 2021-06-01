@@ -16,7 +16,6 @@
 package org.dreamscale.gradle
 
 import org.dreamscale.gradle.ide.IdeExtPlugin
-import org.dreamscale.gradle.maven.publish.MavenPublishExtPlugin
 import org.dreamscale.gradle.support.ManifestAugmentor
 import org.dreamscale.gradle.support.ProjectSupportPlugin
 import org.dreamscale.gradle.test.ComponentTestPlugin
@@ -43,7 +42,6 @@ class CorePlugin implements Plugin<Project> {
         applyIdeExtPlugin()
         applyProjectSupportPlugin()
         applyBuilderTimerPluginIfProjectIsRoot()
-        applyMavenPublishPlugin()
         printGradleCorePluginVersion()
         augmentArtifactManifest()
     }
@@ -80,10 +78,6 @@ class CorePlugin implements Plugin<Project> {
         if (project == project.rootProject) {
             project.apply(plugin: "net.jokubasdargis.build-timer")
         }
-    }
-
-    private void applyMavenPublishPlugin() {
-        project.apply(plugin: MavenPublishExtPlugin.PLUGIN_NAME)
     }
 
     private String getProjectProperty(String propertyName) {
