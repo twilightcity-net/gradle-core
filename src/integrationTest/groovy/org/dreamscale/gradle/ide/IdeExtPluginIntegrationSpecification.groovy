@@ -26,7 +26,7 @@ class IdeExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpec
 		buildFile << """
 apply plugin: 'groovy'
 apply plugin: 'org.dreamscale.ide-ext'
-apply plugin: 'org.dreamscale.integration-test'
+apply plugin: 'org.betterdevxp.dynamic-test-sets'
 
 repositories {
 	mavenCentral()
@@ -108,7 +108,7 @@ sourceSets {
 		buildFile << """
 apply plugin: 'groovy'
 apply plugin: 'org.dreamscale.ide-ext'
-apply plugin: 'org.dreamscale.component-test'
+apply plugin: 'org.betterdevxp.dynamic-test-sets'
 
 repositories {
 	mavenCentral()
@@ -163,7 +163,7 @@ dependencies {
 		buildFile << """
 apply plugin: 'groovy'
 apply plugin: 'org.dreamscale.ide-ext'
-apply plugin: 'org.dreamscale.integration-test'
+apply plugin: 'org.betterdevxp.dynamic-test-sets'
         """
 		mkdir("src/main/resources")
 		mkdir("src/test/resources")
@@ -186,7 +186,7 @@ apply plugin: 'org.dreamscale.integration-test'
 apply plugin: 'groovy'
 apply plugin: 'org.dreamscale.ide-ext'
 apply plugin: 'org.dreamscale.test-ext'
-apply plugin: 'org.dreamscale.component-test'
+apply plugin: 'org.betterdevxp.dynamic-test-sets'
 
 repositories {
 	mavenCentral()

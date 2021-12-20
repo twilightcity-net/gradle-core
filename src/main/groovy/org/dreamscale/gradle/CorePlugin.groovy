@@ -18,7 +18,6 @@ package org.dreamscale.gradle
 import org.dreamscale.gradle.ide.IdeExtPlugin
 import org.dreamscale.gradle.support.ManifestAugmentor
 import org.dreamscale.gradle.support.ProjectSupportPlugin
-import org.dreamscale.gradle.test.ComponentTestPlugin
 
 import org.dreamscale.gradle.test.TestExtPlugin
 import org.gradle.api.Plugin
@@ -38,7 +37,6 @@ class CorePlugin implements Plugin<Project> {
         applyGroovyPlugin()
         applyProjectDefaultsPlugin()
         applyTestExtPlugin()
-        applyComponentTestPlugin()
         applyIdeExtPlugin()
         applyProjectSupportPlugin()
         applyBuilderTimerPluginIfProjectIsRoot()
@@ -60,10 +58,6 @@ class CorePlugin implements Plugin<Project> {
 
     private void applyTestExtPlugin() {
         project.apply(plugin: TestExtPlugin.PLUGIN_NAME)
-    }
-
-    private void applyComponentTestPlugin() {
-        project.apply(plugin: ComponentTestPlugin.PLUGIN_NAME)
     }
 
     private void applyProjectSupportPlugin() {

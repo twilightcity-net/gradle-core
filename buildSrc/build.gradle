@@ -12,6 +12,7 @@ dependencies {
     compile "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"
     compile 'org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r'
     compile "org.betterdevxp:gradle-docker-dsl-plugin:0.+"
+    compile "org.betterdevxp:gradle-dynamic-test-sets-plugin:0.+"
 }
 
 sourceSets {

@@ -1,15 +1,16 @@
 buildscript {
 	repositories {
-		jcenter()
+		mavenLocal()
+		mavenCentral()
 	}
 }
 
 apply plugin: "org.dreamscale.core-oss"
-apply plugin: "org.dreamscale.integration-test"
+apply plugin: "org.betterdevxp.dynamic-test-sets"
 
 repositories {
 	mavenLocal()
-	jcenter()
+	mavenCentral()
     maven {
         url "https://plugins.gradle.org/m2/"
     }
@@ -21,6 +22,7 @@ dependencies {
 	compile "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"
 	compile 'org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r'
 	compile "org.betterdevxp:gradle-docker-dsl-plugin:0.+"
+	compile "org.betterdevxp:gradle-dynamic-test-sets-plugin:0.+"
 
 	mainTestCompile gradleTestKit()
 	mainTestCompile 'commons-io:commons-io:2.4'
@@ -41,10 +43,6 @@ license {
 
 [licenseMain, licenseFormatMain]*.exclude "licenses/*"
 [licenseMain, licenseFormatMain]*.exclude "**/*.sh"
-// exclude the test kit source which was copied from a different project (https://github.com/alkemist/gradle-test-kit)
-// and has it's own license
-[licenseMainTest, licenseFormatMainTest]*.exclude "org/gradle/testkit/**"
-
 
 jar {
     manifest {
