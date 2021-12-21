@@ -16,6 +16,7 @@
 package org.dreamscale.gradle
 
 import org.dreamscale.gradle.categories.ProjectCategory
+import org.gradle.api.plugins.JavaPlugin
 
 import java.text.DateFormat
 import org.gradle.api.Plugin
@@ -33,10 +34,10 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	private Project project
 	private ProjectDefaultsProperties defaultsProperties
 
-	public void apply(Project project) {
+	void apply(Project project) {
 		this.project = project
 		this.defaultsProperties = new ProjectDefaultsProperties(project)
-		project.apply(plugin: 'java')
+		project.pluginManager.apply(JavaPlugin)
 		addBuildDateAndJdkToJarManifest()
 		setDefaultBaseNameForJarTasks()
 		project.afterEvaluate {

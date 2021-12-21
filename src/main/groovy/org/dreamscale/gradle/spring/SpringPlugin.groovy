@@ -31,7 +31,7 @@ class SpringPlugin implements Plugin<Project> {
     void apply(Project project) {
         this.project = project
 
-        project.apply(plugin: IdeExtPlugin.PLUGIN_NAME)
+        project.pluginManager.apply(IdeExtPlugin)
         addLocalSpringProfileToTasksAndIdeaApplicationConfigurations()
     }
 

@@ -18,17 +18,18 @@ package org.dreamscale.gradle
 import org.dreamscale.gradle.support.CommonTaskFactory
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSet
 
-public class JavaExtPlugin implements Plugin<Project> {
+class JavaExtPlugin implements Plugin<Project> {
 
 	static final String PLUGIN_NAME = 'org.dreamscale.java-ext'
 
 	private Project project
 
-	public void apply(Project project) {
+	void apply(Project project) {
 		this.project = project
-		project.apply(plugin: 'java')
+		project.pluginManager.apply(JavaPlugin)
 
 		CommonTaskFactory factory = new CommonTaskFactory(project, project.sourceSets.main as SourceSet)
 		factory.createSourcesJarTask()

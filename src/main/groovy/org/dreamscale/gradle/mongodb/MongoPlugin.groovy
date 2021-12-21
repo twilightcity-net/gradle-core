@@ -15,6 +15,7 @@
  */
 package org.dreamscale.gradle.mongodb
 
+import org.betterdevxp.dockerdsl.DockerDslPlugin
 import org.dreamscale.gradle.ide.IdeExtPlugin
 import org.dreamscale.gradle.support.ExternalServiceTaskManager
 import org.gradle.api.Plugin
@@ -30,7 +31,7 @@ class MongoPlugin implements Plugin<Project> {
     void apply(Project project) {
         this.project = project
 
-        project.apply(plugin: IdeExtPlugin.PLUGIN_NAME)
+        project.pluginManager.apply(IdeExtPlugin)
 
         MongoExtension extension = project.extensions.create(MongoExtension.NAME, MongoExtension)
 
@@ -48,7 +49,7 @@ class MongoPlugin implements Plugin<Project> {
     }
 
     private void createMongoDockerContainer() {
-        project.apply(plugin: "docker")
+        project.pluginManager.apply(DockerDslPlugin)
 
         project.afterEvaluate {
             project.docker {
