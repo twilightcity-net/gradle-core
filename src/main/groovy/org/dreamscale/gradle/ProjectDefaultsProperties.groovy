@@ -27,7 +27,7 @@ class ProjectDefaultsProperties extends DefaultProjectPropertyContainer {
 		/**
 		 * Sets the project's sourceCompatibility and targetCompatibility
 		 */
-		String javaVersion = JavaVersion.VERSION_1_8.majorVersion
+		String javaVersion = JavaVersion.VERSION_11.majorVersion
 
 		/**
 		 * Default options.encoding for all JavaCompile tasks

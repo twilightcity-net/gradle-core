@@ -18,6 +18,9 @@ package org.dreamscale.gradle.ide
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.plugins.JavaPlugin
+import org.gradle.plugins.ide.eclipse.EclipsePlugin
+import org.gradle.plugins.ide.idea.IdeaPlugin
 
 class IdeExtPlugin implements Plugin<Project> {
 
@@ -31,7 +34,7 @@ class IdeExtPlugin implements Plugin<Project> {
 
         project.extensions.create(IdeaExtExtension.NAME, IdeaExtExtension)
 
-        project.apply(plugin: 'java')
+        project.pluginManager.apply(JavaPlugin)
         applyIdeaPlugin()
         applyEclipsePlugin()
         project.ext['updateIdePaths'] = true
@@ -45,7 +48,7 @@ class IdeExtPlugin implements Plugin<Project> {
     private void applyIdeaPlugin() {
         IdeaProject ideaProject = new IdeaProject(project)
 
-        project.apply(plugin: 'idea')
+        project.pluginManager.apply(IdeaPlugin)
         addRefreshIdeaTask()
         addRefreshIdeaModuleTask()
         repairCleanIdeaWorkspaceTask()
@@ -104,7 +107,7 @@ class IdeExtPlugin implements Plugin<Project> {
 
 
     private void applyEclipsePlugin() {
-        project.apply(plugin: 'eclipse')
+        project.pluginManager.apply(EclipsePlugin)
         addRefreshEclipseTask()
         updateEclipseSourcePathAndClassPathAfterProjectEvaluation()
     }

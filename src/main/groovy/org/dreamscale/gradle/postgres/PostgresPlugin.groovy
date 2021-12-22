@@ -49,7 +49,7 @@ class PostgresPlugin implements Plugin<Project> {
     }
 
     private void createPostgresDockerContainer() {
-        project.apply(plugin: DockerDslPlugin.NAME)
+        project.pluginManager.apply(DockerDslPlugin)
 
         project.afterEvaluate {
             project.dockerdsl {

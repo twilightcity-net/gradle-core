@@ -15,14 +15,14 @@
  */
 package org.dreamscale.gradle.support
 
-import org.dreamscale.exception.ExceptionSupport
+
 import org.dreamscale.gradle.test.AbstractProjectSpecification
 import org.gradle.api.GradleException
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Unroll
 
-class ClearArtifactCacheSpecification extends AbstractProjectSpecification implements ExceptionSupport {
+class ClearArtifactCacheSpecification extends AbstractProjectSpecification {
 
 	@Rule
 	private TemporaryFolder temporaryFolder

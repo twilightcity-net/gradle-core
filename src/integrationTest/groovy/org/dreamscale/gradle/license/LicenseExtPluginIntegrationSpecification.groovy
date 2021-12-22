@@ -15,11 +15,10 @@
  */
 package org.dreamscale.gradle.license
 
-import org.dreamscale.exception.ExceptionSupport
 import org.dreamscale.gradle.test.AbstractPluginIntegrationSpecification
 import org.gradle.testkit.runner.BuildResult
 
-class LicenseExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification implements ExceptionSupport {
+class LicenseExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
 	/**************************************************************************************************************
 	 * NOTE: if these test fail in an IDE, you may need to add 'licenses/*' to the compiler settings so resources

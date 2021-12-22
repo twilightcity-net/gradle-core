@@ -15,14 +15,12 @@
  */
 package org.dreamscale.gradle.test
 
-import org.dreamscale.gradle.GradlePluginMixin
-import org.dreamscale.gradle.support.CommonTaskFactory
+import org.betterdevxp.gradle.test.DynamicTestSetsPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.SourceSet
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.testing.Test
 
-@Mixin(GradlePluginMixin)
 class TestExtPlugin implements Plugin<Project> {
 
 	static final String PLUGIN_NAME = "org.dreamscale.test-ext"
@@ -34,60 +32,11 @@ class TestExtPlugin implements Plugin<Project> {
 	@Override
 	void apply(Project project) {
 		this.project = project
-		project.apply(plugin: "java")
-		configureMainTestAndSharedTest()
+		project.pluginManager.apply(JavaPlugin.class)
+		project.pluginManager.apply(DynamicTestSetsPlugin.class)
 		updateTestLoggersToWriteStackTracesOnTestFailure()
 		udpateTestLoggersToWriteSkippedTestEvents()
 		addStyledTestOutputTask()
-	}
-
-	private void configureMainTestAndSharedTest() {
-		addMainTestAndSharedTestConfigurations()
-		addMainTestAndSharedTestSourceSets()
-		updateSourceSetTestToIncludeConfigurationSharedTest()
-
-		if (project.file("src/mainTest").exists()) {
-			addMainTestJarTasks()
-		}
-	}
-
-	private void addMainTestAndSharedTestConfigurations() {
-		createNamedConfigurationExtendingFrom("mainTest", ["compile"], ["compileOnly"], [])
-		createNamedConfigurationExtendingFrom("sharedTest", ["compile", "mainTestCompile"], ["compileOnly", "mainTestCompileOnly"], ["runtime"])
-	}
-
-	private void addMainTestAndSharedTestSourceSets() {
-		project.sourceSets {
-			mainTest {
-				compileClasspath = main.output + compileClasspath
-				runtimeClasspath = mainTest.output + main.output + runtimeClasspath
-			}
-		}
-
-		project.sourceSets {
-            sharedTest {
-                compileClasspath = mainTest.output + main.output + compileClasspath
-                runtimeClasspath = sharedTest.output + mainTest.output + main.output + runtimeClasspath
-            }
-        }
-	}
-
-	private void addMainTestJarTasks() {
-		SourceSet mainTest = project.sourceSets.mainTest
-		CommonTaskFactory taskFactory = new CommonTaskFactory(project, mainTest)
-
-		taskFactory.createJarTask()
-		taskFactory.createSourcesJarTask()
-		taskFactory.createJavadocJarTask()
-	}
-
-	private void updateSourceSetTestToIncludeConfigurationSharedTest() {
-		project.sourceSets {
-			test {
-				compileClasspath = sharedTest.output + sharedTest.compileClasspath + compileClasspath
-				runtimeClasspath = test.output + sharedTest.runtimeClasspath + runtimeClasspath
-			}
-		}
 	}
 
 	private void updateTestLoggersToWriteStackTracesOnTestFailure() {

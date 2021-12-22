@@ -28,12 +28,8 @@ class CoreOssPlugin implements Plugin<Project> {
 
     void apply(Project project) {
         this.project = project
-        project.apply(plugin: CorePlugin.PLUGIN_NAME)
-        applyLicenseExtPlugin()
-    }
-
-    private void applyLicenseExtPlugin() {
-        project.apply(plugin: LicenseExtPlugin.PLUGIN_NAME)
+        project.pluginManager.apply(CorePlugin)
+        project.pluginManager.apply(LicenseExtPlugin)
     }
 
 }

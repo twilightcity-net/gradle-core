@@ -16,6 +16,7 @@
 package org.dreamscale.gradle.license
 
 import nl.javadude.gradle.plugins.license.License
+import nl.javadude.gradle.plugins.license.LicensePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -44,7 +45,7 @@ class LicenseExtPlugin implements Plugin<Project> {
 	}
 
 	private void applyLicensePlugin() {
-		project.apply(plugin: 'license')
+		project.pluginManager.apply(LicensePlugin)
 	}
 
 	private void configureLicenseHeader() {

@@ -15,14 +15,16 @@
  */
 package org.dreamscale.gradle
 
+import io.freefair.gradle.plugins.lombok.LombokPlugin
+import net.jokubasdargis.buildtimer.BuildTimerPlugin
 import org.dreamscale.gradle.ide.IdeExtPlugin
 import org.dreamscale.gradle.support.ManifestAugmentor
 import org.dreamscale.gradle.support.ProjectSupportPlugin
-import org.dreamscale.gradle.test.ComponentTestPlugin
 
 import org.dreamscale.gradle.test.TestExtPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.GroovyPlugin
 
 import java.util.jar.JarFile
 
@@ -38,45 +40,45 @@ class CorePlugin implements Plugin<Project> {
         applyGroovyPlugin()
         applyProjectDefaultsPlugin()
         applyTestExtPlugin()
-        applyComponentTestPlugin()
         applyIdeExtPlugin()
         applyProjectSupportPlugin()
+        applyLombokPlugin()
         applyBuilderTimerPluginIfProjectIsRoot()
         printGradleCorePluginVersion()
         augmentArtifactManifest()
     }
 
     private void applyJavaExtPlugin() {
-        project.apply(plugin: JavaExtPlugin.PLUGIN_NAME)
+        project.pluginManager.apply(JavaExtPlugin)
     }
 
     private void applyGroovyPlugin() {
-        project.apply(plugin: 'groovy')
+        project.pluginManager.apply(GroovyPlugin)
     }
 
     private void applyIdeExtPlugin() {
-        project.apply(plugin: IdeExtPlugin.PLUGIN_NAME)
+        project.pluginManager.apply(IdeExtPlugin)
     }
 
     private void applyTestExtPlugin() {
-        project.apply(plugin: TestExtPlugin.PLUGIN_NAME)
-    }
-
-    private void applyComponentTestPlugin() {
-        project.apply(plugin: ComponentTestPlugin.PLUGIN_NAME)
+        project.pluginManager.apply(TestExtPlugin)
     }
 
     private void applyProjectSupportPlugin() {
-        project.apply(plugin: ProjectSupportPlugin.PLUGIN_NAME)
+        project.pluginManager.apply(ProjectSupportPlugin)
     }
 
     private void applyProjectDefaultsPlugin() {
-        project.apply(plugin: ProjectDefaultsPlugin.PLUGIN_NAME)
+        project.pluginManager.apply(ProjectDefaultsPlugin)
+    }
+
+    private void applyLombokPlugin() {
+        project.pluginManager.apply(LombokPlugin)
     }
 
     private void applyBuilderTimerPluginIfProjectIsRoot() {
         if (project == project.rootProject) {
-            project.apply(plugin: "net.jokubasdargis.build-timer")
+            project.pluginManager.apply(BuildTimerPlugin)
         }
     }
 
