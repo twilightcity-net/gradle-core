@@ -15,6 +15,7 @@
  */
 package org.dreamscale.gradle
 
+import io.freefair.gradle.plugins.lombok.LombokPlugin
 import net.jokubasdargis.buildtimer.BuildTimerPlugin
 import org.dreamscale.gradle.ide.IdeExtPlugin
 import org.dreamscale.gradle.support.ManifestAugmentor
@@ -41,6 +42,7 @@ class CorePlugin implements Plugin<Project> {
         applyTestExtPlugin()
         applyIdeExtPlugin()
         applyProjectSupportPlugin()
+        applyLombokPlugin()
         applyBuilderTimerPluginIfProjectIsRoot()
         printGradleCorePluginVersion()
         augmentArtifactManifest()
@@ -68,6 +70,10 @@ class CorePlugin implements Plugin<Project> {
 
     private void applyProjectDefaultsPlugin() {
         project.pluginManager.apply(ProjectDefaultsPlugin)
+    }
+
+    private void applyLombokPlugin() {
+        project.pluginManager.apply(LombokPlugin)
     }
 
     private void applyBuilderTimerPluginIfProjectIsRoot() {
