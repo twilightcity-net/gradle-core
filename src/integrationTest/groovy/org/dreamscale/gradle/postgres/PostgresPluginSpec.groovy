@@ -28,6 +28,7 @@ ext.artifactId="test"
 
 postgres {
     dockerContainerName = "postgres-test-container"
+    postgresPort = "5433"
 }
 		"""
 
