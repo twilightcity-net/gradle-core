@@ -5,7 +5,7 @@ buildscript {
 	}
 }
 
-apply plugin: "org.dreamscale.core-oss"
+apply plugin: "net.twilightcity.core-oss"
 apply plugin: "org.betterdevxp.dynamic-test-sets"
 apply plugin: "maven-publish"
 
