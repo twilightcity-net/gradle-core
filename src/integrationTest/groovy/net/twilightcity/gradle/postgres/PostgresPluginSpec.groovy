@@ -15,10 +15,10 @@
  */
 package net.twilightcity.gradle.postgres
 
-
+import net.twilightcity.gradle.test.AbstractPluginIntegrationSpecification
 import org.gradle.testkit.runner.BuildResult
 
-class PostgresPluginSpec extends net.twilightcity.gradle.test.AbstractPluginIntegrationSpecification {
+class PostgresPluginSpec extends AbstractPluginIntegrationSpecification {
 
     def "should publish artifact and sources"() {
         given:

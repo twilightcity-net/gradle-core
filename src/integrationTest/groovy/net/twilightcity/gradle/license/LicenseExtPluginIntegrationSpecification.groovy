@@ -1,11 +1,11 @@
-/**
- * Copyright 2013 BancVue, LTD
+/*
+ * Copyright 2021 TwilightCity, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * 	http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,10 +15,10 @@
  */
 package net.twilightcity.gradle.license
 
-
+import net.twilightcity.gradle.test.AbstractPluginIntegrationSpecification
 import org.gradle.testkit.runner.BuildResult
 
-class LicenseExtPluginIntegrationSpecification extends net.twilightcity.gradle.test.AbstractPluginIntegrationSpecification {
+class LicenseExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
 	/**************************************************************************************************************
 	 * NOTE: if these test fail in an IDE, you may need to add 'licenses/*' to the compiler settings so resources
@@ -32,7 +32,7 @@ class LicenseExtPluginIntegrationSpecification extends net.twilightcity.gradle.t
 		}
 		buildFile << """
 ext {
-	licenseName='BancVue'
+	licenseName='TwilightCity'
 }
 
 apply plugin: 'net.twilightcity.test-ext'
@@ -46,7 +46,7 @@ apply plugin: 'net.twilightcity.license-ext'
 		String year = Calendar.getInstance().get(Calendar.YEAR)
 		srcFiles.each { File srcFile ->
 			String text = srcFile.text
-			assert text =~ /Copyright ${year} BancVue/
+			assert text =~ /Copyright ${year} TwilightCity/
 			assert text =~ /www.apache.org/
 		}
 	}
@@ -60,7 +60,7 @@ apply plugin: 'net.twilightcity.license-ext'
 
 license {
     ext.year='1975'
-	ext.name='BancVue'
+	ext.name='TwilightCity'
 }
 		"""
 
@@ -69,7 +69,7 @@ license {
 
 		then:
 		String text = srcFile.text
-		text =~ /Copyright 1975 BancVue/
+		text =~ /Copyright 1975 TwilightCity/
 		text =~ /www.apache.org/
 	}
 

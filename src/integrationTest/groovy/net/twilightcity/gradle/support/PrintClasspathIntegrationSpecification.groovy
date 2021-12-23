@@ -1,11 +1,11 @@
-/**
- * Copyright 2013 BancVue, LTD
+/*
+ * Copyright 2021 TwilightCity, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * 	http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,10 +15,10 @@
  */
 package net.twilightcity.gradle.support
 
-
+import net.twilightcity.gradle.test.AbstractPluginIntegrationSpecification
 import org.gradle.testkit.runner.BuildResult
 
-class PrintClasspathIntegrationSpecification extends net.twilightcity.gradle.test.AbstractPluginIntegrationSpecification {
+class PrintClasspathIntegrationSpecification extends AbstractPluginIntegrationSpecification {
 
 	def "should print compile and runtime classpaths to console for all source sets"() {
 		given:

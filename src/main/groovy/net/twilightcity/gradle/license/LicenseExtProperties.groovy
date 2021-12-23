@@ -1,11 +1,11 @@
-/**
- * Copyright 2013 BancVue, LTD
+/*
+ * Copyright 2021 TwilightCity, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * 	http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,10 +17,11 @@ package net.twilightcity.gradle.license
 
 
 import groovy.util.logging.Slf4j
+import net.twilightcity.gradle.DefaultProjectPropertyContainer
 import org.gradle.api.Project
 
 @Slf4j
-class LicenseExtProperties extends net.twilightcity.gradle.DefaultProjectPropertyContainer {
+class LicenseExtProperties extends DefaultProjectPropertyContainer {
 
 	private static final String NAME = "license"
 
