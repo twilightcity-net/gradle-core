@@ -4,8 +4,6 @@
 
 A collection of gradle plugins meant to codify and streamline project development within an organization.
 
-See the [wiki](https://github.com/BancVue/gradle-core/wiki) for documentation.
-
 # Publishing to Bintray
 
 Make sure you have a bintray account and are a member of the [dreamscale organization](https://bintray.com/dreamscale/organization/edit)
