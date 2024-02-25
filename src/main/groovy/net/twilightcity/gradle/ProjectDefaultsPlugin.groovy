@@ -146,13 +146,13 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 
 	private void setDefaultBaseNameForJarTasks() {
 		project.tasks.withType(Jar) { Jar jar ->
-			jar.conventionMapping.archiveBaseName = { getDefaultBaseNameForTask(jar) }
+			jar.conventionMapping.baseName = { getDefaultBaseNameForTask(jar) }
 		}
 	}
 
 	private String getDefaultBaseNameForTask(Jar jar) {
 		String artifactId = net.twilightcity.gradle.categories.ProjectCategory.getArtifactIdOrNull(project)
-		artifactId ?: jar.archiveBaseName
+		artifactId ?: jar.baseName
 	}
 
 }

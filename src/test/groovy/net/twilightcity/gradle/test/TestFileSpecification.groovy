@@ -12,8 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-package net.twilightcity.gradle.test
+*/ net.twilightcity.gradle.test
 
 import spock.lang.Specification
 
