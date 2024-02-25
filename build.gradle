@@ -19,20 +19,19 @@ repositories {
 }
 
 dependencies {
-	compile gradleApi()
-	compile "net.jokubasdargis.buildtimer:gradle-plugin:0.3.0"
-	compile "gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.15.0"
-	compile 'org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r'
-	compile "org.betterdevxp:gradle-docker-dsl-plugin:0.1.0"
-	compile "org.betterdevxp:gradle-dynamic-test-sets-plugin:0.1.0"
-	compile "io.freefair.gradle:lombok-plugin:5.3.3.3"
+	implementation gradleApi()
+	implementation "net.jokubasdargis.buildtimer:gradle-plugin:0.3.0"
+	implementation "gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1"
+	implementation 'org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r'
+	implementation "org.betterdevxp:gradle-docker-dsl-plugin:0.1.0"
+	implementation "org.betterdevxp:gradle-dynamic-test-sets-plugin:0.1.0"
+	implementation "io.freefair.gradle:lombok-plugin:5.3.3.3"
 
 	sharedTestApi gradleTestKit()
 	sharedTestApi 'commons-io:commons-io:2.4'
 	sharedTestApi 'com.google.guava:guava:30.1.1-jre'
-	sharedTestApi('org.spockframework:spock-core:1.1-groovy-2.4') {
-		exclude group: 'org.codehaus.groovy'
-	}
+	sharedTestApi 'org.spockframework:spock-core:2.0-groovy-3.0'
+	sharedTestApi 'org.spockframework:spock-junit4:2.0-groovy-3.0'
 	sharedTestApi 'cglib:cglib-nodep:2.2.2'
 	sharedTestApi 'org.objenesis:objenesis:1.3'
 }

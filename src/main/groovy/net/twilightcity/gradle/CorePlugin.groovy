@@ -15,7 +15,9 @@
  */
 package net.twilightcity.gradle
 
+import io.freefair.gradle.plugins.lombok.LombokExtension
 import io.freefair.gradle.plugins.lombok.LombokPlugin
+import io.freefair.gradle.plugins.lombok.tasks.GenerateLombokConfig
 import net.jokubasdargis.buildtimer.BuildTimerPlugin
 import net.twilightcity.gradle.support.ManifestAugmentor
 import net.twilightcity.gradle.support.ProjectSupportPlugin
@@ -73,6 +75,9 @@ class CorePlugin implements Plugin<Project> {
 
     private void applyLombokPlugin() {
         project.pluginManager.apply(LombokPlugin)
+        project.tasks.withType(GenerateLombokConfig).configureEach {
+            enabled = project == project.rootProject
+        }
     }
 
     private void applyBuilderTimerPluginIfProjectIsRoot() {

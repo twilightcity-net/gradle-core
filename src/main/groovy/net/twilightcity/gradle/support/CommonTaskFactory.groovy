@@ -54,7 +54,7 @@ class CommonTaskFactory {
 			group = "Build"
 			description = "Assembles a jar archive containing the ${sourceSet.name} ${jarContent}."
 			if (classifierString) {
-				classifier = classifierString
+				archiveClassifier = classifierString
 			}
 			if (postfix) {
 				baseName = "${baseName}-${postfix}"
