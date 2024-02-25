@@ -41,11 +41,9 @@ class ProjectInfo {
 			}
 		}
 
-		compileConfigurations = findConfigurationsMatching(project, /(?i).*(?<!test)compile$/) +
-				findConfigurationsMatching(project, /(?i).*(?<!test)compileonly$/)
+		compileConfigurations = findConfigurationsMatching(project, /(?i).*(?<!test)compile$/)
 		runtimeConfigurations = findConfigurationsMatching(project, /(?i).*(?<!test)runtime$/)
-		testConfigurations = findConfigurationsMatching(project, /(?i).*testcompile$/) +
-				findConfigurationsMatching(project, /(?i).*testcompileonly$/)
+		testConfigurations = findConfigurationsMatching(project, /(?i).*testcompile$/)
 	}
 
 	private Set<Configuration> findConfigurationsMatching(Project project, String regex) {
