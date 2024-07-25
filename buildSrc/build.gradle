@@ -3,7 +3,7 @@ repositories {
     mavenCentral()
     gradlePluginPortal()
     maven {
-        url "${findProperty('nexus.url')}/repository/twilightcity"
+        url "http://nexus.twilightcity.net:8081/repository/public"
     }
 }
 

@@ -19,9 +19,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Publish with Gradle
         env:
-          NEXUS_URL: ${{ secrets.NEXUS_URL }}
-          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
         run: |-
-          ./gradlew publishPluginMavenPublicationToMavenRepository \
-            -Pnexus.url="$NEXUS_URL" -Pnexus.username="$NEXUS_USERNAME" -Pnexus.password="$NEXUS_PASSWORD"
+          ./gradlew publishPluginMavenPublicationToMavenRepository -Pnexus.password="$NEXUS_PASSWORD"
