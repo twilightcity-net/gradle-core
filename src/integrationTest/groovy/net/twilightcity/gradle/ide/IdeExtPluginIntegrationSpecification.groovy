@@ -26,7 +26,7 @@ class IdeExtPluginIntegrationSpecification extends AbstractPluginIntegrationSpec
 		buildFile << """
 apply plugin: 'groovy'
 apply plugin: 'net.twilightcity.ide-ext'
-apply plugin: 'org.betterdevxp.dynamic-test-sets'
+apply plugin: 'net.twilightcity.dynamic-test-sets'
 
 repositories {
 	mavenCentral()
@@ -108,7 +108,7 @@ sourceSets {
 		buildFile << """
 apply plugin: 'groovy'
 apply plugin: 'net.twilightcity.ide-ext'
-apply plugin: 'org.betterdevxp.dynamic-test-sets'
+apply plugin: 'net.twilightcity.dynamic-test-sets'
 
 repositories {
 	mavenCentral()
@@ -163,7 +163,7 @@ dependencies {
 		buildFile << """
 apply plugin: 'groovy'
 apply plugin: 'net.twilightcity.ide-ext'
-apply plugin: 'org.betterdevxp.dynamic-test-sets'
+apply plugin: 'net.twilightcity.dynamic-test-sets'
         """
 		mkdir("src/main/resources")
 		mkdir("src/test/resources")
@@ -186,7 +186,7 @@ apply plugin: 'org.betterdevxp.dynamic-test-sets'
 apply plugin: 'groovy'
 apply plugin: 'net.twilightcity.ide-ext'
 apply plugin: 'net.twilightcity.test-ext'
-apply plugin: 'org.betterdevxp.dynamic-test-sets'
+apply plugin: 'net.twilightcity.dynamic-test-sets'
 
 repositories {
 	mavenCentral()
