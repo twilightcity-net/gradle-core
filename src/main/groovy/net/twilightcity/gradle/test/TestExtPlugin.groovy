@@ -19,7 +19,9 @@ import org.betterdevxp.gradle.test.DynamicTestSetsPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.testing.Test
+import org.gradle.internal.impldep.org.testng.internal.thread.IThreadFactory
 
 class TestExtPlugin implements Plugin<Project> {
 
@@ -37,30 +39,46 @@ class TestExtPlugin implements Plugin<Project> {
 		updateTestLoggersToWriteStackTracesOnTestFailure()
 		udpateTestLoggersToWriteSkippedTestEvents()
 		addStyledTestOutputTask()
+		configureTestTimerReporter()
 	}
 
 	private void updateTestLoggersToWriteStackTracesOnTestFailure() {
-		project.tasks.withType(Test) { Test test ->
+		project.tasks.withType(Test).configureEach { Test test ->
 			test.testLogging.exceptionFormat = "full"
 			test.testLogging.stackTraceFilters("groovy")
 		}
 	}
 
 	private void udpateTestLoggersToWriteSkippedTestEvents() {
-		project.tasks.withType(Test) { Test test ->
+		project.tasks.withType(Test).configureEach { Test test ->
 			test.testLogging.events("skipped")
 		}
 	}
 
 	private void addStyledTestOutputTask() {
-		StyledTestOutput stoTask = project.tasks.create("styledTestOutput", StyledTestOutput)
+		TaskProvider<StyledTestOutput> stoTask = project.tasks.register("styledTestOutput", StyledTestOutput)
 		stoTask.configure {
 			group = VERIFICATION_GROUP_NAME
 			description = "Modifies build to output test results incrementally"
 		}
 
-		project.tasks.withType(Test) { Test test ->
+		project.tasks.withType(Test).configureEach { Test test ->
 			test.mustRunAfter stoTask
+		}
+	}
+
+	private void configureTestTimerReporter() {
+		def testTimerReportThreshold = project.findProperty("testTimerReportThreshold")
+		if (testTimerReportThreshold) {
+			def threshold = Integer.parseInt(testTimerReportThreshold.toString())
+			project.tasks.withType(Test).configureEach {
+				afterTest { descriptor, result ->
+					def totalTime = result.endTime - result.startTime
+					if (totalTime > threshold) {
+						println "$descriptor.className.$descriptor.name took $totalTime ms"
+					}
+				}
+			}
 		}
 	}
 
