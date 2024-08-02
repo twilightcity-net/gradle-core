@@ -10,7 +10,6 @@ repositories {
 dependencies {
     compile gradleApi()
     compile "net.jokubasdargis.buildtimer:gradle-plugin:0.3.0"
-    compile "gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.15.0"
     compile 'org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r'
     compile "net.twilightcity:gradle-docker-dsl-plugin:0.1.0"
     compile "net.twilightcity:gradle-dynamic-test-sets-plugin:0.1.0"

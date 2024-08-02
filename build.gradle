@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 }
 
-apply plugin: "net.twilightcity.core-oss"
+apply plugin: "net.twilightcity.core"
 apply plugin: "net.twilightcity.dynamic-test-sets"
 
 repositories {
@@ -18,7 +18,6 @@ repositories {
 dependencies {
 	implementation gradleApi()
 	implementation "net.jokubasdargis.buildtimer:gradle-plugin:0.3.0"
-	implementation "gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.15.0"
 	implementation 'org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r'
 	implementation "net.twilightcity:gradle-docker-dsl-plugin:0.1.0"
 	implementation "net.twilightcity:gradle-dynamic-test-sets-plugin:0.1.0"
@@ -35,14 +34,6 @@ dependencies {
 }
 
 check.dependsOn integrationTest
-
-license {
-	ext.name = "TwilightCity, Inc"
-	skipExistingHeaders true
-}
-
-[licenseMain, licenseFormatMain]*.exclude "licenses/*"
-[licenseMain, licenseFormatMain]*.exclude "**/*.sh"
 
 java {
 	withSourcesJar()
