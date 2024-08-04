@@ -17,9 +17,11 @@ package net.twilightcity.gradle.test
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.TempDir
 
 /**
  * Extended by tests which are not testing a plugin itself, but testing classes which are used by plugins and
@@ -27,8 +29,8 @@ import spock.lang.Specification
  */
 abstract class AbstractPluginSupportSpecification extends Specification {
 
-    @Rule
-    public TemporaryFolder projectDir = new TemporaryFolder()
+    @TempDir
+    protected File projectDir
     protected Project project
     protected ProjectFileSystem projectFS
 
@@ -40,7 +42,7 @@ abstract class AbstractPluginSupportSpecification extends Specification {
     protected Project createProject() {
         ProjectBuilder.builder()
             .withName("plugin-support")
-            .withProjectDir(projectDir.root)
+            .withProjectDir(projectDir)
             .build()
     }
 

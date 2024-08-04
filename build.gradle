@@ -11,7 +11,7 @@ repositories {
 	mavenCentral()
 	gradlePluginPortal()
     maven {
-		url "http://nexus.twilightcity.net:8081/repository/public"
+		url "http://nexus.twilightcity.net:8081/repository/public"; setAllowInsecureProtocol(true)
     }
 }
 
@@ -19,24 +19,26 @@ dependencies {
 	implementation gradleApi()
 	implementation "net.jokubasdargis.buildtimer:gradle-plugin:0.3.0"
 	implementation 'org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r'
-	implementation "net.twilightcity:gradle-docker-dsl-plugin:0.1.0"
-	implementation "net.twilightcity:gradle-dynamic-test-sets-plugin:0.1.0"
+	implementation "net.twilightcity:gradle-docker-dsl-plugin:0.2.0"
+	implementation "net.twilightcity:gradle-dynamic-test-sets-plugin:0.2.0"
 	implementation "io.freefair.gradle:lombok-plugin:5.3.3.3"
 
 	sharedTestApi gradleTestKit()
 	sharedTestApi 'commons-io:commons-io:2.4'
 	sharedTestApi 'com.google.guava:guava:30.1.1-jre'
-	sharedTestApi('org.spockframework:spock-core:1.1-groovy-2.4') {
+	sharedTestApi('org.spockframework:spock-core:2.2-groovy-3.0') {
 		exclude group: 'org.codehaus.groovy'
 	}
 	sharedTestApi 'cglib:cglib-nodep:2.2.2'
 	sharedTestApi 'org.objenesis:objenesis:1.3'
+
+	sharedTestApi 'junit:junit:4.12'
 }
 
 check.dependsOn integrationTest
 
-java {
-	withSourcesJar()
+tasks.withType(Test).configureEach {
+	useJUnitPlatform()
 }
 
 jar {

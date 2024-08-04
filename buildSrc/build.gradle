@@ -3,17 +3,17 @@ repositories {
     mavenCentral()
     gradlePluginPortal()
     maven {
-        url "http://nexus.twilightcity.net:8081/repository/public"
+        url "http://nexus.twilightcity.net:8081/repository/public"; setAllowInsecureProtocol(true)
     }
 }
 
 dependencies {
-    compile gradleApi()
-    compile "net.jokubasdargis.buildtimer:gradle-plugin:0.3.0"
-    compile 'org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r'
-    compile "net.twilightcity:gradle-docker-dsl-plugin:0.1.0"
-    compile "net.twilightcity:gradle-dynamic-test-sets-plugin:0.1.0"
-    compile "io.freefair.gradle:lombok-plugin:5.3.3.3"
+    implementation gradleApi()
+    implementation "net.jokubasdargis.buildtimer:gradle-plugin:0.3.0"
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r'
+    implementation "net.twilightcity:gradle-docker-dsl-plugin:0.2.0"
+    implementation "net.twilightcity:gradle-dynamic-test-sets-plugin:0.2.0"
+    implementation "io.freefair.gradle:lombok-plugin:5.3.3.3"
 }
 
 sourceSets {
