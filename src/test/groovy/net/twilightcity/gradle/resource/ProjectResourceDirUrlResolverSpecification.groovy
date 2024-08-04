@@ -16,6 +16,7 @@
 package net.twilightcity.gradle.resource
 
 import net.twilightcity.gradle.test.AbstractPluginSupportSpecification
+import net.twilightcity.gradle.test.TestFile
 
 class ProjectResourceDirUrlResolverSpecification extends AbstractPluginSupportSpecification {
 
@@ -28,7 +29,7 @@ class ProjectResourceDirUrlResolverSpecification extends AbstractPluginSupportSp
 
 	def "getResourceAsUrlOrNull should return URL if resource exists in project resource dir"() {
 		given:
-		net.twilightcity.gradle.test.TestFile resourceFile = projectFS.file("src/main/resources/resource.txt") << "content"
+        TestFile resourceFile = projectFS.file("src/main/resources/resource.txt") << "content"
 
 		when:
 		URL resourceUrl = resolver.getResourceAsUrlOrNull("resource.txt")

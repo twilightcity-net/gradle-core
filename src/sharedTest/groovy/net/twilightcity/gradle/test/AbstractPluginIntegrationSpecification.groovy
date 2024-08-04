@@ -19,15 +19,16 @@ import org.gradle.testkit.runner.BuildResult
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.TempDir
 
 abstract class AbstractPluginIntegrationSpecification extends Specification {
 
-    @Rule
-    public TemporaryFolder projectDir = new TemporaryFolder()
+    @TempDir
+    protected File projectDir
     protected TestGradleBuild testGradleBuild
 
     void setup() {
-        testGradleBuild = new TestGradleBuild(projectDir.root)
+        testGradleBuild = new TestGradleBuild(projectDir)
     }
 
     protected BuildResult run(String... args) {

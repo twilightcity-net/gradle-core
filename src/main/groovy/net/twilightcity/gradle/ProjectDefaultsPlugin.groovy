@@ -15,7 +15,7 @@
  */
 package net.twilightcity.gradle
 
-
+import net.twilightcity.gradle.categories.ProjectCategory
 import org.gradle.api.plugins.JavaPlugin
 
 import java.text.DateFormat
@@ -132,7 +132,7 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	}
 
 	private void addBuildDateAndJdkToJarManifest() {
-		project.tasks.withType(Jar) { Jar jar ->
+		project.tasks.withType(Jar).configureEach { Jar jar ->
 			manifest {
 				attributes 'Build-Date': getDateAsString()
 				attributes 'Build-Jdk': System.getProperty('java.version')
@@ -145,14 +145,14 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	}
 
 	private void setDefaultBaseNameForJarTasks() {
-		project.tasks.withType(Jar) { Jar jar ->
-			jar.conventionMapping.baseName = { getDefaultBaseNameForTask(jar) }
+		project.tasks.withType(Jar).configureEach { Jar jar ->
+			jar.conventionMapping.archiveBaseName = { getDefaultBaseNameForTask(jar) }
 		}
 	}
 
 	private String getDefaultBaseNameForTask(Jar jar) {
-		String artifactId = net.twilightcity.gradle.categories.ProjectCategory.getArtifactIdOrNull(project)
-		artifactId ?: jar.baseName
+		String artifactId = ProjectCategory.getArtifactIdOrNull(project)
+		artifactId ?: jar.archiveBaseName.get()
 	}
 
 }

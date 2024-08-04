@@ -19,12 +19,12 @@ import net.twilightcity.gradle.test.AbstractProjectSpecification
 import org.gradle.api.GradleException
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import spock.lang.TempDir
 import spock.lang.Unroll
 
 class ClearArtifactCacheSpecification extends AbstractProjectSpecification {
 
-	@Rule
-	private TemporaryFolder temporaryFolder
+	@TempDir
 	private File tempDir
 	private ClearArtifactCache clearArtifactCacheTask
 
@@ -34,7 +34,6 @@ class ClearArtifactCacheSpecification extends AbstractProjectSpecification {
 	}
 
 	void setup() {
-		tempDir = temporaryFolder.root
 		clearArtifactCacheTask = project.tasks.create("clearArtifactCacheTask", ClearArtifactCache)
 	}
 
