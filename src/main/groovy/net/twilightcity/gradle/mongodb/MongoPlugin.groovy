@@ -16,7 +16,6 @@
 package net.twilightcity.gradle.mongodb
 
 import org.betterdevxp.dockerdsl.DockerDslPlugin
-import net.twilightcity.gradle.ide.IdeExtPlugin
 import net.twilightcity.gradle.support.ExternalServiceTaskManager
 import org.gradle.api.Plugin
 import org.gradle.api.Project
