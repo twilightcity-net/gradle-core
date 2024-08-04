@@ -34,11 +34,7 @@ class SpringPlugin implements Plugin<Project> {
     }
 
     private void addLocalSpringProfileToTasksAndIdeaApplicationConfigurations() {
-        net.twilightcity.gradle.ide.IdeaExtExtension ideaExtension = net.twilightcity.gradle.ide.IdeaExtExtension.getInstance(project)
-        ideaExtension.springBootConfigurationVmParameter("spring.profiles.active=local,bootRun")
-        ideaExtension.applicationConfigurationVmParameter("spring.profiles.active=local,bootRun")
-
-        project.tasks.withType(JavaExec) { Task task ->
+        project.tasks.withType(JavaExec).configureEach { Task task ->
             systemProperty "spring.profiles.active", "local,${task.name}"
         }
     }

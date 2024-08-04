@@ -19,7 +19,6 @@ import io.freefair.gradle.plugins.lombok.LombokPlugin
 import net.jokubasdargis.buildtimer.BuildTimerPlugin
 import net.twilightcity.gradle.support.ManifestAugmentor
 import net.twilightcity.gradle.support.ProjectSupportPlugin
-
 import net.twilightcity.gradle.test.TestExtPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -39,7 +38,6 @@ class CorePlugin implements Plugin<Project> {
         applyGroovyPlugin()
         applyProjectDefaultsPlugin()
         applyTestExtPlugin()
-        applyIdeExtPlugin()
         applyProjectSupportPlugin()
         applyLombokPlugin()
         applyBuilderTimerPluginIfProjectIsRoot()
@@ -53,10 +51,6 @@ class CorePlugin implements Plugin<Project> {
 
     private void applyGroovyPlugin() {
         project.pluginManager.apply(GroovyPlugin)
-    }
-
-    private void applyIdeExtPlugin() {
-        project.pluginManager.apply(net.twilightcity.gradle.ide.IdeExtPlugin)
     }
 
     private void applyTestExtPlugin() {
