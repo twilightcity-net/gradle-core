@@ -50,10 +50,10 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	}
 
 	private void setDefaultCompileMemorySettings() {
-		project.tasks.withType(GroovyCompile) { GroovyCompile compile ->
+		project.tasks.withType(GroovyCompile).configureEach { GroovyCompile compile ->
 			setCompileMemorySettings(compile.groovyOptions.forkOptions)
 		}
-		project.tasks.withType(JavaCompile) { JavaCompile compile ->
+		project.tasks.withType(JavaCompile).configureEach { JavaCompile compile ->
 			setCompileMemorySettings(compile.options.forkOptions)
 		}
 	}
@@ -61,34 +61,16 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	private void setCompileMemorySettings(BaseForkOptions forkOptions) {
 		forkOptions.memoryInitialSize = forkOptions.memoryInitialSize ?: defaultsProperties.minHeapSize
 		forkOptions.memoryMaximumSize = forkOptions.memoryMaximumSize ?: defaultsProperties.maxHeapSize
-		if (shouldSetMaxPermSize(forkOptions)) {
-			forkOptions.jvmArgs << "-XX:MaxPermSize=${defaultsProperties.maxPermSize}".toString()
-		}
 	}
 
-	private boolean shouldSetMaxPermSize(def jvmArgContainer) {
-		isMaxPermSizeAvailable() && isMissingJvmArg(jvmArgContainer, "-XX:MaxPermSize")
-	}
-
-	private boolean isMaxPermSizeAvailable() {
-		try {
-			return ((defaultsProperties.javaVersion as float) < 1.8)
-		} catch (Exception ex) {
-			return false
-		}
-	}
-
-	private boolean isMissingJvmArg(def jvmArgContainer, String jvmArg) {
+	private static boolean isMissingJvmArg(def jvmArgContainer, String jvmArg) {
 		!jvmArgContainer.jvmArgs.find { it.startsWith(jvmArg) }
 	}
 
 	private void setDefaultTestMemorySettings() {
-		project.tasks.withType(Test) { Test test ->
+		project.tasks.withType(Test).configureEach { Test test ->
 			test.minHeapSize = test.minHeapSize ?: defaultsProperties.minTestHeapSize
 			test.maxHeapSize = test.maxHeapSize ?: defaultsProperties.maxTestHeapSize
-			if (shouldSetMaxPermSize(test)) {
-				test.jvmArgs("-XX:MaxPermSize=${defaultsProperties.maxTestPermSize}".toString())
-			}
 		}
 	}
 
@@ -97,17 +79,17 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 		if (javaTmpDir) {
 			String jvmArgTmpDir = "-Djava.io.tmpdir=${javaTmpDir}".toString()
 
-			project.tasks.withType(Test) { Test test ->
+			project.tasks.withType(Test).configureEach { Test test ->
 				if (isMissingJvmArg(test, "-Djava.io.tmpdir")) {
 					test.jvmArgs(jvmArgTmpDir)
 				}
 			}
-			project.tasks.withType(GroovyCompile) { GroovyCompile compile ->
+			project.tasks.withType(GroovyCompile).configureEach { GroovyCompile compile ->
 				if (isMissingJvmArg(compile.groovyOptions.forkOptions, "-Djava.io.tmpdir")) {
 					compile.groovyOptions.forkOptions.jvmArgs << jvmArgTmpDir
 				}
 			}
-			project.tasks.withType(JavaCompile) { JavaCompile compile ->
+			project.tasks.withType(JavaCompile).configureEach { JavaCompile compile ->
 				if (isMissingJvmArg(compile.options.forkOptions, "-Djava.io.tmpdir")) {
 					compile.options.forkOptions.jvmArgs << jvmArgTmpDir
 				}
@@ -117,11 +99,11 @@ class ProjectDefaultsPlugin implements Plugin<Project> {
 	}
 
 	private void setCompilerEncoding() {
-		project.tasks.withType(JavaCompile) { JavaCompile compile ->
+		project.tasks.withType(JavaCompile).configureEach { JavaCompile compile ->
 			compile.options.encoding = compile.options.encoding ?: defaultsProperties.compilerEncoding
 		}
 
-		project.tasks.withType(GroovyCompile) { GroovyCompile compile ->
+		project.tasks.withType(GroovyCompile).configureEach { GroovyCompile compile ->
 			compile.groovyOptions.encoding = compile.groovyOptions.encoding ?: defaultsProperties.compilerEncoding
 		}
 	}
