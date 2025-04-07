@@ -15,10 +15,11 @@
  */
 package net.twilightcity.gradle.support
 
-
+import net.twilightcity.gradle.categories.ProjectCategory
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
 
@@ -28,67 +29,71 @@ class CommonTaskFactory {
 	private SourceSet sourceSet
 	private TaskAndConfigurationNamer namer
 
-	public CommonTaskFactory(Project project, SourceSet sourceSet) {
+	CommonTaskFactory(Project project, SourceSet sourceSet) {
 		this(project, sourceSet, new TaskAndConfigurationNamer(sourceSet.name))
 	}
 
-	public CommonTaskFactory(Project project, SourceSet sourceSet, TaskAndConfigurationNamer namer) {
+	CommonTaskFactory(Project project, SourceSet sourceSet, TaskAndConfigurationNamer namer) {
 		this.project = project
 		this.sourceSet = sourceSet
 		this.namer = namer
 	}
 
-	Jar createJarTask() {
+	TaskProvider<Jar> createJarTask() {
 		createAndConfigureJarTask(namer.jarTaskName, sourceSet.output)
 	}
 
-	Jar createSourcesJarTask() {
+	TaskProvider<Jar> createSourcesJarTask() {
 		createAndConfigureJarTask(namer.sourcesJarTaskName, sourceSet.allSource, "sources")
 	}
 
-	private Jar createAndConfigureJarTask(String jarTaskName, Object sourcePath, String classifierString = null) {
+	TaskProvider<Jar> createAndConfigureJarTask(String jarTaskName, Object sourcePath, String classifierString = null) {
 		String postfix = namer.sourceSetNameAppendix
 		String jarContent = classifierString ? classifierString : "classes"
-		Jar jarTask = project.tasks.create(jarTaskName, Jar)
-		jarTask.configure {
+		TaskProvider<Jar> jarTaskProvider = project.tasks.register(jarTaskName, Jar)
+		jarTaskProvider.configure {
 			group = "Build"
 			description = "Assembles a jar archive containing the ${sourceSet.name} ${jarContent}."
 			if (classifierString) {
-				classifier = classifierString
+				getArchiveClassifier().set(classifierString)
 			}
 			if (postfix) {
-				baseName = "${baseName}-${postfix}"
+				getArchiveBaseName().set("${getArchiveBaseName().get()}-${postfix}")
 			}
 			from sourcePath
 		}
-		jarTask
+		return jarTaskProvider
 	}
 
-	Jar createJavadocJarTask() {
-		Javadoc javadocTask = project.tasks.findByName(namer.javadocTaskName)
+	TaskProvider<Jar> createJavadocJarTask() {
+		TaskProvider<Javadoc> javadocTask = project.tasks.named(namer.javadocTaskName)
 		if (javadocTask == null) {
 			javadocTask = createJavadocTask()
 		}
-		Jar javadocJarTask = createAndConfigureJarTask(namer.javadocJarTaskName, javadocTask.destinationDir, "javadoc")
-		javadocJarTask.dependsOn { javadocTask }
-		javadocJarTask
+		TaskProvider<Jar> javadocJarTaskProvider = createAndConfigureJarTask(
+				namer.javadocJarTaskName, javadocTask.get().destinationDir, "javadoc"
+		)
+		javadocJarTaskProvider.configure {
+			dependsOn(javadocTask)
+		}
+		javadocJarTaskProvider
 	}
 
-	Javadoc createJavadocTask() {
+	TaskProvider<Javadoc> createJavadocTask() {
 		File javadocsDir = getJavadocsDir()
-		Javadoc javadocTask = project.tasks.create(namer.javadocTaskName, Javadoc)
-		javadocTask.configure {
+		TaskProvider<Javadoc> javadocTaskProvider = project.tasks.register(namer.javadocTaskName, Javadoc)
+		javadocTaskProvider.configure {
 			source = sourceSet.allJava
 			classpath = sourceSet.output + sourceSet.compileClasspath
 			group = JavaBasePlugin.DOCUMENTATION_GROUP
 			description = "Generates Javadoc API documentation for the ${sourceSet.name} source code."
 			destinationDir = javadocsDir
 		}
-		javadocTask
+		javadocTaskProvider
 	}
 
 	private File getJavadocsDir() {
-		use(net.twilightcity.gradle.categories.ProjectCategory) {
+		use(ProjectCategory) {
 			new File(project.getJavaConvention().docsDir, "${sourceSet.name}Docs")
 		}
 	}

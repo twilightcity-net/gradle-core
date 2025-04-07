@@ -25,7 +25,7 @@ class PrintClasspathIntegrationSpecification extends AbstractPluginIntegrationSp
 		buildFile << """
 apply plugin: 'java'
 dependencies {
-    compile localGroovy()
+    implementation localGroovy()
 }
 task printClasspath(type: net.twilightcity.gradle.support.PrintClasspath)
         """
@@ -39,7 +39,7 @@ task printClasspath(type: net.twilightcity.gradle.support.PrintClasspath)
 		output =~ /main.runtimeClasspath/
 		output =~ /test.compileClasspath/
 		output =~ /test.runtimeClasspath/
-		output =~ /groovy-all.*jar/
+		output =~ /groovy-.*jar/
 	}
 
 	def "should filter source set by name"() {

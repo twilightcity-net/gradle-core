@@ -152,20 +152,20 @@ class ProjectDefaultsPluginSpecification extends AbstractPluginSpecification {
 		evaluateProject()
 
 		then:
-		jarTask.baseName == 'some-artifact'
+		jarTask.archiveBaseName.get() == 'some-artifact'
 
 		when:
-		jarTask.baseName = 'other-artifact'
+		jarTask.archiveBaseName.set('other-artifact')
 
 		then:
-		jarTask.baseName == 'other-artifact'
+		jarTask.archiveBaseName.get() == 'other-artifact'
 	}
 
 	def "getDefaultBaseNameForTask should use task baseName if project artifactId not defined"() {
 		given:
 		project = createProject() // re-create project since artifactId is set as part of setUp
 		Jar jarTask = project.tasks.create('jarTask', Jar)
-		jarTask.baseName = 'someName'
+		jarTask.archiveBaseName.set('someName')
 
 		when:
 		applyPlugin()
